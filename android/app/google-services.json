@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "553345211212",
+    "project_id": "mysyeapp",
+    "storage_bucket": "mysyeapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:553345211212:android:0bbb33d80cfa8c13040de9",
+        "android_client_info": {
+          "package_name": "com.example.sye_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXITXB_fchfa4pF8WQ9fTvvWocoTY3vgA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
