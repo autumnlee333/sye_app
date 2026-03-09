@@ -21,7 +21,8 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
 **Feature 1: Create a profile**
 
  1.1 **User Authentication**
-   - **Concept:** Establish a secure gateway using Firebase Auth, allowing users to create accounts and log in with email/password.
+   - **Concept:** Establish a secure gateway using Firebase Auth, allowing users to create accounts and log in with email/password
+                  and google authentication.
    - **Goal:** Implement an `AuthService` and `authProvider` to manage the user's session.
 
  1.2 **User Model**

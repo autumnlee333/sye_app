@@ -21,4 +21,6 @@
      I have removed the counter code from main.dart and the widget test. I will now run the tests to see if Firebase.initializeApp causes any failures and address them as needed.
      I've removed the counter code and I'm ready for the next task.
      The counter code has been removed from lib/main.dart and test/widget_test.dart. I've also simplified MyHomePage to a basic welcome screen.
-     
+
+* 3. read requirements.md and look at prompt 1.1. Implement this step. Don't jump ahead
+
