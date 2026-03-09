@@ -14,6 +14,7 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
 3. **Local Storage**: Use `shared_preferences` for local app state (e.g., theme toggles, onboarding status).
 4. **Database**: Use Firebase Firestore for persistent cloud data.
 5. **Stepwise Execution**: Only implement the specific step requested in the prompt. Do not jump ahead.
+6. **Test**: Generate a test widget in the test folder for each feature added. 
 
 ---
 
