@@ -8,8 +8,6 @@ final ThemeData lightTheme = ThemeData(
     onSecondary: Colors.black,
     surface: Colors.brown[50]!, // Tan as surface
     onSurface: Colors.black,
-    background: Colors.brown[50]!, // Tan as background
-    onBackground: Colors.black,
     error: Colors.red,
     onError: Colors.white,
   ),

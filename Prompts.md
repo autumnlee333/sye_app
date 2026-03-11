@@ -24,3 +24,17 @@
 
 * 3. read requirements.md and look at prompt 1.1. Implement this step. Don't jump ahead
 
+    Response :
+       
+        ✦ I have implemented Step 1.1: User Authentication.
+
+
+  Changes Made:
+   1. Created lib/services/auth_service.dart: Provides methods for signIn, signUp, signOut, and an authStateChanges stream using firebase_auth.
+   2. Created lib/providers/auth_provider.dart: Exports authServiceProvider and authProvider (a StreamProvider for tracking user session) using flutter_riverpod.
+   3. Cleaned up the project structure: Removed empty root-level directories (services, providers, models, screens, widgets) to align with the Flutter standard
+      and your project requirements.
+
+
+  I'm ready for Step 1.2: User Model. Shall I proceed?
+
