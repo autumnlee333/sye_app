@@ -1,13 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-
-
 class AuthService {
+  final FirebaseAuth _auth;
+  final GoogleSignIn _googleSignIn;
 
-  // connectors to firebase (main account system) and Google
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  AuthService({
+    FirebaseAuth? auth,
+    GoogleSignIn? googleSignIn,
+  })  : _auth = auth ?? FirebaseAuth.instance,
+        _googleSignIn = googleSignIn ?? GoogleSignIn.instance;
 
   // Stream of auth state changes
   Stream<User?> get authStateChanges => _auth.authStateChanges();
