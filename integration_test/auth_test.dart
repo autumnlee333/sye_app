@@ -6,7 +6,7 @@ import 'package:sye_app/firebase_options.dart';
 import 'package:sye_app/services/auth_service.dart';
 
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('Authentication Integration Test', () {
     testWidgets('Live Firebase Auth Test', (WidgetTester tester) async {
@@ -29,6 +29,7 @@ void main() {
                   const Text('Click buttons to test REAL Firebase:'),
                   const SizedBox(height: 20),
                   ElevatedButton(
+                    key: const Key('email_signup_button'),
                     onPressed: () async {
                       try {
                         final email = 'test_${DateTime.now().millisecondsSinceEpoch}@sye.com';
@@ -42,6 +43,7 @@ void main() {
                   ),
                   const SizedBox(height: 10),
                   ElevatedButton(
+                    key: const Key('google_signin_button'),
                     onPressed: () async {
                       try {
                         await authService.signInWithGoogle();
@@ -60,9 +62,14 @@ void main() {
       );
 
       // Keep the test alive so you can interact with the buttons
-      // This will stay open until you stop the process
+      // On web, we need to report data back to the driver
       await tester.pumpAndSettle();
+      
+      // We will wait for a long time to allow manual testing
       await Future.delayed(const Duration(minutes: 5));
+
+      // After 5 minutes, finish the test
+      binding.reportData = {'status': 'finished'};
     });
   });
 }
