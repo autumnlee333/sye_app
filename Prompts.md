@@ -55,13 +55,30 @@
        * Value equality (via freezed).
        * The copyWith functionality.
 
-* 5 Can you commit to Github with a comment of the changes made
+*  5 Can you commit to Github with a comment of the changes made
 
 Response: 
 ✦ Your changes have been successfully pushed to the remote repository. The project is now up to date with Requirement 1.2: User Model.
 
 
   Would you like to move on to Requirement 1.3: User Collection (Firestore)?
+
+  * 6 yes
+  Response:
+    ✦ I have implemented Requirement 1.3: User Collection (Firestore).
+
+
+  Summary of Implementation:
+   - UserService: Created a new service in lib/services/user_service.dart to handle Firestore operations (saveUser, getUser, and watchUser).
+   - Riverpod Providers: Added lib/providers/user_provider.dart which provides:
+     - userServiceProvider: For accessing the user service.
+     - currentUserDataProvider: A StreamProvider that reactively syncs the current user's profile data from Firestore whenever they are logged in.
+   - Unit Testing: Added test/services/user_service_test.dart to verify that the service correctly interacts with Firestore using mocks.
+
+
+  Requirement 1.3 is now complete and verified. Would you like to proceed with Requirement 1.4: Onboarding Screen?
+
+* 7: commit to github with a comment of changes made
 
 
 

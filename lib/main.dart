@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'theme.dart';
+import 'screens/verify_firestore_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,35 +25,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'SYE',
       theme: lightTheme,
-      home: const MyHomePage(title: 'SYE Home'),
-    );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Welcome to SYE',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            Text('Social Media for Books'),
-          ],
-        ),
-      ),
+      // Temporarily using the verification screen as home to verify Requirement 1.3
+      home: const VerifyFirestoreScreen(),
     );
   }
 }
