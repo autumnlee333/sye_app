@@ -19,6 +19,8 @@ void main() {
   });
 
   // A helper function to create a ProviderContainer with the mocked service
+  // MockAuthService pretends to be a real authentication service for testing
+  
   ProviderContainer makeProviderContainer(MockAuthService service) {
     final container = ProviderContainer(
       overrides: [

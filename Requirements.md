@@ -25,7 +25,7 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
                   and google authentication.
    - **Goal:** Implement an `AuthService` and `authProvider` to manage the user's session.
 
- [ ] 1.2 **User Model**
+ [x] 1.2 **User Model**
    - **Concept:** Define a structured Dart data class to represent the user's identity, interests (genres), and personal details consistently across the app.
    - **Goal:** Create a `UserModel` in `/models` with fields for `uid`, `displayName`, `bio`, `profilePicUrl`, and `favoriteGenres`.
 
