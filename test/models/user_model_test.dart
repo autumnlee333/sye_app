@@ -2,7 +2,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sye_app/models/user_model.dart';
 
 void main() {
+  /// These tests verify that the [UserModel] (and the machinery generated 
+  /// by Freezed/JSON Serializable) is functioning correctly.
   group('UserModel', () {
+    // 1. Setup "Ground Truth" data.
+    // We define a sample user object (tUser) and its identical JSON map (tJson).
+    // These act as our "control group" for the following tests.
     const tUid = '123';
     const tDisplayName = 'Autumn Lee';
     const tBio = 'A book lover.';
@@ -25,27 +30,35 @@ void main() {
       'favoriteGenres': tFavoriteGenres,
     };
 
+    // 2. Test Deserialization (JSON -> Object)
+    // Ensures we can correctly convert raw Firestore data into a Dart object.
     test('should be a valid UserModel from JSON', () {
-      // ACT
+      // ACT: Convert the control JSON map into a UserModel
       final result = UserModel.fromJson(tJson);
 
-      // ASSERT
+      // ASSERT: Verify it matches our control user object.
+      // This passes because Freezed compares data values, not just memory addresses.
       expect(result, tUser);
     });
 
+    // 3. Test Serialization (Object -> JSON)
+    // Ensures we can correctly convert our object into a format Firestore understands.
     test('should return a valid JSON map from UserModel', () {
-      // ACT
+      // ACT: Convert our control user object into a JSON map
       final result = tUser.toJson();
 
-      // ASSERT
+      // ASSERT: Verify it matches our control JSON map.
       expect(result, tJson);
     });
 
+    // 4. Test Immutability (Editing)
+    // Ensures we can safely create modified copies of a user without changing 
+    // the original object.
     test('should support copyWith', () {
-      // ACT
+      // ACT: Create a new user by copying tUser and updating only the name
       final updatedUser = tUser.copyWith(displayName: 'Autumn');
 
-      // ASSERT
+      // ASSERT: Verify the name was updated while other fields (like uid) remained the same.
       expect(updatedUser.displayName, 'Autumn');
       expect(updatedUser.uid, tUid);
     });

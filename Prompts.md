@@ -38,3 +38,32 @@
 
   I'm ready for Step 1.2: User Model. Shall I proceed?
 
+  * 4. Yes reread requirements.md and implement step 1.2
+
+    Response: 
+
+        I have implemented requirement 1.2: User Model.
+
+
+        Changes Made:
+        1. Dependencies: Added freezed, json_serializable, and build_runner to pubspec.yaml to comply with the architectural rules.
+        2. Model Implementation: Created lib/models/user_model.dart using the freezed package. The model includes all requested fields: uid, displayName, bio,
+      profilePicUrl, and favoriteGenres.
+         3. Code Generation: Ran build_runner to generate the serialization and value-equality logic (.freezed.dart and .g.dart files).
+        4. Verification: Created a unit test in test/models/user_model_test.dart to verify:
+       * JSON serialization/deserialization.
+       * Value equality (via freezed).
+       * The copyWith functionality.
+
+* 5 Can you commit to Github with a comment of the changes made
+
+Response: 
+✦ Your changes have been successfully pushed to the remote repository. The project is now up to date with Requirement 1.2: User Model.
+
+
+  Would you like to move on to Requirement 1.3: User Collection (Firestore)?
+
+
+
+
+

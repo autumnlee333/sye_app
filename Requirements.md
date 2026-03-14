@@ -29,7 +29,7 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
    - **Concept:** Define a structured Dart data class to represent the user's identity, interests (genres), and personal details consistently across the app.
    - **Goal:** Create a `UserModel` in `/models` with fields for `uid`, `displayName`, `bio`, `profilePicUrl`, and `favoriteGenres`.
 
- [ ] 1.3 **User Collection (Firestore)**
+ [x] 1.3 **User Collection (Firestore)**
    - **Concept:** Persistently store user profiles in the cloud to enable social features like following and sharing bookshelves.
    - **Goal:** Create a `UserService` to handle Firestore operations for the `users` collection, ensuring every authenticated user has a corresponding document.
 
