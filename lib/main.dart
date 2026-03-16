@@ -6,7 +6,7 @@ import 'firebase_options.dart';
 import 'theme.dart';
 import 'providers/storage_provider.dart';
 import 'services/storage_service.dart';
-import 'screens/onboarding_screen.dart';
+import 'screens/auth_wrapper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'SYE',
       theme: lightTheme,
-      home: const OnboardingScreen(),
+      home: const AuthWrapper(),
     );
   }
 }

@@ -37,7 +37,7 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
    - **Concept:** Create a welcoming first-time experience where users can personalize their profile (name, bio, genres) before entering the main feed.
    - **Goal:** Build a UI that captures user preferences and saves them to both Firestore and `shared_preferences` (to track onboarding completion).
 
- [ ] 1.5 **Auth Wrapper**
+ [x] 1.5 **Auth Wrapper**
    - **Concept:** Implement a state-aware entry point that automatically directs users to the correct screen based on their login and onboarding status.
    - **Goal:** Refactor `main.dart` to show the `LoginScreen`, `OnboardingScreen`, or `MainNavigation` (Feature 7) dynamically.
 
