@@ -148,6 +148,36 @@ Response:
   Are you ready to move on to Requirement 1.5: Auth Wrapper? This is the last step for the Profile feature!
 
   * 12. Commit changes to github with a message of updates added
+  Response: I will stage the updated test file and commit it with a message explaining the fix for the widget test.
+  Are you ready to jump into Requirement 1.5: Auth Wrapper now? This is the last part of your Profile feature—the smart routing system that decides where the user
+  should go based on their login and onboarding status.
+
+  * 13. Yes, lets move on to requirement 1.5
+   Response:Requirement 1.5 is now complete. I've implemented the Auth Wrapper, which serves as the "brain" for your app's navigation.
+
+
+  What I've implemented:
+   1. AuthWrapper Widget: Created a state-aware entry point in lib/screens/auth_wrapper.dart that listens to both your authentication status and local storage.
+   2. Placeholder Screens:
+       * LoginScreen: A functional UI for Email/Password and Google login.
+       * MainNavigation: A basic home screen with a logout button (placeholder for Feature 7).
+   3. Dynamic Routing:
+       * Not Logged In? Shows LoginScreen.
+       * Logged In + No Profile? Shows OnboardingScreen.
+       * Logged In + Profile Complete? Shows MainNavigation.
+   4. Integration: Refactored main.dart to use AuthWrapper as the home screen.
+   5. Testing: Added widget tests in test/screens/auth_wrapper_test.dart verifying all routing scenarios.
+
+
+  Feature 1: Create a profile is now 100% complete! All foundational requirements for user identity and authentication are finished.
+
+
+  Would you like to push these changes to GitHub, or are you ready to start Feature 2: Book Tracking & Discovery?
+
+  * 14. Yes, push changes to GitHub with a comment exaplining the changes made
+  Response:  I will stage all changes, commit them with a detailed message describing the implementation of the AuthWrapper and placeholder screens, and then push the commit
+  to the main branch on GitHub.
+
 
 
 

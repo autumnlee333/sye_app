@@ -15,7 +15,7 @@ class AuthWrapper extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
-    final storageService = ref.watch(storageServiceProvider);
+    final isComplete = ref.watch(onboardingCompleteProvider);
 
     return authState.when(
       data: (user) {
@@ -24,7 +24,6 @@ class AuthWrapper extends ConsumerWidget {
         }
 
         // User is authenticated, check if onboarding is complete
-        final isComplete = storageService.isOnboardingComplete();
         if (isComplete) {
           return const MainNavigation();
         } else {

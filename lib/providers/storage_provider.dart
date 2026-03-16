@@ -2,9 +2,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/storage_service.dart';
 
 /// Provider for the [StorageService].
-/// This provider is initially unimplemented and must be overridden in the
-/// [ProviderScope] within `main.dart` after the initialization of
-/// [SharedPreferences].
 final storageServiceProvider = Provider<StorageService>((ref) {
   throw UnimplementedError('storageServiceProvider must be overridden in ProviderScope');
 });
+
+/// A reactive provider that tracks whether the user has completed onboarding.
+final onboardingCompleteProvider = NotifierProvider<OnboardingNotifier, bool>(OnboardingNotifier.new);
+
+class OnboardingNotifier extends Notifier<bool> {
+  @override
+  bool build() {
+    final storageService = ref.watch(storageServiceProvider);
+    return storageService.isOnboardingComplete();
+  }
+
+  /// Sets the onboarding status and updates the state.
+  set state(bool value) => super.state = value;
+}

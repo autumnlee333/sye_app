@@ -64,15 +64,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
       // Save to local storage
       await ref.read(storageServiceProvider).setOnboardingComplete(true);
-
-      if (mounted) {
-        // Navigate or show success
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile created successfully!')),
-        );
-        // Requirement 1.5 will handle the automatic navigation.
-        // For now, we can pop or do nothing.
-      }
+      // Trigger the reactive provider to instantly switch screens
+      ref.read(onboardingCompleteProvider.notifier).state = true;
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
