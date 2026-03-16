@@ -80,6 +80,18 @@ Response:
 
 * 7: commit to github with a comment of changes made
 
+    Response: ✦ Your changes for Requirement 1.3: User Collection (Firestore) have been successfully pushed to GitHub.
+
+
+  Current Project Status:
+   - Feature 1.1: User Authentication (Complete)
+   - Feature 1.2: User Model (Complete)
+   - Feature 1.3: User Collection/Firestore (Complete)
+
+
+  Are you ready to move on to Requirement 1.4: Onboarding Screen? This will involve building the first piece of the user interface for capturing profile details
+  like name, bio, and favorite genres.
+
 
 
 

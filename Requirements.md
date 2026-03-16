@@ -33,7 +33,7 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
    - **Concept:** Persistently store user profiles in the cloud to enable social features like following and sharing bookshelves.
    - **Goal:** Create a `UserService` to handle Firestore operations for the `users` collection, ensuring every authenticated user has a corresponding document.
 
- [ ] 1.4 **Onboarding Screen**
+ [x] 1.4 **Onboarding Screen**
    - **Concept:** Create a welcoming first-time experience where users can personalize their profile (name, bio, genres) before entering the main feed.
    - **Goal:** Build a UI that captures user preferences and saves them to both Firestore and `shared_preferences` (to track onboarding completion).
 

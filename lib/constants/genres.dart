@@ -1,0 +1,18 @@
+const List<String> bookGenres = [
+  'Fiction',
+  'Non-Fiction',
+  'Fantasy',
+  'Sci-Fi',
+  'Mystery',
+  'Thriller',
+  'Romance',
+  'Historical',
+  'Biography',
+  'Self-Help',
+  'Classic',
+  'Horror',
+  'Adventure',
+  'Cooking',
+  'Art',
+  'Philosophy',
+];
