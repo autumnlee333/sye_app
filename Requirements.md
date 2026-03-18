@@ -18,6 +18,24 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
 
 ---
 
+**MainIdea**
+ 1. Core "Social" Loop (The MVP Heart)
+   * Book Search & Discovery: Integration with Google Books API so users can quickly find any book.
+   * The "Live Feed": An Instagram-style vertical feed where users see reviews from people they follow. Each "post" shows the book cover, a 5-star rating, and the user's
+     text review.
+   * The Review Board: A way for users to post, edit, and delete their own reviews (as you mentioned, these should persist).
+
+  2. Streamlined Tracking
+   * Simple Shelves: Instead of complex custom lists, start with three standard statuses: Want to Read, Reading, and Finished.
+   * Reading Progress: A simple way to log "I'm on page X of Y" which then generates an automated update in the social feed.
+
+  3. Personalized Profile
+   * The "Showcase": A profile section for a short bio and the user's "Top 5 All-Time Favorite Books" (to give it that personal touch immediately).
+   * Activity History: A clean list of the user's past reviews and reading milestones.
+
+  4. Basic Social Graph
+   * Follow/Unfollow: The ability to find other readers and follow them to populate your home feed.
+
 **Feature 1: Create a profile**
 
  [x] 1.1 **User Authentication**
@@ -41,6 +59,15 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
    - **Concept:** Implement a state-aware entry point that automatically directs users to the correct screen based on their login and onboarding status.
    - **Goal:** Refactor `main.dart` to show the `LoginScreen`, `OnboardingScreen`, or `MainNavigation` (Feature 7) dynamically.
 
+ [ ] 1.6 **Top Favorites Showcase**
+   - **Concept:** Allow users to personalize their profile by showcasing their "Top 5" all-time favorite books.
+   - **Goal:** Update `UserModel` and Profile UI to allow selecting and displaying 5 favorite books fetched from the Book API.
+
+  [ ] 1.7 **Home Screen**
+  - **Concept:** Have a hard coded homescreen with a way to link to their own profile screen switch between screens in app even if
+                  they are not completely updated
+  -**Goal:** Hardcode 'MainNavigation' to demonstrate the auth wrappers work
+
 
  **Feature 2: Book Tracking & Discovery**  
 
@@ -63,12 +90,12 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
 **Feature 3: Social Interactions**
 
  [ ] 3.1 **Book Reviews & Ratings**
-   - **Concept:** Empower users to share their literary opinions, helping the community discover quality reads through collective wisdom.
-   - **Goal:** Implement a 1–5 star rating system and text reviews stored in a top-level Firestore collection.
+   - **Concept:** Empower users to share their literary opinions via a persistent "Live Board" where reviews can be assigned a 1–5 star rating.
+   - **Goal:** Implement a 5-star rating system and text reviews that can be edited or deleted by the user.
 
- [ ] 3.2 **Activity Feed**
-   - **Concept:** Create a "living" home screen where users can see their friends' reading milestones in real-time, fostering a sense of community.
-   - **Goal:** Build a chronological feed showing updates like "Started reading" or "Rated [Book] 5 stars" from followed users.
+ [ ] 3.2 **Live Activity Feed**
+   - **Concept:** A "clean", Instagram-style vertical feed where users see their friends' reading milestones and reviews in real-time.
+   - **Goal:** Build a chronological feed showing updates like "Started reading" or "Rated [Book] 5 stars" with persistent posts.
 
  [ ] 3.3 **Follow System**
    - **Concept:** Build the social graph of the app, allowing readers to connect with others who share similar tastes.
@@ -76,19 +103,19 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
 
 **Feature 4: Community & Lists**
 
- [ ] 4.1 **Custom Book Lists**
-   - **Concept:** Allow users to curate and share themed collections, moving beyond basic bookshelves to creative storytelling.
-   - **Goal:** Enable users to create public or private themed lists (e.g., "Best Sci-Fi of 2024").
+ [ ] 4.1 **Custom & Shared Book Lists**
+   - **Concept:** Allow users to curate and share themed collections, including the ability to create "Shared Lists" between multiple users.
+   - **Goal:** Enable users to create public, private, or collaborative themed lists (e.g., "Best Sci-Fi of 2024").
 
- [ ] 4.2 **Reading Goals**
-   - **Concept:** Motivate users to read more by gamifying their progress through yearly challenges and visual milestones.
-   - **Goal:** Implement a yearly reading challenge with a visual progress bar on the profile.
+ [ ] 4.2 **Reading Goals & Gamification**
+   - **Concept:** Motivate users through yearly challenges, reading streaks, and unlockable badges that attach to their profile.
+   - **Goal:** Implement a yearly challenge progress bar and logic for "Streak" and "Goal reached" badges.
 
 **Feature 5: Privacy and Settings**
 
  [ ] 5.1 **Private Shelves**
    - **Concept:** Respect user privacy by giving them control over which parts of their library are public or "eyes-only."
-   - **Goal:** Option to make specific bookshelves private from other users.
+   - **Goal:** Option to make specific bookshelves or lists private from other users.
 
  [ ] 5.2 **Account Settings**
    - **Concept:** Provide essential tools for users to manage their identity and account security.
@@ -100,12 +127,18 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
 
 **Feature 6: Notifications**
 
- [ ] 6.1 **Push Notifications**
-   - **Concept:** Keep users engaged with the community by providing timely alerts for social interactions and book trends.
-   - **Goal:** Notify users of new followers, likes/comments on reviews, or trending books on their "Want to Read" list.
+ [ ] 6.1 **Push Notifications & Reminders**
+   - **Concept:** Keep users engaged with alerts for social interactions and inactivity reminders if they haven't opened the app in a while.
+   - **Goal:** Notify users of new followers/likes, and implement a "reminder to read" system for inactive users.
 
 **Feature 7: Navigation and Structure**
 
  [ ] 7.1 **Main App Layout**
-   - **Concept:** Establish a clear, intuitive hierarchy that makes all core features (Feed, Search, Library, Profile) easily accessible.
-   - **Goal:** Implement a `BottomNavigationBar` with four main tabs: Home, Search, My Library, and Profile.
+   - **Concept:** Establish a modern, "Instagram-like" hierarchy with a high-performance UI.
+   - **Goal:** Implement a `BottomNavigationBar` with four main tabs: Home (Feed), Search, My Library, and Profile.
+
+**Feature 8: Real-Time Communication**
+
+ [ ] 8.1 **User-to-User Chat**
+   - **Concept:** Foster community discussion through a direct messaging feature where readers can discuss books.
+   - **Goal:** Implement a real-time chat service using Firestore for private 1-on-1 messaging.
