@@ -17,5 +17,6 @@ class OnboardingNotifier extends Notifier<bool> {
   }
 
   /// Sets the onboarding status and updates the state.
+  @override
   set state(bool value) => super.state = value;
 }

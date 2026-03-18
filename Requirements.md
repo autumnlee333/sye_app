@@ -59,7 +59,7 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
    - **Concept:** Implement a state-aware entry point that automatically directs users to the correct screen based on their login and onboarding status.
    - **Goal:** Refactor `main.dart` to show the `LoginScreen`, `OnboardingScreen`, or `MainNavigation` (Feature 7) dynamically.
 
- [ ] 1.6 **Home Screen Navigation**
+ [x] 1.6 **Home Screen Navigation**
   - **Concept:** Build a modern, "Instagram-like" navigation structure to demonstrate the app's core flow.
   - **Goal:** Implement a hardcoded `MainNavigation` with a `BottomNavigationBar` to switch between Home, Search, Library, and Profile.
 

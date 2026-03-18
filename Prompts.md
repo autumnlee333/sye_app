@@ -178,6 +178,22 @@ Response:
   Response:  I will stage all changes, commit them with a detailed message describing the implementation of the AuthWrapper and placeholder screens, and then push the commit
   to the main branch on GitHub.
 
+  * 15. read requirement 1.6 and implement it
+  Response. ✦ Step 1.6 is complete! Your app now has a Bottom Navigation Bar with four tabs: Home (Feed), Search, Library, and Profile.
+
+
+   - Home: Placeholder for the live board.
+   - Search: Placeholder for the book search.
+   - Library: Placeholder for tracking.
+   - Profile: Displays your real Firestore Display Name and has a Sign Out button.
+
+
+  I used an IndexedStack for the body, which means the screens stay "alive" in the background and don't lose their scroll position when you switch between tabs.
+   Shall we move to Feature 2.1: Book Search Service? (This will turn that "Search" tab into a real working feature).
+
+* 16. Yes
+
+
 
 
 

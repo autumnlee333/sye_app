@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart';
 import '../providers/navigation_provider.dart';
 import '../providers/user_provider.dart';
+import '../providers/book_provider.dart';
+import '../widgets/book_card.dart';
 
 class MainNavigation extends ConsumerWidget {
   const MainNavigation({super.key});
@@ -13,7 +15,7 @@ class MainNavigation extends ConsumerWidget {
 
     final List<Widget> screens = [
       const _HomePlaceholder(),
-      const _SearchPlaceholder(),
+      const BookSearchTab(),
       const _LibraryPlaceholder(),
       const _ProfilePlaceholder(),
     ];
@@ -67,20 +69,74 @@ class _HomePlaceholder extends StatelessWidget {
   }
 }
 
-class _SearchPlaceholder extends StatelessWidget {
-  const _SearchPlaceholder();
+class BookSearchTab extends ConsumerStatefulWidget {
+  const BookSearchTab({super.key});
+
+  @override
+  ConsumerState<BookSearchTab> createState() => _BookSearchTabState();
+}
+
+class _BookSearchTabState extends ConsumerState<BookSearchTab> {
+  final _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearch() {
+    final query = _searchController.text.trim();
+    if (query.isNotEmpty) {
+      ref.read(bookSearchProvider.notifier).search(query);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.search, size: 64, color: Colors.grey),
-          SizedBox(height: 16),
-          Text('Book Search', style: TextStyle(fontSize: 20)),
-          Text('Search the Google Books API.'),
-        ],
-      ),
+    final searchResults = ref.watch(bookSearchProvider);
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: TextField(
+            controller: _searchController,
+            decoration: InputDecoration(
+              hintText: 'Search for books...',
+              prefixIcon: const Icon(Icons.search),
+              suffixIcon: IconButton(
+                icon: const Icon(Icons.send),
+                onPressed: _onSearch,
+              ),
+              border: const OutlineInputBorder(),
+            ),
+            onSubmitted: (_) => _onSearch(),
+          ),
+        ),
+        Expanded(
+          child: searchResults.when(
+            data: (books) {
+              if (books.isEmpty) {
+                return const Center(child: Text('Search for your next read!'));
+              }
+              return ListView.builder(
+                itemCount: books.length,
+                itemBuilder: (context, index) {
+                  return BookCard(
+                    book: books[index],
+                    onTap: () {
+                      // TODO: Navigate to Book Details
+                    },
+                  );
+                },
+              );
+            },
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, __) => Center(child: Text('Error: $e')),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -132,7 +188,7 @@ class _ProfilePlaceholder extends ConsumerWidget {
             label: const Text('Sign Out'),
             style: ElevatedButton.styleFrom(
               foregroundColor: Colors.red,
-              backgroundColor: Colors.red.withOpacity(0.1),
+              backgroundColor: Colors.red.withValues(alpha: 0.1),
             ),
           ),
         ],
