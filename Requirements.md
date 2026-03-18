@@ -59,14 +59,9 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
    - **Concept:** Implement a state-aware entry point that automatically directs users to the correct screen based on their login and onboarding status.
    - **Goal:** Refactor `main.dart` to show the `LoginScreen`, `OnboardingScreen`, or `MainNavigation` (Feature 7) dynamically.
 
- [ ] 1.6 **Top Favorites Showcase**
-   - **Concept:** Allow users to personalize their profile by showcasing their "Top 5" all-time favorite books.
-   - **Goal:** Update `UserModel` and Profile UI to allow selecting and displaying 5 favorite books fetched from the Book API.
-
-  [ ] 1.7 **Home Screen**
-  - **Concept:** Have a hard coded homescreen with a way to link to their own profile screen switch between screens in app even if
-                  they are not completely updated
-  -**Goal:** Hardcode 'MainNavigation' to demonstrate the auth wrappers work
+ [ ] 1.6 **Home Screen Navigation**
+  - **Concept:** Build a modern, "Instagram-like" navigation structure to demonstrate the app's core flow.
+  - **Goal:** Implement a hardcoded `MainNavigation` with a `BottomNavigationBar` to switch between Home, Search, Library, and Profile.
 
 
  **Feature 2: Book Tracking & Discovery**  
@@ -75,15 +70,19 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
    - **Concept:** Bridge the app with a global library (Google Books API) to provide users with a vast database of books to explore and track.
    - **Goal:** Integrate with a Book API to allow users to search for books by title, author, or ISBN. Create a `BookModel` in `/models`.
 
- [ ] 2.2 **Personal Bookshelves**
+ [ ] 2.2 **Top Favorites Showcase**
+   - **Concept:** Allow users to personalize their profile by showcasing their "Top 5" all-time favorite books.
+   - **Goal:** Update `UserModel` and Profile UI to allow selecting and displaying 5 favorite books fetched from the Book API.
+
+ [ ] 2.3 **Personal Bookshelves**
    - **Concept:** Create a digital representation of a physical library, allowing users to organize their past, present, and future reads.
    - **Goal:** Implement reading status tracking: "Want to Read", "Currently Reading", and "Finished" using Firestore sub-collections.
 
- [ ] 2.3 **Reading Progress Updates**
+ [ ] 2.4 **Reading Progress Updates**
    - **Concept:** Turn reading into a dynamic activity by allowing users to log their journey, creating a history of their engagement with a book.
    - **Goal:** Allow users to update page numbers/percentages and store a history of these updates for the activity feed.
 
- [ ] 2.4 **Genre Recommendations**
+ [ ] 2.5 **Genre Recommendations**
    - **Concept:** Personalize the discovery experience by surfacing books that align with a user's unique reading DNA.
    - **Goal:** Suggest books based on "Favorite genres" from onboarding and past reading history.
 
