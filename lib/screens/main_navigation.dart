@@ -87,9 +87,7 @@ class _BookSearchTabState extends ConsumerState<BookSearchTab> {
 
   void _onSearch() {
     final query = _searchController.text.trim();
-    if (query.isNotEmpty) {
-      ref.read(bookSearchProvider.notifier).search(query);
-    }
+    ref.read(bookSearchProvider.notifier).search(query);
   }
 
   @override
@@ -103,22 +101,50 @@ class _BookSearchTabState extends ConsumerState<BookSearchTab> {
           child: TextField(
             controller: _searchController,
             decoration: InputDecoration(
-              hintText: 'Search for books...',
+              hintText: 'Search for books, authors, or ISBN...',
               prefixIcon: const Icon(Icons.search),
               suffixIcon: IconButton(
-                icon: const Icon(Icons.send),
-                onPressed: _onSearch,
+                icon: const Icon(Icons.clear),
+                onPressed: () {
+                  _searchController.clear();
+                  ref.read(bookSearchProvider.notifier).search('');
+                },
               ),
-              border: const OutlineInputBorder(),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              filled: true,
+              fillColor: Colors.grey[100],
             ),
             onSubmitted: (_) => _onSearch(),
+            textInputAction: TextInputAction.search,
           ),
         ),
         Expanded(
           child: searchResults.when(
             data: (books) {
               if (books.isEmpty) {
-                return const Center(child: Text('Search for your next read!'));
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        _searchController.text.isEmpty
+                            ? Icons.search
+                            : Icons.search_off,
+                        size: 64,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        _searchController.text.isEmpty
+                            ? 'Search for your next great read!'
+                            : 'No books found.',
+                        style: const TextStyle(color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                );
               }
               return ListView.builder(
                 itemCount: books.length,
@@ -133,7 +159,12 @@ class _BookSearchTabState extends ConsumerState<BookSearchTab> {
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, __) => Center(child: Text('Error: $e')),
+            error: (e, __) => Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Text('Error: $e', textAlign: TextAlign.center),
+              ),
+            ),
           ),
         ),
       ],
