@@ -66,7 +66,7 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
 
  **Feature 2: Book Tracking & Discovery**  
 
- [ ] 2.1 **Book Search Service**
+ [x] 2.1 **Book Search Service**
    - **Concept:** Bridge the app with a global library (Google Books API) to provide users with a vast database of books to explore and track.
    - **Goal:** Integrate with a Book API to allow users to search for books by title, author, or ISBN. Create a `BookModel` in `/models`.
 

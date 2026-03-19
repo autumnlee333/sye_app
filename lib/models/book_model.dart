@@ -20,3 +20,4 @@ abstract class BookModel with _$BookModel {
 
   factory BookModel.fromJson(Map<String, dynamic> json) => _$BookModelFromJson(json);
 }
+
