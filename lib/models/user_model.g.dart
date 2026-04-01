@@ -14,6 +14,11 @@ _UserModel _$UserModelFromJson(Map<String, dynamic> json) => _UserModel(
   favoriteGenres: (json['favoriteGenres'] as List<dynamic>)
       .map((e) => e as String)
       .toList(),
+  topFavoriteBookIds:
+      (json['topFavoriteBookIds'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
 );
 
 Map<String, dynamic> _$UserModelToJson(_UserModel instance) =>
@@ -23,4 +28,5 @@ Map<String, dynamic> _$UserModelToJson(_UserModel instance) =>
       'bio': instance.bio,
       'profilePicUrl': instance.profilePicUrl,
       'favoriteGenres': instance.favoriteGenres,
+      'topFavoriteBookIds': instance.topFavoriteBookIds,
     };

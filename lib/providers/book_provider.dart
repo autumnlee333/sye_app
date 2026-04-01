@@ -33,3 +33,13 @@ class BookSearchNotifier extends AsyncNotifier<List<BookModel>> {
 final bookSearchProvider = AsyncNotifierProvider.autoDispose<BookSearchNotifier, List<BookModel>>(
   BookSearchNotifier.new,
 );
+
+/// Provider to fetch details for multiple books by their IDs.
+final bookDetailsProvider = FutureProvider.family<List<BookModel>, List<String>>((ref, ids) async {
+  if (ids.isEmpty) return [];
+  final bookService = ref.read(bookServiceProvider);
+  final futures = ids.map((id) => bookService.getBookById(id));
+  final results = await Future.wait(futures);
+  return results.whereType<BookModel>().toList();
+});
+

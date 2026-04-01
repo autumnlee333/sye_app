@@ -4,30 +4,45 @@ import '../models/book_model.dart';
 
 class BookService {
   final http.Client _client;
+  static const String _apiKey = 'AIzaSyDVAYZUuURl6ez3JXSea__Qzs4xLHYCJY4';
+  static const String _baseUrl = 'https://www.googleapis.com/books/v1/volumes';
 
   BookService({http.Client? client}) : _client = client ?? http.Client();
-
-  static const String _baseUrl = 'https://www.googleapis.com/books/v1/volumes';
 
   /// Searches for books using the Google Books API.
   Future<List<BookModel>> searchBooks(String query) async {
     if (query.isEmpty) return [];
 
     try {
-      final response = await _client.get(
-        Uri.parse('$_baseUrl?q=${Uri.encodeComponent(query)}&maxResults=20'),
-      );
+      final url = Uri.parse('$_baseUrl?q=${Uri.encodeComponent(query)}&maxResults=20&key=$_apiKey');
+      final response = await _client.get(url);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final List<dynamic> items = data['items'] ?? [];
 
         return items.map((item) => _parseBook(item)).toList();
+      } else if (response.statusCode == 429) {
+        throw Exception('Too many requests. Please wait a moment.');
       } else {
         throw Exception('Failed to load books: ${response.statusCode}');
       }
     } catch (e) {
       throw Exception('Error searching books: $e');
+    }
+  }
+
+  /// Fetches a single book by its ID.
+  Future<BookModel?> getBookById(String id) async {
+    try {
+      final url = Uri.parse('$_baseUrl/$id?key=$_apiKey');
+      final response = await _client.get(url);
+      if (response.statusCode == 200) {
+        return _parseBook(json.decode(response.body));
+      }
+      return null;
+    } catch (e) {
+      return null;
     }
   }
 
@@ -56,3 +71,4 @@ class BookService {
     );
   }
 }
+

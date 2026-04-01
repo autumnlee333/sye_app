@@ -38,6 +38,7 @@ void main() {
 
   testWidgets('AuthWrapper shows OnboardingScreen when authenticated but onboarding not complete', (WidgetTester tester) async {
     final mockUser = MockUser();
+    when(() => mockUser.uid).thenReturn('123');
     when(() => mockStorageService.isOnboardingComplete()).thenReturn(false);
 
     await tester.pumpWidget(
@@ -51,11 +52,13 @@ void main() {
     );
 
     await tester.pump(); // Handle stream
+    await tester.pump(); // Handle user profile stream
     expect(find.byType(OnboardingScreen), findsOneWidget);
   });
 
   testWidgets('AuthWrapper shows MainNavigation when authenticated and onboarding complete', (WidgetTester tester) async {
     final mockUser = MockUser();
+    when(() => mockUser.uid).thenReturn('123');
     when(() => mockStorageService.isOnboardingComplete()).thenReturn(true);
 
     await tester.pumpWidget(
@@ -69,6 +72,7 @@ void main() {
     );
 
     await tester.pump(); // Handle stream
+    await tester.pump(); // Handle user profile stream
     expect(find.byType(MainNavigation), findsOneWidget);
   });
 }

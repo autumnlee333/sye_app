@@ -1,10 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/auth_provider.dart';
 import '../providers/navigation_provider.dart';
-import '../providers/user_provider.dart';
 import '../providers/book_provider.dart';
 import '../widgets/book_card.dart';
+import 'profile_screen.dart';
 
 class MainNavigation extends ConsumerWidget {
   const MainNavigation({super.key});
@@ -17,7 +17,7 @@ class MainNavigation extends ConsumerWidget {
       const _HomePlaceholder(),
       const BookSearchTab(),
       const _LibraryPlaceholder(),
-      const _ProfilePlaceholder(),
+      const ProfileScreen(),
     ];
 
     final List<String> titles = [
@@ -78,16 +78,22 @@ class BookSearchTab extends ConsumerStatefulWidget {
 
 class _BookSearchTabState extends ConsumerState<BookSearchTab> {
   final _searchController = TextEditingController();
+  Timer? _debounce;
 
   @override
   void dispose() {
     _searchController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
-  void _onSearch() {
-    final query = _searchController.text.trim();
-    ref.read(bookSearchProvider.notifier).search(query);
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        ref.read(bookSearchProvider.notifier).search(query.trim());
+      }
+    });
   }
 
   @override
@@ -116,7 +122,7 @@ class _BookSearchTabState extends ConsumerState<BookSearchTab> {
               filled: true,
               fillColor: Colors.grey[100],
             ),
-            onSubmitted: (_) => _onSearch(),
+            onChanged: _onSearchChanged,
             textInputAction: TextInputAction.search,
           ),
         ),
@@ -162,7 +168,23 @@ class _BookSearchTabState extends ConsumerState<BookSearchTab> {
             error: (e, __) => Center(
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
-                child: Text('Error: $e', textAlign: TextAlign.center),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                    const SizedBox(height: 16),
+                    Text(
+                      e.toString().replaceFirst('Exception: ', '').replaceFirst('Error searching books: ', ''),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () => ref.read(bookSearchProvider.notifier).search(_searchController.text.trim()),
+                      child: const Text('Try Again'),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -184,44 +206,6 @@ class _LibraryPlaceholder extends StatelessWidget {
           SizedBox(height: 16),
           Text('My Library', style: TextStyle(fontSize: 20)),
           Text('Your shelves and reading progress.'),
-        ],
-      ),
-    );
-  }
-}
-
-class _ProfilePlaceholder extends ConsumerWidget {
-  const _ProfilePlaceholder();
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final userProfile = ref.watch(currentUserDataProvider);
-
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.account_circle, size: 80, color: Colors.grey),
-          const SizedBox(height: 16),
-          userProfile.when(
-            data: (user) => Text(
-              user?.displayName ?? 'Reader',
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            loading: () => const CircularProgressIndicator(),
-            error: (_, __) => const Text('Error loading profile'),
-          ),
-          const SizedBox(height: 8),
-          const Text('Member since 2026'),
-          const SizedBox(height: 32),
-          ElevatedButton.icon(
-            onPressed: () => ref.read(authServiceProvider).signOut(),
-            icon: const Icon(Icons.logout),
-            label: const Text('Sign Out'),
-            style: ElevatedButton.styleFrom(
-              foregroundColor: Colors.red,
-              backgroundColor: Colors.red.withValues(alpha: 0.1),
-            ),
-          ),
         ],
       ),
     );

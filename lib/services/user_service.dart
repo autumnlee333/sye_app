@@ -20,6 +20,17 @@ class UserService {
     }
   }
 
+  /// Updates only the favorite book IDs for a user.
+  Future<void> updateFavoriteBooks(String uid, List<String> bookIds) async {
+    try {
+      await _usersCollection.doc(uid).update({
+        'topFavoriteBookIds': bookIds,
+      });
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   /// Retrieves a user's data from Firestore by their UID.
   Future<UserModel?> getUser(String uid) async {
     try {

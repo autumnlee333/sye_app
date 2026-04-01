@@ -70,7 +70,7 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
    - **Concept:** Bridge the app with a global library (Google Books API) to provide users with a vast database of books to explore and track.
    - **Goal:** Integrate with a Book API to allow users to search for books by title, author, or ISBN. Create a `BookModel` in `/models`.
 
- [ ] 2.2 **Top Favorites Showcase**
+ [x] 2.2 **Top Favorites Showcase**
    - **Concept:** Allow users to personalize their profile by showcasing their "Top 5" all-time favorite books.
    - **Goal:** Update `UserModel` and Profile UI to allow selecting and displaying 5 favorite books fetched from the Book API.
 

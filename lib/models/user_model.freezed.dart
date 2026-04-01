@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UserModel {
 
- String get uid; String get displayName; String get bio; String get profilePicUrl; List<String> get favoriteGenres;
+ String get uid; String get displayName; String get bio; String get profilePicUrl; List<String> get favoriteGenres; List<String> get topFavoriteBookIds;
 /// Create a copy of UserModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $UserModelCopyWith<UserModel> get copyWith => _$UserModelCopyWithImpl<UserModel>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.profilePicUrl, profilePicUrl) || other.profilePicUrl == profilePicUrl)&&const DeepCollectionEquality().equals(other.favoriteGenres, favoriteGenres));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.profilePicUrl, profilePicUrl) || other.profilePicUrl == profilePicUrl)&&const DeepCollectionEquality().equals(other.favoriteGenres, favoriteGenres)&&const DeepCollectionEquality().equals(other.topFavoriteBookIds, topFavoriteBookIds));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,uid,displayName,bio,profilePicUrl,const DeepCollectionEquality().hash(favoriteGenres));
+int get hashCode => Object.hash(runtimeType,uid,displayName,bio,profilePicUrl,const DeepCollectionEquality().hash(favoriteGenres),const DeepCollectionEquality().hash(topFavoriteBookIds));
 
 @override
 String toString() {
-  return 'UserModel(uid: $uid, displayName: $displayName, bio: $bio, profilePicUrl: $profilePicUrl, favoriteGenres: $favoriteGenres)';
+  return 'UserModel(uid: $uid, displayName: $displayName, bio: $bio, profilePicUrl: $profilePicUrl, favoriteGenres: $favoriteGenres, topFavoriteBookIds: $topFavoriteBookIds)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $UserModelCopyWith<$Res>  {
   factory $UserModelCopyWith(UserModel value, $Res Function(UserModel) _then) = _$UserModelCopyWithImpl;
 @useResult
 $Res call({
- String uid, String displayName, String bio, String profilePicUrl, List<String> favoriteGenres
+ String uid, String displayName, String bio, String profilePicUrl, List<String> favoriteGenres, List<String> topFavoriteBookIds
 });
 
 
@@ -65,13 +65,14 @@ class _$UserModelCopyWithImpl<$Res>
 
 /// Create a copy of UserModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? uid = null,Object? displayName = null,Object? bio = null,Object? profilePicUrl = null,Object? favoriteGenres = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? uid = null,Object? displayName = null,Object? bio = null,Object? profilePicUrl = null,Object? favoriteGenres = null,Object? topFavoriteBookIds = null,}) {
   return _then(_self.copyWith(
 uid: null == uid ? _self.uid : uid // ignore: cast_nullable_to_non_nullable
 as String,displayName: null == displayName ? _self.displayName : displayName // ignore: cast_nullable_to_non_nullable
 as String,bio: null == bio ? _self.bio : bio // ignore: cast_nullable_to_non_nullable
 as String,profilePicUrl: null == profilePicUrl ? _self.profilePicUrl : profilePicUrl // ignore: cast_nullable_to_non_nullable
 as String,favoriteGenres: null == favoriteGenres ? _self.favoriteGenres : favoriteGenres // ignore: cast_nullable_to_non_nullable
+as List<String>,topFavoriteBookIds: null == topFavoriteBookIds ? _self.topFavoriteBookIds : topFavoriteBookIds // ignore: cast_nullable_to_non_nullable
 as List<String>,
   ));
 }
@@ -157,10 +158,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String uid,  String displayName,  String bio,  String profilePicUrl,  List<String> favoriteGenres)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String uid,  String displayName,  String bio,  String profilePicUrl,  List<String> favoriteGenres,  List<String> topFavoriteBookIds)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserModel() when $default != null:
-return $default(_that.uid,_that.displayName,_that.bio,_that.profilePicUrl,_that.favoriteGenres);case _:
+return $default(_that.uid,_that.displayName,_that.bio,_that.profilePicUrl,_that.favoriteGenres,_that.topFavoriteBookIds);case _:
   return orElse();
 
 }
@@ -178,10 +179,10 @@ return $default(_that.uid,_that.displayName,_that.bio,_that.profilePicUrl,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String uid,  String displayName,  String bio,  String profilePicUrl,  List<String> favoriteGenres)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String uid,  String displayName,  String bio,  String profilePicUrl,  List<String> favoriteGenres,  List<String> topFavoriteBookIds)  $default,) {final _that = this;
 switch (_that) {
 case _UserModel():
-return $default(_that.uid,_that.displayName,_that.bio,_that.profilePicUrl,_that.favoriteGenres);case _:
+return $default(_that.uid,_that.displayName,_that.bio,_that.profilePicUrl,_that.favoriteGenres,_that.topFavoriteBookIds);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -198,10 +199,10 @@ return $default(_that.uid,_that.displayName,_that.bio,_that.profilePicUrl,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String uid,  String displayName,  String bio,  String profilePicUrl,  List<String> favoriteGenres)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String uid,  String displayName,  String bio,  String profilePicUrl,  List<String> favoriteGenres,  List<String> topFavoriteBookIds)?  $default,) {final _that = this;
 switch (_that) {
 case _UserModel() when $default != null:
-return $default(_that.uid,_that.displayName,_that.bio,_that.profilePicUrl,_that.favoriteGenres);case _:
+return $default(_that.uid,_that.displayName,_that.bio,_that.profilePicUrl,_that.favoriteGenres,_that.topFavoriteBookIds);case _:
   return null;
 
 }
@@ -213,7 +214,7 @@ return $default(_that.uid,_that.displayName,_that.bio,_that.profilePicUrl,_that.
 @JsonSerializable()
 
 class _UserModel implements UserModel {
-  const _UserModel({required this.uid, required this.displayName, required this.bio, required this.profilePicUrl, required final  List<String> favoriteGenres}): _favoriteGenres = favoriteGenres;
+  const _UserModel({required this.uid, required this.displayName, required this.bio, required this.profilePicUrl, required final  List<String> favoriteGenres, final  List<String> topFavoriteBookIds = const []}): _favoriteGenres = favoriteGenres,_topFavoriteBookIds = topFavoriteBookIds;
   factory _UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
 
 @override final  String uid;
@@ -225,6 +226,13 @@ class _UserModel implements UserModel {
   if (_favoriteGenres is EqualUnmodifiableListView) return _favoriteGenres;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_favoriteGenres);
+}
+
+ final  List<String> _topFavoriteBookIds;
+@override@JsonKey() List<String> get topFavoriteBookIds {
+  if (_topFavoriteBookIds is EqualUnmodifiableListView) return _topFavoriteBookIds;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_topFavoriteBookIds);
 }
 
 
@@ -241,16 +249,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.profilePicUrl, profilePicUrl) || other.profilePicUrl == profilePicUrl)&&const DeepCollectionEquality().equals(other._favoriteGenres, _favoriteGenres));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.profilePicUrl, profilePicUrl) || other.profilePicUrl == profilePicUrl)&&const DeepCollectionEquality().equals(other._favoriteGenres, _favoriteGenres)&&const DeepCollectionEquality().equals(other._topFavoriteBookIds, _topFavoriteBookIds));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,uid,displayName,bio,profilePicUrl,const DeepCollectionEquality().hash(_favoriteGenres));
+int get hashCode => Object.hash(runtimeType,uid,displayName,bio,profilePicUrl,const DeepCollectionEquality().hash(_favoriteGenres),const DeepCollectionEquality().hash(_topFavoriteBookIds));
 
 @override
 String toString() {
-  return 'UserModel(uid: $uid, displayName: $displayName, bio: $bio, profilePicUrl: $profilePicUrl, favoriteGenres: $favoriteGenres)';
+  return 'UserModel(uid: $uid, displayName: $displayName, bio: $bio, profilePicUrl: $profilePicUrl, favoriteGenres: $favoriteGenres, topFavoriteBookIds: $topFavoriteBookIds)';
 }
 
 
@@ -261,7 +269,7 @@ abstract mixin class _$UserModelCopyWith<$Res> implements $UserModelCopyWith<$Re
   factory _$UserModelCopyWith(_UserModel value, $Res Function(_UserModel) _then) = __$UserModelCopyWithImpl;
 @override @useResult
 $Res call({
- String uid, String displayName, String bio, String profilePicUrl, List<String> favoriteGenres
+ String uid, String displayName, String bio, String profilePicUrl, List<String> favoriteGenres, List<String> topFavoriteBookIds
 });
 
 
@@ -278,13 +286,14 @@ class __$UserModelCopyWithImpl<$Res>
 
 /// Create a copy of UserModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? uid = null,Object? displayName = null,Object? bio = null,Object? profilePicUrl = null,Object? favoriteGenres = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? uid = null,Object? displayName = null,Object? bio = null,Object? profilePicUrl = null,Object? favoriteGenres = null,Object? topFavoriteBookIds = null,}) {
   return _then(_UserModel(
 uid: null == uid ? _self.uid : uid // ignore: cast_nullable_to_non_nullable
 as String,displayName: null == displayName ? _self.displayName : displayName // ignore: cast_nullable_to_non_nullable
 as String,bio: null == bio ? _self.bio : bio // ignore: cast_nullable_to_non_nullable
 as String,profilePicUrl: null == profilePicUrl ? _self.profilePicUrl : profilePicUrl // ignore: cast_nullable_to_non_nullable
 as String,favoriteGenres: null == favoriteGenres ? _self._favoriteGenres : favoriteGenres // ignore: cast_nullable_to_non_nullable
+as List<String>,topFavoriteBookIds: null == topFavoriteBookIds ? _self._topFavoriteBookIds : topFavoriteBookIds // ignore: cast_nullable_to_non_nullable
 as List<String>,
   ));
 }

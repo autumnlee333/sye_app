@@ -28,6 +28,7 @@ void main() {
       'bio': tBio,
       'profilePicUrl': tProfilePicUrl,
       'favoriteGenres': tFavoriteGenres,
+      'topFavoriteBookIds': <String>[],
     };
 
     // 2. Test Deserialization (JSON -> Object)
