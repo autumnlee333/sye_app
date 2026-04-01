@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/navigation_provider.dart';
 import '../providers/book_provider.dart';
+import '../providers/library_provider.dart';
+import '../models/library_book_model.dart';
 import '../widgets/book_card.dart';
 import 'profile_screen.dart';
+import 'library_screen.dart';
 
 class MainNavigation extends ConsumerWidget {
   const MainNavigation({super.key});
@@ -16,7 +19,7 @@ class MainNavigation extends ConsumerWidget {
     final List<Widget> screens = [
       const _HomePlaceholder(),
       const BookSearchTab(),
-      const _LibraryPlaceholder(),
+      const LibraryScreen(),
       const ProfileScreen(),
     ];
 
@@ -28,10 +31,12 @@ class MainNavigation extends ConsumerWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(titles[currentIndex]),
-        centerTitle: true,
-      ),
+      appBar: currentIndex != 2 // LibraryScreen has its own AppBar with tabs
+          ? AppBar(
+              title: Text(titles[currentIndex]),
+              centerTitle: true,
+            )
+          : null,
       body: IndexedStack(
         index: currentIndex,
         children: screens,
@@ -155,17 +160,38 @@ class _BookSearchTabState extends ConsumerState<BookSearchTab> {
               return ListView.builder(
                 itemCount: books.length,
                 itemBuilder: (context, index) {
+                  final book = books[index];
                   return BookCard(
-                    book: books[index],
+                    title: book.title,
+                    authors: book.authors,
+                    thumbnailUrl: book.thumbnailUrl,
+                    averageRating: book.averageRating,
+                    categories: book.categories,
                     onTap: () {
                       // TODO: Navigate to Book Details
                     },
+                    trailing: PopupMenuButton<ReadingStatus>(
+                      icon: const Icon(Icons.library_add, color: Colors.blue),
+                      tooltip: 'Add to Library',
+                      onSelected: (status) {
+                        ref.read(libraryActionProvider.notifier).addBook(book, status);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Added to ${status.label}')),
+                        );
+                      },
+                      itemBuilder: (context) => ReadingStatus.values.map((status) {
+                        return PopupMenuItem(
+                          value: status,
+                          child: Text(status.label),
+                        );
+                      }).toList(),
+                    ),
                   );
                 },
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, __) => Center(
+            error: (e, _) => Center(
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
@@ -190,24 +216,6 @@ class _BookSearchTabState extends ConsumerState<BookSearchTab> {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _LibraryPlaceholder extends StatelessWidget {
-  const _LibraryPlaceholder();
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.collections_bookmark, size: 64, color: Colors.grey),
-          SizedBox(height: 16),
-          Text('My Library', style: TextStyle(fontSize: 20)),
-          Text('Your shelves and reading progress.'),
-        ],
-      ),
     );
   }
 }

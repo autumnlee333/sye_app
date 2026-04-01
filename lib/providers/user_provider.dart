@@ -8,8 +8,8 @@ final userServiceProvider = Provider<UserService>((ref) {
   return UserService();
 });
 
-// StreamProvider that watches the CURRENT user's Firestore document
-// based on their Firebase Auth UID.
+// Provider for getting current user's full profile from Firestore
+// watches the uid from auth provider and fetches the doc
 final currentUserDataProvider = StreamProvider<UserModel?>((ref) {
   final authState = ref.watch(authProvider);
   final userService = ref.watch(userServiceProvider);
@@ -21,6 +21,7 @@ final currentUserDataProvider = StreamProvider<UserModel?>((ref) {
       return userService.watchUser(user.uid);
     },
     loading: () => const Stream.empty(),
-    error: (_, __) => Stream.value(null),
+    error: (_, _) => Stream.value(null),
   );
 });
+

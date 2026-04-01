@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
-import '../models/book_model.dart';
 
 class BookCard extends StatelessWidget {
-  final BookModel book;
+  final String title;
+  final List<String> authors;
+  final String? thumbnailUrl;
+  final double? averageRating;
+  final List<String> categories;
   final VoidCallback? onTap;
   final Widget? trailing;
 
   const BookCard({
     super.key,
-    required this.book,
+    required this.title,
+    required this.authors,
+    this.thumbnailUrl,
+    this.averageRating,
+    this.categories = const [],
     this.onTap,
     this.trailing,
   });
@@ -35,9 +42,9 @@ class BookCard extends StatelessWidget {
                   width: 80,
                   height: 120,
                   color: Colors.grey[200],
-                  child: this.book.thumbnailUrl != null
+                  child: thumbnailUrl != null
                       ? Image.network(
-                          this.book.thumbnailUrl!,
+                          thumbnailUrl!,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) =>
                               const Icon(Icons.book, size: 40, color: Colors.grey),
@@ -52,7 +59,7 @@ class BookCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      this.book.title,
+                      title,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -62,8 +69,8 @@ class BookCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      this.book.authors.isNotEmpty
-                          ? this.book.authors.join(', ')
+                      authors.isNotEmpty
+                          ? authors.join(', ')
                           : 'Unknown Author',
                       style: TextStyle(
                         fontSize: 14,
@@ -73,13 +80,13 @@ class BookCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 8),
-                    if (this.book.averageRating != null)
+                    if (averageRating != null)
                       Row(
                         children: [
                           const Icon(Icons.star, size: 16, color: Colors.amber),
                           const SizedBox(width: 4),
                           Text(
-                            this.book.averageRating!.toString(),
+                            averageRating!.toString(),
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
@@ -88,7 +95,7 @@ class BookCard extends StatelessWidget {
                         ],
                       ),
                     const SizedBox(height: 8),
-                    if (this.book.categories.isNotEmpty)
+                    if (categories.isNotEmpty)
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
@@ -99,7 +106,7 @@ class BookCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          this.book.categories.first,
+                          categories.first,
                           style: TextStyle(
                             fontSize: 12,
                             color: Theme.of(context).colorScheme.primary,

@@ -81,7 +81,14 @@ class ProfileScreen extends ConsumerWidget {
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: books.length,
                         itemBuilder: (context, index) {
-                          return BookCard(book: books[index]);
+                          final book = books[index];
+                          return BookCard(
+                            title: book.title,
+                            authors: book.authors,
+                            thumbnailUrl: book.thumbnailUrl,
+                            averageRating: book.averageRating,
+                            categories: book.categories,
+                          );
                         },
                       ),
                       loading: () => const Center(
@@ -90,7 +97,7 @@ class ProfileScreen extends ConsumerWidget {
                           child: CircularProgressIndicator(),
                         ),
                       ),
-                      error: (e, __) => Center(
+                      error: (e, _) => Center(
                         child: Padding(
                           padding: const EdgeInsets.all(32.0),
                           child: Text('Error loading books: $e'),
@@ -113,7 +120,7 @@ class ProfileScreen extends ConsumerWidget {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, __) => Center(child: Text('Error: $e')),
+      error: (e, _) => Center(child: Text('Error: $e')),
     );
   }
 }

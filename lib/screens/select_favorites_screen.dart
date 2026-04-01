@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/book_model.dart';
 import '../providers/book_provider.dart';
 import '../providers/user_provider.dart';
 import '../providers/auth_provider.dart';
@@ -143,7 +142,11 @@ class _SelectFavoritesScreenState extends ConsumerState<SelectFavoritesScreen> {
                     final book = books[index];
                     final isSelected = _selectedIds.contains(book.id);
                     return BookCard(
-                      book: book,
+                      title: book.title,
+                      authors: book.authors,
+                      thumbnailUrl: book.thumbnailUrl,
+                      averageRating: book.averageRating,
+                      categories: book.categories,
                       onTap: () => _toggleSelection(book.id),
                       trailing: Icon(
                         isSelected ? Icons.check_circle : Icons.add_circle_outline,
@@ -154,7 +157,7 @@ class _SelectFavoritesScreenState extends ConsumerState<SelectFavoritesScreen> {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, __) => Center(child: Text('Error: $e')),
+              error: (e, _) => Center(child: Text('Error: $e')),
             ),
           ),
           Padding(

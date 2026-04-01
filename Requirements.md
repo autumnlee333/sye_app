@@ -74,7 +74,7 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
    - **Concept:** Allow users to personalize their profile by showcasing their "Top 5" all-time favorite books.
    - **Goal:** Update `UserModel` and Profile UI to allow selecting and displaying 5 favorite books fetched from the Book API.
 
- [ ] 2.3 **Personal Bookshelves**
+ [x] 2.3 **Personal Bookshelves**
    - **Concept:** Create a digital representation of a physical library, allowing users to organize their past, present, and future reads.
    - **Goal:** Implement reading status tracking: "Want to Read", "Currently Reading", and "Finished" using Firestore sub-collections.
 
