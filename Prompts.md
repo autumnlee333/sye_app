@@ -278,6 +278,22 @@ Response: ✦ Feature 2.1 is now officially complete, with both the background e
 
   Would you like to move on to Feature 2.5: Genre Recommendations? (This will suggest books based on the favorite genres you selected during onboarding).
 
+✦ I have successfully implemented Feature 2.5: Genre Recommendations.
+
+  New Capabilities:
+   1. Smart Recommendations: Added getRecommendations to BookService, which queries the Google Books API using the user's favoriteGenres from onboarding.
+   2. Reactive Provider: Created recommendationsProvider in book_provider.dart that automatically refreshes whenever the user's profile or genres change.
+   3. Dynamic Feed: Replaced the "Feed" tab's placeholder with a functional FeedScreen.
+   4. Instant Library Integration: Users can now add recommended books directly to their shelves (Want to Read, Reading, Finished) from the Feed tab.
+   5. Pull-to-Refresh: Implemented a RefreshIndicator so users can pull down to get a fresh set of recommendations from their favorite genres.
+
+  How to Use:
+   1. Go to the Home (Feed) tab.
+   2. You will see a list of books under "Recommended for You".
+   3. These books are fetched based on the genres you picked when you first signed up.
+   4. Tap the Blue Library Icon on any book to add it to your collection!
+
+  Would you like to move on to Feature 3.1: Book Reviews & Ratings? (This will allow users to leave 1-5 star ratings and written reviews for books).
 
 
 

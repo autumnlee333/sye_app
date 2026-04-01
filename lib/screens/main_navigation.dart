@@ -8,6 +8,7 @@ import '../models/library_book_model.dart';
 import '../widgets/book_card.dart';
 import 'profile_screen.dart';
 import 'library_screen.dart';
+import 'feed_screen.dart';
 
 class MainNavigation extends ConsumerWidget {
   const MainNavigation({super.key});
@@ -17,7 +18,7 @@ class MainNavigation extends ConsumerWidget {
     final currentIndex = ref.watch(navigationIndexProvider);
 
     final List<Widget> screens = [
-      const _HomePlaceholder(),
+      const FeedScreen(),
       const BookSearchTab(),
       const LibraryScreen(),
       const ProfileScreen(),
@@ -50,24 +51,6 @@ class MainNavigation extends ConsumerWidget {
           BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
           BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Library'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
-      ),
-    );
-  }
-}
-
-class _HomePlaceholder extends StatelessWidget {
-  const _HomePlaceholder();
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.rss_feed, size: 64, color: Colors.grey),
-          SizedBox(height: 16),
-          Text('Live Activity Feed', style: TextStyle(fontSize: 20)),
-          Text('See what your friends are reading!'),
         ],
       ),
     );

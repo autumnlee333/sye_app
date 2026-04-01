@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/book_model.dart';
 import '../services/book_service.dart';
+import 'user_provider.dart';
 
 /// Provider for the [BookService].
 final bookServiceProvider = Provider<BookService>((ref) {
@@ -41,5 +42,14 @@ final bookDetailsProvider = FutureProvider.family<List<BookModel>, List<String>>
   final futures = ids.map((id) => bookService.getBookById(id));
   final results = await Future.wait(futures);
   return results.whereType<BookModel>().toList();
+});
+
+/// Provider for recommended books based on user's favorite genres.
+final recommendationsProvider = FutureProvider<List<BookModel>>((ref) async {
+  final userProfile = ref.watch(currentUserDataProvider).value;
+  if (userProfile == null || userProfile.favoriteGenres.isEmpty) return [];
+
+  final bookService = ref.read(bookServiceProvider);
+  return await bookService.getRecommendations(userProfile.favoriteGenres);
 });
 

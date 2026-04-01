@@ -46,6 +46,27 @@ class BookService {
     }
   }
 
+  /// Fetches book recommendations based on genres.
+  Future<List<BookModel>> getRecommendations(List<String> genres) async {
+    if (genres.isEmpty) return [];
+
+    try {
+      // Pick a random genre from the user's favorites to keep the recommendations fresh
+      final genre = (List<String>.from(genres)..shuffle()).first;
+      final url = Uri.parse('$_baseUrl?q=subject:${Uri.encodeComponent(genre)}&orderBy=newest&maxResults=10&key=$_apiKey');
+      final response = await _client.get(url);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final List<dynamic> items = data['items'] ?? [];
+        return items.map((item) => _parseBook(item)).toList();
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
+  }
+
   /// Parses a single book item from the Google Books API response.
   BookModel _parseBook(Map<String, dynamic> item) {
     final volumeInfo = item['volumeInfo'] ?? {};

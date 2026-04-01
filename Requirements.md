@@ -82,7 +82,7 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
    - **Concept:** Turn reading into a dynamic activity by allowing users to log their journey, creating a history of their engagement with a book.
    - **Goal:** Allow users to update page numbers/percentages and store a history of these updates for the activity feed.
 
- [ ] 2.5 **Genre Recommendations**
+ [x] 2.5 **Genre Recommendations**
    - **Concept:** Personalize the discovery experience by surfacing books that align with a user's unique reading DNA.
    - **Goal:** Suggest books based on "Favorite genres" from onboarding and past reading history.
 
