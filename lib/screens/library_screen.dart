@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/library_book_model.dart';
 import '../providers/library_provider.dart';
+import '../providers/review_provider.dart';
 import '../widgets/book_card.dart';
 
 class LibraryScreen extends ConsumerWidget {
@@ -77,21 +78,32 @@ class _BookList extends ConsumerWidget {
               onTap: libraryBook.status == ReadingStatus.reading 
                 ? () => _showUpdateProgressDialog(context, ref, libraryBook)
                 : null,
-              trailing: PopupMenuButton<ReadingStatus>(
-                onSelected: (status) {
-                  ref.read(libraryActionProvider.notifier).updateStatus(libraryBook.bookId, status);
+              trailing: PopupMenuButton<String>(
+                onSelected: (value) {
+                  if (value == 'review') {
+                    _showReviewDialog(context, ref, libraryBook);
+                  } else {
+                    final status = ReadingStatus.values.firstWhere((e) => e.name == value);
+                    ref.read(libraryActionProvider.notifier).updateStatus(libraryBook.bookId, status);
+                  }
                 },
-                itemBuilder: (context) => ReadingStatus.values.map((status) {
-                  return PopupMenuItem(
-                    value: status,
-                    child: Text(status.label),
-                  );
-                }).toList()..add(
+                itemBuilder: (context) => [
+                  ...ReadingStatus.values.map((status) {
+                    return PopupMenuItem(
+                      value: status.name,
+                      child: Text(status.label),
+                    );
+                  }),
+                  const PopupMenuDivider(),
+                  const PopupMenuItem(
+                    value: 'review',
+                    child: Text('Rate & Review', style: TextStyle(color: Colors.blue)),
+                  ),
                   PopupMenuItem(
                     onTap: () => ref.read(libraryActionProvider.notifier).removeBook(libraryBook.bookId),
                     child: const Text('Remove from Library', style: TextStyle(color: Colors.red)),
-                  ) as PopupMenuItem<ReadingStatus>,
-                ),
+                  ),
+                ],
               ),
             ),
             if (libraryBook.status == ReadingStatus.reading && libraryBook.totalPages > 0)
@@ -124,6 +136,68 @@ class _BookList extends ConsumerWidget {
           ],
         );
       },
+    );
+  }
+
+  void _showReviewDialog(BuildContext context, WidgetRef ref, LibraryBookModel book) {
+    double rating = 0;
+    final reviewController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: Text('Review: ${book.title}'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('What do you think?'),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(5, (index) {
+                  return IconButton(
+                    icon: Icon(
+                      index < rating ? Icons.star : Icons.star_border,
+                      color: Colors.amber,
+                      size: 32,
+                    ),
+                    onPressed: () => setState(() => rating = index + 1.0),
+                  );
+                }),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: reviewController,
+                maxLines: 3,
+                decoration: const InputDecoration(
+                  hintText: 'Write your thoughts here...',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+            ElevatedButton(
+              onPressed: rating == 0 ? null : () {
+                ref.read(reviewActionProvider.notifier).postReview(
+                  bookId: book.bookId,
+                  bookTitle: book.title,
+                  bookThumbnail: book.thumbnailUrl,
+                  rating: rating,
+                  text: reviewController.text.trim(),
+                );
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Review posted!')),
+                );
+              },
+              child: const Text('Post Review'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
