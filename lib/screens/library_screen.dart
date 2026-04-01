@@ -184,6 +184,7 @@ class _BookList extends ConsumerWidget {
                 ref.read(reviewActionProvider.notifier).postReview(
                   bookId: book.bookId,
                   bookTitle: book.title,
+                  bookAuthors: book.authors,
                   bookThumbnail: book.thumbnailUrl,
                   rating: rating,
                   text: reviewController.text.trim(),

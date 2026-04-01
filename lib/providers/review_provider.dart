@@ -27,6 +27,7 @@ class ReviewNotifier extends AsyncNotifier<void> {
   Future<void> postReview({
     required String bookId,
     required String bookTitle,
+    List<String> bookAuthors = const [],
     String? bookThumbnail,
     required double rating,
     required String text,
@@ -44,6 +45,7 @@ class ReviewNotifier extends AsyncNotifier<void> {
         userProfilePic: userProfile.profilePicUrl,
         bookId: bookId,
         bookTitle: bookTitle,
+        bookAuthors: bookAuthors,
         bookThumbnail: bookThumbnail,
         rating: rating,
         reviewText: text,

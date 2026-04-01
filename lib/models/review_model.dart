@@ -12,6 +12,7 @@ abstract class ReviewModel with _$ReviewModel {
     String? userProfilePic,
     required String bookId,
     required String bookTitle,
+    @Default([]) List<String> bookAuthors,
     String? bookThumbnail,
     required double rating,
     required String reviewText,

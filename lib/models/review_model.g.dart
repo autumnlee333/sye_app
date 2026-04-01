@@ -13,6 +13,11 @@ _ReviewModel _$ReviewModelFromJson(Map<String, dynamic> json) => _ReviewModel(
   userProfilePic: json['userProfilePic'] as String?,
   bookId: json['bookId'] as String,
   bookTitle: json['bookTitle'] as String,
+  bookAuthors:
+      (json['bookAuthors'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
   bookThumbnail: json['bookThumbnail'] as String?,
   rating: (json['rating'] as num).toDouble(),
   reviewText: json['reviewText'] as String,
@@ -27,6 +32,7 @@ Map<String, dynamic> _$ReviewModelToJson(_ReviewModel instance) =>
       'userProfilePic': instance.userProfilePic,
       'bookId': instance.bookId,
       'bookTitle': instance.bookTitle,
+      'bookAuthors': instance.bookAuthors,
       'bookThumbnail': instance.bookThumbnail,
       'rating': instance.rating,
       'reviewText': instance.reviewText,

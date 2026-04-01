@@ -114,4 +114,15 @@ This document tracks the iterative development process of the SYE (Share Your Ex
 ### 3.1 Book Reviews & Ratings
 **User:** Implement feature 3.1
 ***Gemini**
+✦ I have successfully implemented Feature 3.1: Book Reviews & Ratings and integrated it into your Live Board.
+
+  New Capabilities:
+   1. Rate & Review: Users can now leave 1-5 star ratings and written reviews for any book in their library.
+   2. Interactive Dialog: Tapping "Rate & Review" in the Library opens a stylized dialog with star selection and a text field.
+   3. Live Board (Global Feed): The Feed tab has been transformed into a community hub. It now displays a vertical "Live Board" of reviews from all users, alongside your
+      personalized genre recommendations.
+   4. Real-Time Sync: Using Firestore streams, new reviews appear on the Live Board instantly without needing to refresh.
+   5. Clean Architecture: Separated the ReviewModel, ReviewService, and ReviewNotifier to maintain the project's high standards.
+---
+### Tweaks to previous features
 
