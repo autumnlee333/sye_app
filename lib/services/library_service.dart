@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/library_book_model.dart';
+import '../models/progress_update_model.dart';
 
 class LibraryService {
   final FirebaseFirestore _firestore;
@@ -37,6 +38,52 @@ class LibraryService {
     } catch (e) {
       rethrow;
     }
+  }
+
+  /// Updates the reading progress of a book and adds an entry to the history.
+  Future<void> updateProgress(String uid, String bookId, int currentPage, int totalPages, {String? comment}) async {
+    try {
+      final batch = _firestore.batch();
+      
+      // Update the book document
+      batch.update(_libraryCollection(uid).doc(bookId), {
+        'currentPage': currentPage,
+        'totalPages': totalPages,
+      });
+
+      // Add to history sub-collection
+      final historyRef = _libraryCollection(uid).doc(bookId).collection('progress_history').doc();
+      batch.set(historyRef, {
+        'id': historyRef.id,
+        'bookId': bookId,
+        'page': currentPage,
+        'comment': comment,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      await batch.commit();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Streams the progress history for a specific book.
+  Stream<List<ProgressUpdateModel>> watchProgressHistory(String uid, String bookId) {
+    return _libraryCollection(uid)
+        .doc(bookId)
+        .collection('progress_history')
+        .orderBy('timestamp', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+        // Convert Timestamp to ISO8601 string for the model's DateTime.fromJson
+        if (data['timestamp'] is Timestamp) {
+          data['timestamp'] = (data['timestamp'] as Timestamp).toDate().toIso8601String();
+        }
+        return ProgressUpdateModel.fromJson(data);
+      }).toList();
+    });
   }
 
   /// Streams the entire library for a specific user.

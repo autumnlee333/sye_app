@@ -78,7 +78,7 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
    - **Concept:** Create a digital representation of a physical library, allowing users to organize their past, present, and future reads.
    - **Goal:** Implement reading status tracking: "Want to Read", "Currently Reading", and "Finished" using Firestore sub-collections.
 
- [ ] 2.4 **Reading Progress Updates**
+ [x] 2.4 **Reading Progress Updates**
    - **Concept:** Turn reading into a dynamic activity by allowing users to log their journey, creating a history of their engagement with a book.
    - **Goal:** Allow users to update page numbers/percentages and store a history of these updates for the activity feed.
 

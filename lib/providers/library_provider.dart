@@ -66,6 +66,22 @@ class LibraryNotifier extends AsyncNotifier<void> {
       await ref.read(libraryServiceProvider).removeBookFromLibrary(user.uid, bookId);
     });
   }
+
+  Future<void> updateProgress(String bookId, int currentPage, int totalPages, {String? comment}) async {
+    final user = ref.read(authProvider).value;
+    if (user == null) return;
+
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      await ref.read(libraryServiceProvider).updateProgress(
+            user.uid,
+            bookId,
+            currentPage,
+            totalPages,
+            comment: comment,
+          );
+    });
+  }
 }
 
 final libraryActionProvider = AsyncNotifierProvider.autoDispose<LibraryNotifier, void>(

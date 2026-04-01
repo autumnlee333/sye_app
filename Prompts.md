@@ -244,6 +244,40 @@ Response: ✦ Feature 2.1 is now officially complete, with both the background e
 
     Yes please move on to feature 2.3
 
+    ✦ I have successfully implemented Feature 2.3: Personal Bookshelves.
+
+  Key Changes:
+   1. Data Model: Created LibraryBookModel with a ReadingStatus enum (wantToRead, reading, finished) to track books in Firestore.
+   2. Firestore Integration: Added LibraryService to manage a library sub-collection under each user document.
+   3. State Management: Implemented userLibraryProvider (a real-time stream) and LibraryNotifier to handle adding, updating, and removing books.
+   4. Library UI: Built a new LibraryScreen with a 3-tab layout (Reading, Want to Read, Finished).
+   5. Search Integration: Updated the Search tab so every book now has an "Add to Library" button with a popup menu to choose a status.
+   6. Widget Refactoring: Refactored BookCard to be more generic, allowing it to display both search results and library items seamlessly.
+
+  You can now search for books, add them to specific shelves, and manage your entire reading collection from the "My Library" tab!
+
+  Shall we move on to Feature 2.4: Reading Progress Updates? (This will allow you to track page numbers/percentages for the books you are currently reading).
+
+
+  yes move on to feature 2.4
+   I have successfully implemented Feature 2.4: Reading Progress Updates.
+
+  New Capabilities:
+   1. Progress Tracking: Users can now track their current page number and total pages for any book in their library.
+   2. Visual Progress: Books in the "Reading" tab now display a Linear Progress Bar and a percentage completion label.
+   3. Update Dialog: Tapping on a book in the "Reading" tab opens a dialog to update the current page, total pages, and add an optional comment.
+   4. History Logging: Every progress update is saved as a new entry in a progress_history sub-collection in Firestore, which will be used to power the upcoming "Live
+      Activity Feed."
+   5. Technical Debt: Fixed a few more "unnecessary underscore" linting warnings during the UI update.
+
+  How to Use:
+   1. Go to your Library.
+   2. Ensure you have a book in the Reading tab.
+   3. Tap on the book card to open the Update Progress dialog.
+   4. Enter your new page number and hit Update.
+
+  Would you like to move on to Feature 2.5: Genre Recommendations? (This will suggest books based on the favorite genres you selected during onboarding).
+
 
 
 

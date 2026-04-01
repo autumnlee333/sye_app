@@ -34,6 +34,8 @@ abstract class LibraryBookModel with _$LibraryBookModel {
     String? thumbnailUrl,
     required ReadingStatus status,
     required DateTime addedAt,
+    @Default(0) int currentPage,
+    @Default(0) int totalPages,
   }) = _LibraryBookModel;
 
   factory LibraryBookModel.fromJson(Map<String, dynamic> json) => _$LibraryBookModelFromJson(json);
