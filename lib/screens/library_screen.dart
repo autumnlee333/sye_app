@@ -18,6 +18,9 @@ class LibraryScreen extends ConsumerWidget {
         appBar: AppBar(
           title: const Text('My Library'),
           bottom: const TabBar(
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white70,
+            indicatorColor: Colors.white,
             tabs: [
               Tab(text: 'Reading'),
               Tab(text: 'Want to Read'),
