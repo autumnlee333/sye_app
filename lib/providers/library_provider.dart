@@ -1,13 +1,20 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import '../models/library_book_model.dart';
 import '../models/book_model.dart';
+import '../models/activity_model.dart';
 import '../services/library_service.dart';
 import 'auth_provider.dart';
+import 'activity_provider.dart';
 
 /// Provider for the [LibraryService].
 final libraryServiceProvider = Provider<LibraryService>((ref) {
   return LibraryService();
 });
+
+/// A simple StateProvider to track the book that was just marked as finished.
+final finishedBookProvider = StateProvider<LibraryBookModel?>((ref) => null);
 
 /// A stream provider that watches the current user's library.
 final userLibraryProvider = StreamProvider<List<LibraryBookModel>>((ref) {
@@ -34,6 +41,9 @@ class LibraryNotifier extends AsyncNotifier<void> {
     if (user == null) return;
 
     state = const AsyncValue.loading();
+    
+    final finishedBookNotifier = ref.read(finishedBookProvider.notifier);
+
     state = await AsyncValue.guard(() async {
       final libraryBook = LibraryBookModel(
         bookId: book.id,
@@ -44,16 +54,42 @@ class LibraryNotifier extends AsyncNotifier<void> {
         addedAt: DateTime.now(),
       );
       await ref.read(libraryServiceProvider).addBookToLibrary(user.uid, libraryBook);
+      
+      // Post activity if they started reading
+      if (status == ReadingStatus.reading) {
+        await ref.read(activityActionProvider.notifier).postActivity(ActivityModel(
+          id: '',
+          userId: user.uid,
+          userName: '', // Handled by ActivityNotifier
+          bookId: book.id,
+          bookTitle: book.title,
+          bookAuthors: book.authors,
+          bookThumbnail: book.thumbnailUrl,
+          type: ActivityType.started,
+          timestamp: DateTime.now(),
+        ));
+      }
+
+      if (status == ReadingStatus.finished) {
+        finishedBookNotifier.state = libraryBook;
+      }
     });
   }
 
-  Future<void> updateStatus(String bookId, ReadingStatus status) async {
+  Future<void> updateStatus(LibraryBookModel book, ReadingStatus status) async {
     final user = ref.read(authProvider).value;
     if (user == null) return;
 
     state = const AsyncValue.loading();
+    
+    final finishedBookNotifier = ref.read(finishedBookProvider.notifier);
+
     state = await AsyncValue.guard(() async {
-      await ref.read(libraryServiceProvider).updateBookStatus(user.uid, bookId, status);
+      await ref.read(libraryServiceProvider).updateBookStatus(user.uid, book.bookId, status);
+      
+      if (status == ReadingStatus.finished) {
+        finishedBookNotifier.state = book;
+      }
     });
   }
 
@@ -67,7 +103,12 @@ class LibraryNotifier extends AsyncNotifier<void> {
     });
   }
 
-  Future<void> updateProgress(String bookId, int currentPage, int totalPages, {String? comment}) async {
+  Future<void> updateProgress(
+    String bookId, 
+    int currentPage, 
+    int totalPages, 
+    {String? comment, bool postToFeed = false}
+  ) async {
     final user = ref.read(authProvider).value;
     if (user == null) return;
 
@@ -80,10 +121,31 @@ class LibraryNotifier extends AsyncNotifier<void> {
             totalPages,
             comment: comment,
           );
+      
+      if (postToFeed) {
+        // Fetch book details from library for activity post
+        final library = ref.read(userLibraryProvider).value ?? [];
+        final book = library.firstWhere((b) => b.bookId == bookId);
+
+        await ref.read(activityActionProvider.notifier).postActivity(ActivityModel(
+          id: '',
+          userId: user.uid,
+          userName: '', // Handled by ActivityNotifier
+          bookId: bookId,
+          bookTitle: book.title,
+          bookAuthors: book.authors,
+          bookThumbnail: book.thumbnailUrl,
+          type: ActivityType.progress,
+          text: comment,
+          page: currentPage,
+          totalPages: totalPages,
+          timestamp: DateTime.now(),
+        ));
+      }
     });
   }
 }
 
-final libraryActionProvider = AsyncNotifierProvider.autoDispose<LibraryNotifier, void>(
+final libraryActionProvider = AsyncNotifierProvider<LibraryNotifier, void>(
   LibraryNotifier.new,
 );

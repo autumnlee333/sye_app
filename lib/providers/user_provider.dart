@@ -3,25 +3,27 @@ import '../models/user_model.dart';
 import '../services/user_service.dart';
 import 'auth_provider.dart';
 
-// Provider for UserService
+/// Provider for the [UserService].
 final userServiceProvider = Provider<UserService>((ref) {
   return UserService();
 });
 
-// Provider for getting current user's full profile from Firestore
-// watches the uid from auth provider and fetches the doc
+/// Streams the current user's profile data from Firestore.
 final currentUserDataProvider = StreamProvider<UserModel?>((ref) {
   final authState = ref.watch(authProvider);
   final userService = ref.watch(userServiceProvider);
 
-  // If there's no authenticated user, the data stream is null.
   return authState.when(
     data: (user) {
       if (user == null) return Stream.value(null);
       return userService.watchUser(user.uid);
     },
     loading: () => const Stream.empty(),
-    error: (_, _) => Stream.value(null),
+    error: (_, __) => Stream.value(null),
   );
 });
 
+/// Fetches any user's profile data by UID.
+final userDataProvider = FutureProvider.family<UserModel?, String>((ref, uid) async {
+  return ref.watch(userServiceProvider).getUser(uid);
+});

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/library_book_model.dart';
 import '../providers/library_provider.dart';
-import '../providers/review_provider.dart';
 import '../widgets/book_card.dart';
+import '../widgets/review_dialog.dart';
 
 class LibraryScreen extends ConsumerWidget {
   const LibraryScreen({super.key});
@@ -42,9 +42,18 @@ class LibraryScreen extends ConsumerWidget {
 
             return TabBarView(
               children: [
-                _BookList(books: reading, emptyMessage: 'Not reading anything yet.'),
-                _BookList(books: wantToRead, emptyMessage: 'No books on your wishlist.'),
-                _BookList(books: finished, emptyMessage: 'No books finished yet.'),
+                _BookList(
+                  books: reading,
+                  emptyMessage: 'Not reading anything yet.',
+                ),
+                _BookList(
+                  books: wantToRead,
+                  emptyMessage: 'No books on your wishlist.',
+                ),
+                _BookList(
+                  books: finished,
+                  emptyMessage: 'No books finished yet.',
+                ),
               ],
             );
           },
@@ -60,7 +69,10 @@ class _BookList extends ConsumerWidget {
   final List<LibraryBookModel> books;
   final String emptyMessage;
 
-  const _BookList({required this.books, required this.emptyMessage});
+  const _BookList({
+    required this.books,
+    required this.emptyMessage,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -82,12 +94,18 @@ class _BookList extends ConsumerWidget {
                 ? () => _showUpdateProgressDialog(context, ref, libraryBook)
                 : null,
               trailing: PopupMenuButton<String>(
-                onSelected: (value) {
+                onSelected: (value) async {
                   if (value == 'review') {
-                    _showReviewDialog(context, ref, libraryBook);
+                    ReviewDialog.show(context, libraryBook);
                   } else {
-                    final status = ReadingStatus.values.firstWhere((e) => e.name == value);
-                    ref.read(libraryActionProvider.notifier).updateStatus(libraryBook.bookId, status);
+                    try {
+                      final status = ReadingStatus.values.firstWhere((e) => e.name == value);
+                      debugPrint('Updating status for ${libraryBook.title} to $status');
+                      
+                      await ref.read(libraryActionProvider.notifier).updateStatus(libraryBook, status);
+                    } catch (e) {
+                      debugPrint('Error updating status: $e');
+                    }
                   }
                 },
                 itemBuilder: (context) => [
@@ -109,154 +127,163 @@ class _BookList extends ConsumerWidget {
                 ],
               ),
             ),
-            if (libraryBook.status == ReadingStatus.reading && libraryBook.totalPages > 0)
+            if (libraryBook.status == ReadingStatus.reading) ...[
+              if (libraryBook.totalPages > 0)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0),
+                  child: Column(
+                    children: [
+                      LinearProgressIndicator(
+                        value: libraryBook.currentPage / libraryBook.totalPages,
+                        backgroundColor: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '${((libraryBook.currentPage / libraryBook.totalPages) * 100).toInt()}% complete',
+                            style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          ),
+                          Text(
+                            'Page ${libraryBook.currentPage} of ${libraryBook.totalPages}',
+                            style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0),
-                child: Column(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Row(
                   children: [
-                    LinearProgressIndicator(
-                      value: libraryBook.currentPage / libraryBook.totalPages,
-                      backgroundColor: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(4),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        icon: const Icon(Icons.edit_note, size: 18),
+                        label: const Text('Update Progress'),
+                        onPressed: () => _showUpdateProgressDialog(context, ref, libraryBook),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                      ),
                     ),
-                    const SizedBox(height: 4),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '${((libraryBook.currentPage / libraryBook.totalPages) * 100).toInt()}% complete',
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.send, size: 18),
+                        label: const Text('Post Thought'),
+                        onPressed: () => _showUpdateProgressDialog(context, ref, libraryBook, forcePost: true),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                         ),
-                        Text(
-                          'Page ${libraryBook.currentPage} of ${libraryBook.totalPages}',
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
-                        ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
               ),
+              const SizedBox(height: 8),
+            ],
           ],
         );
       },
     );
   }
 
-  void _showReviewDialog(BuildContext context, WidgetRef ref, LibraryBookModel book) {
-    double rating = 0;
-    final reviewController = TextEditingController();
+  void _showUpdateProgressDialog(BuildContext context, WidgetRef ref, LibraryBookModel book, {bool forcePost = false}) {
+    final pageController = TextEditingController(text: book.currentPage.toString());
+    final totalController = TextEditingController(text: book.totalPages.toString());
+    final commentController = TextEditingController();
+    bool postToFeed = forcePost;
 
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: Text('Review: ${book.title}'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('What do you think?'),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(5, (index) {
-                  return IconButton(
-                    icon: Icon(
-                      index < rating ? Icons.star : Icons.star_border,
-                      color: Colors.amber,
-                      size: 32,
+          title: Text(forcePost ? 'Post a Thought' : 'Update Progress'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(book.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: pageController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: 'Current Page',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
                     ),
-                    onPressed: () => setState(() => rating = index + 1.0),
-                  );
-                }),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: reviewController,
-                maxLines: 3,
-                decoration: const InputDecoration(
-                  hintText: 'Write your thoughts here...',
-                  border: OutlineInputBorder(),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: TextField(
+                        controller: totalController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: 'Total Pages',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
+                const SizedBox(height: 16),
+                TextField(
+                  controller: commentController,
+                  decoration: const InputDecoration(
+                    labelText: 'What are your thoughts?',
+                    hintText: 'Share a quick update with your friends...',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 3,
+                ),
+                if (!forcePost)
+                  CheckboxListTile(
+                    title: const Text('Post to Live Board', style: TextStyle(fontSize: 14)),
+                    value: postToFeed,
+                    onChanged: (value) => setState(() => postToFeed = value ?? false),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+              ],
+            ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
             ElevatedButton(
-              onPressed: rating == 0 ? null : () {
-                ref.read(reviewActionProvider.notifier).postReview(
-                  bookId: book.bookId,
-                  bookTitle: book.title,
-                  bookAuthors: book.authors,
-                  bookThumbnail: book.thumbnailUrl,
-                  rating: rating,
-                  text: reviewController.text.trim(),
+              onPressed: () {
+                final currentPage = int.tryParse(pageController.text) ?? 0;
+                final totalPages = int.tryParse(totalController.text) ?? 0;
+                
+                ref.read(libraryActionProvider.notifier).updateProgress(
+                  book.bookId,
+                  currentPage,
+                  totalPages,
+                  comment: commentController.text.trim().isEmpty ? null : commentController.text.trim(),
+                  postToFeed: postToFeed,
                 );
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Review posted!')),
-                );
+                
+                if (postToFeed) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Thought posted to feed!')),
+                  );
+                }
               },
-              child: const Text('Post Review'),
+              child: Text(forcePost ? 'Post' : 'Update'),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  void _showUpdateProgressDialog(BuildContext context, WidgetRef ref, LibraryBookModel book) {
-    final pageController = TextEditingController(text: book.currentPage.toString());
-    final totalController = TextEditingController(text: book.totalPages.toString());
-    final commentController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Update Progress: ${book.title}'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: pageController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Current Page'),
-              ),
-              TextField(
-                controller: totalController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Total Pages'),
-              ),
-              TextField(
-                controller: commentController,
-                decoration: const InputDecoration(labelText: 'Comment (Optional)'),
-                maxLines: 2,
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final currentPage = int.tryParse(pageController.text) ?? 0;
-              final totalPages = int.tryParse(totalController.text) ?? 0;
-              
-              ref.read(libraryActionProvider.notifier).updateProgress(
-                book.bookId,
-                currentPage,
-                totalPages,
-                comment: commentController.text.trim().isEmpty ? null : commentController.text.trim(),
-              );
-              Navigator.pop(context);
-            },
-            child: const Text('Update'),
-          ),
-        ],
       ),
     );
   }

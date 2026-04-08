@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/review_model.dart';
+import '../models/activity_model.dart';
 import '../services/review_service.dart';
 import 'auth_provider.dart';
 import 'user_provider.dart';
+import 'activity_provider.dart';
 
 /// Provider for the [ReviewService].
 final reviewServiceProvider = Provider<ReviewService>((ref) {
@@ -10,6 +12,7 @@ final reviewServiceProvider = Provider<ReviewService>((ref) {
 });
 
 /// Streams all reviews for the global activity feed.
+/// DEPRECATED: Use allActivitiesProvider instead.
 final allReviewsProvider = StreamProvider<List<ReviewModel>>((ref) {
   return ref.watch(reviewServiceProvider).watchAllReviews();
 });
@@ -52,6 +55,22 @@ class ReviewNotifier extends AsyncNotifier<void> {
         timestamp: DateTime.now(),
       );
       await ref.read(reviewServiceProvider).saveReview(review);
+
+      // Also post to unified activity feed
+      await ref.read(activityActionProvider.notifier).postActivity(ActivityModel(
+        id: '',
+        userId: user.uid,
+        userName: userProfile.displayName,
+        userProfilePic: userProfile.profilePicUrl,
+        bookId: bookId,
+        bookTitle: bookTitle,
+        bookAuthors: bookAuthors,
+        bookThumbnail: bookThumbnail,
+        type: ActivityType.review,
+        rating: rating,
+        text: text,
+        timestamp: DateTime.now(),
+      ));
     });
   }
 

@@ -6,6 +6,8 @@ import '../providers/user_provider.dart';
 
 // Temporary verification screen to test UserService and currentUserDataProvider
 
+
+
 class VerifyFirestoreScreen extends ConsumerWidget {
   const VerifyFirestoreScreen({super.key});
 

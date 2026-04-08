@@ -123,6 +123,16 @@ This document tracks the iterative development process of the SYE (Share Your Ex
       personalized genre recommendations.
    4. Real-Time Sync: Using Firestore streams, new reviews appear on the Live Board instantly without needing to refresh.
    5. Clean Architecture: Separated the ReviewModel, ReviewService, and ReviewNotifier to maintain the project's high standards.
+
+### 3.2 Live Activity Feed
+**User:** Implement feature 3.2
+**Gemini** 
+
 ---
-### Tweaks to previous features
+### UI Polish & Refinement
+**User:** Improve TabBar visibility in Library and move Save button in Edit Profile to the bottom.
+**Gemini:** 
+- Explicitly styled `TabBar` colors in `LibraryScreen` for better contrast.
+- Moved "Save" button to the bottom of `EditProfileScreen` as a full-width `ElevatedButton` for better visibility and ergonomics.
+- Implement Popup menu that encourages user to leave a review after finishing a book
 

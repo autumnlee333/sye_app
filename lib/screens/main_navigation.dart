@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/navigation_provider.dart';
 import '../providers/book_provider.dart';
 import '../providers/library_provider.dart';
+import '../providers/review_provider.dart';
 import '../models/library_book_model.dart';
 import '../widgets/book_card.dart';
+import '../widgets/review_dialog.dart';
 import 'profile_screen.dart';
 import 'library_screen.dart';
 import 'feed_screen.dart';
@@ -16,6 +19,20 @@ class MainNavigation extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentIndex = ref.watch(navigationIndexProvider);
+
+    // Global listener for finished books to show the review prompt
+    ref.listen<LibraryBookModel?>(finishedBookProvider, (previous, next) {
+      if (next != null) {
+        // Use SchedulerBinding to ensure we show the dialog after the current frame
+        SchedulerBinding.instance.addPostFrameCallback((_) {
+          if (context.mounted) {
+            _showReviewPrompt(context, ref, next);
+            // Clear the state so it doesn't trigger again
+            ref.read(finishedBookProvider.notifier).state = null;
+          }
+        });
+      }
+    });
 
     final List<Widget> screens = [
       const FeedScreen(),
@@ -51,6 +68,31 @@ class MainNavigation extends ConsumerWidget {
           BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
           BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Library'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+        ],
+      ),
+    );
+  }
+
+  void _showReviewPrompt(BuildContext context, WidgetRef ref, LibraryBookModel book) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      useRootNavigator: true,
+      builder: (context) => AlertDialog(
+        title: const Text('Congratulations!'),
+        content: Text('You\'ve finished "${book.title}". Would you like to leave a review?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Maybe Later'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ReviewDialog.show(context, book);
+            },
+            child: const Text('Leave Review'),
+          ),
         ],
       ),
     );
