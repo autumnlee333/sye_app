@@ -309,7 +309,7 @@ class _ActivityCard extends ConsumerWidget {
           ),
           TextButton(
             onPressed: () {
-              ref.read(activityActionProvider.notifier).deleteActivity(activity.id);
+              ref.read(activityActionProvider.notifier).deleteActivity(activity);
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Post deleted')),

@@ -5,14 +5,38 @@ import '../providers/review_provider.dart';
 
 class ReviewDialog extends ConsumerStatefulWidget {
   final LibraryBookModel book;
+  final String? id;
+  final double? initialRating;
+  final String? initialText;
+  final String? activityId;
 
-  const ReviewDialog({super.key, required this.book});
+  const ReviewDialog({
+    super.key, 
+    required this.book,
+    this.id,
+    this.initialRating,
+    this.initialText,
+    this.activityId,
+  });
 
-  static void show(BuildContext context, LibraryBookModel book) {
+  static void show(
+    BuildContext context, 
+    LibraryBookModel book, {
+    String? id,
+    double? initialRating,
+    String? initialText,
+    String? activityId,
+  }) {
     showDialog(
       context: context,
       useRootNavigator: true,
-      builder: (context) => ReviewDialog(book: book),
+      builder: (context) => ReviewDialog(
+        book: book,
+        id: id,
+        initialRating: initialRating,
+        initialText: initialText,
+        activityId: activityId,
+      ),
     );
   }
 
@@ -21,8 +45,15 @@ class ReviewDialog extends ConsumerStatefulWidget {
 }
 
 class _ReviewDialogState extends ConsumerState<ReviewDialog> {
-  double _rating = 0;
-  final _reviewController = TextEditingController();
+  late double _rating;
+  late final TextEditingController _reviewController;
+
+  @override
+  void initState() {
+    super.initState();
+    _rating = widget.initialRating ?? 0;
+    _reviewController = TextEditingController(text: widget.initialText);
+  }
 
   @override
   void dispose() {
@@ -32,8 +63,10 @@ class _ReviewDialogState extends ConsumerState<ReviewDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final isEditing = widget.id != null;
+
     return AlertDialog(
-      title: Text('Review: ${widget.book.title}'),
+      title: Text('${isEditing ? 'Edit' : 'Review'}: ${widget.book.title}'),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -81,13 +114,15 @@ class _ReviewDialogState extends ConsumerState<ReviewDialog> {
                     bookThumbnail: widget.book.thumbnailUrl,
                     rating: _rating,
                     text: _reviewController.text.trim(),
+                    id: widget.id,
+                    activityId: widget.activityId,
                   );
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Review posted!')),
+                    SnackBar(content: Text(isEditing ? 'Review updated!' : 'Review posted!')),
                   );
                 },
-          child: const Text('Post Review'),
+          child: Text(isEditing ? 'Save Changes' : 'Post Review'),
         ),
       ],
     );

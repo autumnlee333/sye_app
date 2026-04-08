@@ -1,6 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/activity_model.dart';
+import '../models/review_model.dart';
 import '../services/activity_service.dart';
+import '../services/review_service.dart';
 import 'auth_provider.dart';
 import 'user_provider.dart';
 
@@ -27,7 +30,7 @@ class ActivityNotifier extends AsyncNotifier<void> {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final finalActivity = activity.copyWith(
-        id: '', // Will be generated
+        id: activity.id.isEmpty ? '' : activity.id,
         userId: user.uid,
         userName: userProfile.displayName,
         userProfilePic: userProfile.profilePicUrl,
@@ -40,14 +43,41 @@ class ActivityNotifier extends AsyncNotifier<void> {
   Future<void> updateActivity(ActivityModel activity) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await ref.read(activityServiceProvider).updateActivity(activity);
+      if (activity.type == ActivityType.review && activity.reviewId != null) {
+        // Sync update with Reviews collection
+        final review = ReviewModel(
+          id: activity.reviewId!,
+          userId: activity.userId,
+          userName: activity.userName,
+          userProfilePic: activity.userProfilePic,
+          bookId: activity.bookId,
+          bookTitle: activity.bookTitle,
+          bookAuthors: activity.bookAuthors,
+          bookThumbnail: activity.bookThumbnail,
+          activityId: activity.id,
+          rating: activity.rating ?? 0,
+          reviewText: activity.text ?? '',
+          timestamp: activity.timestamp,
+        );
+        
+        final reviewService = ReviewService(firestore: ref.read(activityServiceProvider).firestore);
+        await reviewService.saveReviewWithActivity(review);
+      } else {
+        await ref.read(activityServiceProvider).updateActivity(activity);
+      }
     });
   }
 
-  Future<void> deleteActivity(String activityId) async {
+  Future<void> deleteActivity(ActivityModel activity) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await ref.read(activityServiceProvider).deleteActivity(activityId);
+      if (activity.type == ActivityType.review && activity.reviewId != null) {
+        // Atomic delete for both
+        final reviewService = ReviewService(firestore: ref.read(activityServiceProvider).firestore);
+        await reviewService.deleteReviewWithActivity(activity.reviewId!, activity.id);
+      } else {
+        await ref.read(activityServiceProvider).deleteActivity(activity.id);
+      }
     });
   }
 }

@@ -19,6 +19,7 @@ _ReviewModel _$ReviewModelFromJson(Map<String, dynamic> json) => _ReviewModel(
           .toList() ??
       const [],
   bookThumbnail: json['bookThumbnail'] as String?,
+  activityId: json['activityId'] as String?,
   rating: (json['rating'] as num).toDouble(),
   reviewText: json['reviewText'] as String,
   timestamp: DateTime.parse(json['timestamp'] as String),
@@ -34,6 +35,7 @@ Map<String, dynamic> _$ReviewModelToJson(_ReviewModel instance) =>
       'bookTitle': instance.bookTitle,
       'bookAuthors': instance.bookAuthors,
       'bookThumbnail': instance.bookThumbnail,
+      'activityId': instance.activityId,
       'rating': instance.rating,
       'reviewText': instance.reviewText,
       'timestamp': instance.timestamp.toIso8601String(),

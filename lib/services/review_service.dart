@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/review_model.dart';
+import '../models/activity_model.dart';
 
 class ReviewService {
   final FirebaseFirestore _firestore;
@@ -9,6 +10,62 @@ class ReviewService {
 
   CollectionReference<Map<String, dynamic>> get _reviewsCollection =>
       _firestore.collection('reviews');
+
+  CollectionReference<Map<String, dynamic>> get _activitiesCollection =>
+      _firestore.collection('activities');
+
+  /// Saves a review and its corresponding activity atomically.
+  Future<void> saveReviewWithActivity(ReviewModel review) async {
+    final batch = _firestore.batch();
+    
+    // 1. Prepare Review Doc
+    final reviewDocRef = review.id.isEmpty 
+        ? _reviewsCollection.doc() 
+        : _reviewsCollection.doc(review.id);
+    
+    // 2. Prepare Activity Doc
+    final activityDocRef = (review.activityId != null && review.activityId!.isNotEmpty)
+        ? _activitiesCollection.doc(review.activityId)
+        : _activitiesCollection.doc();
+        
+    final finalReview = review.copyWith(
+      id: reviewDocRef.id,
+      activityId: activityDocRef.id,
+    );
+    
+    final activity = ActivityModel(
+      id: activityDocRef.id,
+      userId: finalReview.userId,
+      userName: finalReview.userName,
+      userProfilePic: finalReview.userProfilePic,
+      bookId: finalReview.bookId,
+      bookTitle: finalReview.bookTitle,
+      bookAuthors: finalReview.bookAuthors,
+      bookThumbnail: finalReview.bookThumbnail,
+      type: ActivityType.review,
+      text: finalReview.reviewText,
+      rating: finalReview.rating,
+      reviewId: finalReview.id,
+      timestamp: finalReview.timestamp,
+    );
+
+    batch.set(reviewDocRef, finalReview.toJson());
+    batch.set(activityDocRef, activity.toJson());
+    
+    await batch.commit();
+  }
+
+  /// Deletes a review and its linked activity.
+  Future<void> deleteReviewWithActivity(String reviewId, String? activityId) async {
+    final batch = _firestore.batch();
+    
+    batch.delete(_reviewsCollection.doc(reviewId));
+    if (activityId != null && activityId.isNotEmpty) {
+      batch.delete(_activitiesCollection.doc(activityId));
+    }
+    
+    await batch.commit();
+  }
 
   /// Saves a review to Firestore. Creates a new doc if ID is empty.
   Future<void> saveReview(ReviewModel review) async {

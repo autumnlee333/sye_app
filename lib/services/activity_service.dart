@@ -7,6 +7,8 @@ class ActivityService {
   ActivityService({FirebaseFirestore? firestore})
       : _firestore = firestore ?? FirebaseFirestore.instance;
 
+  FirebaseFirestore get firestore => _firestore;
+
   CollectionReference<Map<String, dynamic>> get _activitiesCollection =>
       _firestore.collection('activities');
 

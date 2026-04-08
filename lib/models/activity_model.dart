@@ -26,6 +26,7 @@ abstract class ActivityModel with _$ActivityModel {
     required ActivityType type,
     double? rating, // For reviews
     String? text, // Review text or progress thought
+    String? reviewId, // Linked review document ID
     int? page, // Current page for progress updates
     int? totalPages, // Total pages for progress updates
     required DateTime timestamp,

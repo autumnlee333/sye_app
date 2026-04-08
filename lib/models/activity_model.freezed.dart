@@ -17,6 +17,7 @@ mixin _$ActivityModel {
 
  String get id; String get userId; String get userName; String? get userProfilePic; String get bookId; String get bookTitle; List<String> get bookAuthors; String? get bookThumbnail; ActivityType get type; double? get rating;// For reviews
  String? get text;// Review text or progress thought
+ String? get reviewId;// Linked review document ID
  int? get page;// Current page for progress updates
  int? get totalPages;// Total pages for progress updates
  DateTime get timestamp;
@@ -32,16 +33,16 @@ $ActivityModelCopyWith<ActivityModel> get copyWith => _$ActivityModelCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ActivityModel&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.userProfilePic, userProfilePic) || other.userProfilePic == userProfilePic)&&(identical(other.bookId, bookId) || other.bookId == bookId)&&(identical(other.bookTitle, bookTitle) || other.bookTitle == bookTitle)&&const DeepCollectionEquality().equals(other.bookAuthors, bookAuthors)&&(identical(other.bookThumbnail, bookThumbnail) || other.bookThumbnail == bookThumbnail)&&(identical(other.type, type) || other.type == type)&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.text, text) || other.text == text)&&(identical(other.page, page) || other.page == page)&&(identical(other.totalPages, totalPages) || other.totalPages == totalPages)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ActivityModel&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.userProfilePic, userProfilePic) || other.userProfilePic == userProfilePic)&&(identical(other.bookId, bookId) || other.bookId == bookId)&&(identical(other.bookTitle, bookTitle) || other.bookTitle == bookTitle)&&const DeepCollectionEquality().equals(other.bookAuthors, bookAuthors)&&(identical(other.bookThumbnail, bookThumbnail) || other.bookThumbnail == bookThumbnail)&&(identical(other.type, type) || other.type == type)&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.text, text) || other.text == text)&&(identical(other.reviewId, reviewId) || other.reviewId == reviewId)&&(identical(other.page, page) || other.page == page)&&(identical(other.totalPages, totalPages) || other.totalPages == totalPages)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,userId,userName,userProfilePic,bookId,bookTitle,const DeepCollectionEquality().hash(bookAuthors),bookThumbnail,type,rating,text,page,totalPages,timestamp);
+int get hashCode => Object.hash(runtimeType,id,userId,userName,userProfilePic,bookId,bookTitle,const DeepCollectionEquality().hash(bookAuthors),bookThumbnail,type,rating,text,reviewId,page,totalPages,timestamp);
 
 @override
 String toString() {
-  return 'ActivityModel(id: $id, userId: $userId, userName: $userName, userProfilePic: $userProfilePic, bookId: $bookId, bookTitle: $bookTitle, bookAuthors: $bookAuthors, bookThumbnail: $bookThumbnail, type: $type, rating: $rating, text: $text, page: $page, totalPages: $totalPages, timestamp: $timestamp)';
+  return 'ActivityModel(id: $id, userId: $userId, userName: $userName, userProfilePic: $userProfilePic, bookId: $bookId, bookTitle: $bookTitle, bookAuthors: $bookAuthors, bookThumbnail: $bookThumbnail, type: $type, rating: $rating, text: $text, reviewId: $reviewId, page: $page, totalPages: $totalPages, timestamp: $timestamp)';
 }
 
 
@@ -52,7 +53,7 @@ abstract mixin class $ActivityModelCopyWith<$Res>  {
   factory $ActivityModelCopyWith(ActivityModel value, $Res Function(ActivityModel) _then) = _$ActivityModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String userId, String userName, String? userProfilePic, String bookId, String bookTitle, List<String> bookAuthors, String? bookThumbnail, ActivityType type, double? rating, String? text, int? page, int? totalPages, DateTime timestamp
+ String id, String userId, String userName, String? userProfilePic, String bookId, String bookTitle, List<String> bookAuthors, String? bookThumbnail, ActivityType type, double? rating, String? text, String? reviewId, int? page, int? totalPages, DateTime timestamp
 });
 
 
@@ -69,7 +70,7 @@ class _$ActivityModelCopyWithImpl<$Res>
 
 /// Create a copy of ActivityModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? userId = null,Object? userName = null,Object? userProfilePic = freezed,Object? bookId = null,Object? bookTitle = null,Object? bookAuthors = null,Object? bookThumbnail = freezed,Object? type = null,Object? rating = freezed,Object? text = freezed,Object? page = freezed,Object? totalPages = freezed,Object? timestamp = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? userId = null,Object? userName = null,Object? userProfilePic = freezed,Object? bookId = null,Object? bookTitle = null,Object? bookAuthors = null,Object? bookThumbnail = freezed,Object? type = null,Object? rating = freezed,Object? text = freezed,Object? reviewId = freezed,Object? page = freezed,Object? totalPages = freezed,Object? timestamp = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
@@ -82,6 +83,7 @@ as List<String>,bookThumbnail: freezed == bookThumbnail ? _self.bookThumbnail : 
 as String?,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as ActivityType,rating: freezed == rating ? _self.rating : rating // ignore: cast_nullable_to_non_nullable
 as double?,text: freezed == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
+as String?,reviewId: freezed == reviewId ? _self.reviewId : reviewId // ignore: cast_nullable_to_non_nullable
 as String?,page: freezed == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
 as int?,totalPages: freezed == totalPages ? _self.totalPages : totalPages // ignore: cast_nullable_to_non_nullable
 as int?,timestamp: null == timestamp ? _self.timestamp : timestamp // ignore: cast_nullable_to_non_nullable
@@ -170,10 +172,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String userId,  String userName,  String? userProfilePic,  String bookId,  String bookTitle,  List<String> bookAuthors,  String? bookThumbnail,  ActivityType type,  double? rating,  String? text,  int? page,  int? totalPages,  DateTime timestamp)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String userId,  String userName,  String? userProfilePic,  String bookId,  String bookTitle,  List<String> bookAuthors,  String? bookThumbnail,  ActivityType type,  double? rating,  String? text,  String? reviewId,  int? page,  int? totalPages,  DateTime timestamp)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ActivityModel() when $default != null:
-return $default(_that.id,_that.userId,_that.userName,_that.userProfilePic,_that.bookId,_that.bookTitle,_that.bookAuthors,_that.bookThumbnail,_that.type,_that.rating,_that.text,_that.page,_that.totalPages,_that.timestamp);case _:
+return $default(_that.id,_that.userId,_that.userName,_that.userProfilePic,_that.bookId,_that.bookTitle,_that.bookAuthors,_that.bookThumbnail,_that.type,_that.rating,_that.text,_that.reviewId,_that.page,_that.totalPages,_that.timestamp);case _:
   return orElse();
 
 }
@@ -191,10 +193,10 @@ return $default(_that.id,_that.userId,_that.userName,_that.userProfilePic,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String userId,  String userName,  String? userProfilePic,  String bookId,  String bookTitle,  List<String> bookAuthors,  String? bookThumbnail,  ActivityType type,  double? rating,  String? text,  int? page,  int? totalPages,  DateTime timestamp)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String userId,  String userName,  String? userProfilePic,  String bookId,  String bookTitle,  List<String> bookAuthors,  String? bookThumbnail,  ActivityType type,  double? rating,  String? text,  String? reviewId,  int? page,  int? totalPages,  DateTime timestamp)  $default,) {final _that = this;
 switch (_that) {
 case _ActivityModel():
-return $default(_that.id,_that.userId,_that.userName,_that.userProfilePic,_that.bookId,_that.bookTitle,_that.bookAuthors,_that.bookThumbnail,_that.type,_that.rating,_that.text,_that.page,_that.totalPages,_that.timestamp);case _:
+return $default(_that.id,_that.userId,_that.userName,_that.userProfilePic,_that.bookId,_that.bookTitle,_that.bookAuthors,_that.bookThumbnail,_that.type,_that.rating,_that.text,_that.reviewId,_that.page,_that.totalPages,_that.timestamp);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -211,10 +213,10 @@ return $default(_that.id,_that.userId,_that.userName,_that.userProfilePic,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String userId,  String userName,  String? userProfilePic,  String bookId,  String bookTitle,  List<String> bookAuthors,  String? bookThumbnail,  ActivityType type,  double? rating,  String? text,  int? page,  int? totalPages,  DateTime timestamp)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String userId,  String userName,  String? userProfilePic,  String bookId,  String bookTitle,  List<String> bookAuthors,  String? bookThumbnail,  ActivityType type,  double? rating,  String? text,  String? reviewId,  int? page,  int? totalPages,  DateTime timestamp)?  $default,) {final _that = this;
 switch (_that) {
 case _ActivityModel() when $default != null:
-return $default(_that.id,_that.userId,_that.userName,_that.userProfilePic,_that.bookId,_that.bookTitle,_that.bookAuthors,_that.bookThumbnail,_that.type,_that.rating,_that.text,_that.page,_that.totalPages,_that.timestamp);case _:
+return $default(_that.id,_that.userId,_that.userName,_that.userProfilePic,_that.bookId,_that.bookTitle,_that.bookAuthors,_that.bookThumbnail,_that.type,_that.rating,_that.text,_that.reviewId,_that.page,_that.totalPages,_that.timestamp);case _:
   return null;
 
 }
@@ -226,7 +228,7 @@ return $default(_that.id,_that.userId,_that.userName,_that.userProfilePic,_that.
 @JsonSerializable()
 
 class _ActivityModel implements ActivityModel {
-  const _ActivityModel({required this.id, required this.userId, required this.userName, this.userProfilePic, required this.bookId, required this.bookTitle, final  List<String> bookAuthors = const [], this.bookThumbnail, required this.type, this.rating, this.text, this.page, this.totalPages, required this.timestamp}): _bookAuthors = bookAuthors;
+  const _ActivityModel({required this.id, required this.userId, required this.userName, this.userProfilePic, required this.bookId, required this.bookTitle, final  List<String> bookAuthors = const [], this.bookThumbnail, required this.type, this.rating, this.text, this.reviewId, this.page, this.totalPages, required this.timestamp}): _bookAuthors = bookAuthors;
   factory _ActivityModel.fromJson(Map<String, dynamic> json) => _$ActivityModelFromJson(json);
 
 @override final  String id;
@@ -248,6 +250,8 @@ class _ActivityModel implements ActivityModel {
 // For reviews
 @override final  String? text;
 // Review text or progress thought
+@override final  String? reviewId;
+// Linked review document ID
 @override final  int? page;
 // Current page for progress updates
 @override final  int? totalPages;
@@ -267,16 +271,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ActivityModel&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.userProfilePic, userProfilePic) || other.userProfilePic == userProfilePic)&&(identical(other.bookId, bookId) || other.bookId == bookId)&&(identical(other.bookTitle, bookTitle) || other.bookTitle == bookTitle)&&const DeepCollectionEquality().equals(other._bookAuthors, _bookAuthors)&&(identical(other.bookThumbnail, bookThumbnail) || other.bookThumbnail == bookThumbnail)&&(identical(other.type, type) || other.type == type)&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.text, text) || other.text == text)&&(identical(other.page, page) || other.page == page)&&(identical(other.totalPages, totalPages) || other.totalPages == totalPages)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ActivityModel&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.userProfilePic, userProfilePic) || other.userProfilePic == userProfilePic)&&(identical(other.bookId, bookId) || other.bookId == bookId)&&(identical(other.bookTitle, bookTitle) || other.bookTitle == bookTitle)&&const DeepCollectionEquality().equals(other._bookAuthors, _bookAuthors)&&(identical(other.bookThumbnail, bookThumbnail) || other.bookThumbnail == bookThumbnail)&&(identical(other.type, type) || other.type == type)&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.text, text) || other.text == text)&&(identical(other.reviewId, reviewId) || other.reviewId == reviewId)&&(identical(other.page, page) || other.page == page)&&(identical(other.totalPages, totalPages) || other.totalPages == totalPages)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,userId,userName,userProfilePic,bookId,bookTitle,const DeepCollectionEquality().hash(_bookAuthors),bookThumbnail,type,rating,text,page,totalPages,timestamp);
+int get hashCode => Object.hash(runtimeType,id,userId,userName,userProfilePic,bookId,bookTitle,const DeepCollectionEquality().hash(_bookAuthors),bookThumbnail,type,rating,text,reviewId,page,totalPages,timestamp);
 
 @override
 String toString() {
-  return 'ActivityModel(id: $id, userId: $userId, userName: $userName, userProfilePic: $userProfilePic, bookId: $bookId, bookTitle: $bookTitle, bookAuthors: $bookAuthors, bookThumbnail: $bookThumbnail, type: $type, rating: $rating, text: $text, page: $page, totalPages: $totalPages, timestamp: $timestamp)';
+  return 'ActivityModel(id: $id, userId: $userId, userName: $userName, userProfilePic: $userProfilePic, bookId: $bookId, bookTitle: $bookTitle, bookAuthors: $bookAuthors, bookThumbnail: $bookThumbnail, type: $type, rating: $rating, text: $text, reviewId: $reviewId, page: $page, totalPages: $totalPages, timestamp: $timestamp)';
 }
 
 
@@ -287,7 +291,7 @@ abstract mixin class _$ActivityModelCopyWith<$Res> implements $ActivityModelCopy
   factory _$ActivityModelCopyWith(_ActivityModel value, $Res Function(_ActivityModel) _then) = __$ActivityModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String userId, String userName, String? userProfilePic, String bookId, String bookTitle, List<String> bookAuthors, String? bookThumbnail, ActivityType type, double? rating, String? text, int? page, int? totalPages, DateTime timestamp
+ String id, String userId, String userName, String? userProfilePic, String bookId, String bookTitle, List<String> bookAuthors, String? bookThumbnail, ActivityType type, double? rating, String? text, String? reviewId, int? page, int? totalPages, DateTime timestamp
 });
 
 
@@ -304,7 +308,7 @@ class __$ActivityModelCopyWithImpl<$Res>
 
 /// Create a copy of ActivityModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? userId = null,Object? userName = null,Object? userProfilePic = freezed,Object? bookId = null,Object? bookTitle = null,Object? bookAuthors = null,Object? bookThumbnail = freezed,Object? type = null,Object? rating = freezed,Object? text = freezed,Object? page = freezed,Object? totalPages = freezed,Object? timestamp = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? userId = null,Object? userName = null,Object? userProfilePic = freezed,Object? bookId = null,Object? bookTitle = null,Object? bookAuthors = null,Object? bookThumbnail = freezed,Object? type = null,Object? rating = freezed,Object? text = freezed,Object? reviewId = freezed,Object? page = freezed,Object? totalPages = freezed,Object? timestamp = null,}) {
   return _then(_ActivityModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
@@ -317,6 +321,7 @@ as List<String>,bookThumbnail: freezed == bookThumbnail ? _self.bookThumbnail : 
 as String?,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as ActivityType,rating: freezed == rating ? _self.rating : rating // ignore: cast_nullable_to_non_nullable
 as double?,text: freezed == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
+as String?,reviewId: freezed == reviewId ? _self.reviewId : reviewId // ignore: cast_nullable_to_non_nullable
 as String?,page: freezed == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
 as int?,totalPages: freezed == totalPages ? _self.totalPages : totalPages // ignore: cast_nullable_to_non_nullable
 as int?,timestamp: null == timestamp ? _self.timestamp : timestamp // ignore: cast_nullable_to_non_nullable

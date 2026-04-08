@@ -14,6 +14,7 @@ abstract class ReviewModel with _$ReviewModel {
     required String bookTitle,
     @Default([]) List<String> bookAuthors,
     String? bookThumbnail,
+    String? activityId,
     required double rating,
     required String reviewText,
     required DateTime timestamp,
