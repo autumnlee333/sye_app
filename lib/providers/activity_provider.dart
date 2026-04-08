@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/activity_model.dart';
 import '../models/review_model.dart';
 import '../services/activity_service.dart';
@@ -15,6 +14,11 @@ final activityServiceProvider = Provider<ActivityService>((ref) {
 /// Streams all activities for the global feed.
 final allActivitiesProvider = StreamProvider<List<ActivityModel>>((ref) {
   return ref.watch(activityServiceProvider).watchAllActivities();
+});
+
+/// Streams activities for a specific user.
+final userActivitiesProvider = StreamProvider.family<List<ActivityModel>, String>((ref, userId) {
+  return ref.watch(activityServiceProvider).watchActivitiesByUser(userId);
 });
 
 /// A notifier to manage activity operations.

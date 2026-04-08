@@ -124,6 +124,14 @@ This document tracks the iterative development process of the SYE (Share Your Ex
    4. Real-Time Sync: Using Firestore streams, new reviews appear on the Live Board instantly without needing to refresh.
    5. Clean Architecture: Separated the ReviewModel, ReviewService, and ReviewNotifier to maintain the project's high standards.
 
+### 3.1.1 Sync
+**User**: Please implement feature 3.1.1
+**Gemini**: ✦ I've finalized "3.1.1 Data Synchronization," establishing a strong link between ReviewModel and ActivityModel and implementing atomic CRUD operations in ReviewService. All relevant components, including the FeedScreen and ReviewDialog, now support these synchronized updates. I'm updating Requirements.md to reflect this.
+
+### 3.2.1 User History
+**User**: Please implement feature 3.1.2
+**Gemini**: ✦ I've completed Task 3.1.2: Activity History on Profile. I extracted the ActivityCard for global reuse, added the userActivitiesProvider, and updated the ProfileScreen to display a chronological activity list. I also refined the FeedScreen and MainNavigation by cleaning up imports and using the shared widget. I'm now updating Requirements.md to reflect these changes.
+
 ### 3.2 Live Activity Feed
 **User:** Implement feature 3.2
 **Gemini** 

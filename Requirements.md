@@ -92,9 +92,10 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
     [x] 1. Data Synchronization (Critical): Currently, when you edit or delete a "Post" on the Live Board, it only
      updates the activities collection. It does not update the corresponding document in the reviews collection. We
      should use a Firestore batch to ensure both are updated together.
-  2. Activity History on Profile: The "MainIdea" in Requirements.md mentions an "Activity History" section on the
+  [x] 2. Activity History on Profile: The "MainIdea" in Requirements.md mentions an "Activity History" section on the
      profile (a list of the user's past reviews and milestones). Currently, the profile only shows the "Top 3
      Favorites."
+
 
    3.1.3 Book Details Screen: While we can see a global feed of reviews, there is no way to click on a book and see all
       reviews for just that specific book. Most onTap methods for books are currently marked with // TODO: Book
