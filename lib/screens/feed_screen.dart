@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/book_provider.dart';
 import '../providers/activity_provider.dart';
 import '../widgets/activity_card.dart';
+import 'book_details_screen.dart';
 
 class FeedScreen extends ConsumerWidget {
   const FeedScreen({super.key});
@@ -98,7 +99,14 @@ class _CompactBookCard extends ConsumerWidget {
       margin: const EdgeInsets.all(4),
       child: InkWell(
         onTap: () {
-          // TODO: Book Details
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => BookDetailsScreen(
+                bookId: book.id,
+                initialBook: book,
+              ),
+            ),
+          );
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

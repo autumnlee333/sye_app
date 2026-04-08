@@ -44,6 +44,11 @@ final bookDetailsProvider = FutureProvider.family<List<BookModel>, List<String>>
   return results.whereType<BookModel>().toList();
 });
 
+/// Provider to fetch a single book by its ID.
+final singleBookProvider = FutureProvider.family<BookModel?, String>((ref, id) async {
+  return await ref.read(bookServiceProvider).getBookById(id);
+});
+
 /// Provider for recommended books based on user's favorite genres.
 final recommendationsProvider = FutureProvider<List<BookModel>>((ref) async {
   final userProfile = ref.watch(currentUserDataProvider).value;

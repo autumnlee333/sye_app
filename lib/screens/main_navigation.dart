@@ -11,6 +11,7 @@ import '../widgets/review_dialog.dart';
 import 'profile_screen.dart';
 import 'library_screen.dart';
 import 'feed_screen.dart';
+import 'book_details_screen.dart';
 
 class MainNavigation extends ConsumerWidget {
   const MainNavigation({super.key});
@@ -192,7 +193,14 @@ class _BookSearchTabState extends ConsumerState<BookSearchTab> {
                     averageRating: book.averageRating,
                     categories: book.categories,
                     onTap: () {
-                      // TODO: Navigate to Book Details
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => BookDetailsScreen(
+                            bookId: book.id,
+                            initialBook: book,
+                          ),
+                        ),
+                      );
                     },
                     trailing: PopupMenuButton<ReadingStatus>(
                       icon: const Icon(Icons.library_add, color: Colors.blue),

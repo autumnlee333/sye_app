@@ -14,7 +14,8 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
 3. **Local Storage**: Use `shared_preferences` for local app state (e.g., theme toggles, onboarding status).
 4. **Database**: Use Firebase Firestore for persistent cloud data.
 5. **Stepwise Execution**: Only implement the specific step requested in the prompt. Do not jump ahead.
-6. **Test**: Generate a test widget in the test folder for each feature added. 
+6. **Test**: Generate a test widget in the test folder for each feature added.
+7. **Flutter**: Using Flutter 3.41.2 
 
 ---
 
@@ -89,17 +90,14 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
 [x] 3.1 **Book Reviews & Ratings**
   - **Concept:** Empower users to share their literary opinions via a persistent "Live Board" where reviews can be assigned a 1–5 star rating.
   - **Goal:** Implement a 5-star rating system and text reviews that can be edited or deleted by the user.
-    [x] 1. Data Synchronization (Critical): Currently, when you edit or delete a "Post" on the Live Board, it only
-     updates the activities collection. It does not update the corresponding document in the reviews collection. We
-     should use a Firestore batch to ensure both are updated together.
-  [x] 2. Activity History on Profile: The "MainIdea" in Requirements.md mentions an "Activity History" section on the
-     profile (a list of the user's past reviews and milestones). Currently, the profile only shows the "Top 3
-     Favorites."
+    [x] 3.1.1 Data Synchronization (Critical): Currently, when you edit or delete a "Post" on the Live Board, it only
+     updates the activities collection. It does not update the corresponding document in the reviews collection. We should use a Firestore batch to ensure both are updated together.
+
+  [x] 3.1.2 Activity History on Profile: The "MainIdea" in Requirements.md mentions  an "Activity History" section on the profile (a list of the user's past reviews and milestones). Currently, the profile only shows the "Top 3 Favorites."
+
+   [x] 3.1.3 Book Details Screen: While we can see a global feed of reviews, there is no way to click on a book and see all reviews for just that specific book. Most onTap methods for books are currently marked with // TODO: Book Details.
 
 
-   3.1.3 Book Details Screen: While we can see a global feed of reviews, there is no way to click on a book and see all
-      reviews for just that specific book. Most onTap methods for books are currently marked with // TODO: Book
-      Details.
    3.1.4. Review Management in Library: In the "Finished" tab of the Library, it would be a better user experience if
       the "Rate & Review" option changed to "Edit Review" or "View Review" if the user has already submitted one.
    3.1.5. Duplicate Prevention: There is currently no logic to prevent a user from accidentally posting multiple

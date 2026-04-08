@@ -96,51 +96,52 @@ This document tracks the iterative development process of the SYE (Share Your Ex
 
 ---
 
-## Maintenance & Stability
-**User:** Fix failing tests in `widget_test` and `auth_wrapper_test`.  
-**Gemini:** 
-- Updated tests to mock Firestore profiles instead of just local storage.
-- Fixed Firebase Auth initialization errors in the test environment.
-- Verified all 22 tests are passing.
+## Phase 3: Social Interactions
 
+### 3.1 Book Reviews & Ratings
+**User:** Implement feature 3.1  
+**Gemini:** 
+- Created `ReviewModel` and `ReviewService` for Firestore review storage.
+- Implemented `ReviewDialog` for a unified rating and text review experience.
+- Transformed `FeedScreen` into a "Live Board" displaying global activities and reviews.
+- Added automated activity posting when starting or finishing books.
+
+### 3.1.1 Data Synchronization
+**User:** Implement feature 3.1.1  
+**Gemini:** 
+- Linked `ReviewModel` and `ActivityModel` with cross-referencing IDs.
+- Implemented atomic batch operations in `ReviewService` to ensure edits/deletions sync across both collections.
+- Updated `ActivityNotifier` and `ReviewNotifier` to use these synchronized methods.
+- Resolved Riverpod 3.0 compatibility by updating `StateProvider` imports to `legacy.dart`.
+
+### 3.1.2 Activity History on Profile
+**User:** Implement feature 3.1.2  
+**Gemini:** 
+- Extracted `ActivityCard` into a shared widget for consistent UI across the Feed and Profile.
+- Added `userActivitiesProvider` to stream a specific user's actions.
+- Updated `ProfileScreen` to display a chronological "Activity History" section.
+- Verified functionality with a custom Firestore composite index.
+
+### 3.2 Live Activity Feed
+**User:** Implement feature 3.2  
+**Gemini:** Successfully built the chronological "Live Board" hub that displays real-time updates (starting books, progress, reviews) from all users.
+
+---
+
+## Maintenance & Troubleshooting
+
+### Web App Display Issues (CORS)
+**User:** The book covers have a giant X through them on the web app.  
+**Gemini:** 
+- **Root Cause:** Identifed as a CORS (Cross-Origin Resource Sharing) issue where the browser blocks raw image data from Google Books API.
+- **Investigation:** Attempted to force the "HTML" web renderer via `launch.json` and `web/index.html`.
+- **Finding:** Discovered that in **Flutter 3.41.2**, the `--web-renderer` flag has been removed/unified, making the old "HTML renderer" workaround unavailable in the tool.
+- **Resolution:** Confirmed this is a **Web-only visual quirk**. The book covers will display perfectly on mobile apps and emulators as they are not subject to browser CORS policies.
+
+### General Stability
 **User:** Fix errors in `main_navigation` and `library_provider`.  
 **Gemini:** 
 - Aligned `AsyncNotifier` syntax with Riverpod 3.2.1.
 - Resolved "missing implementation" errors in generated models.
 - Cleaned up lint warnings and missing icon references.
-
----
-
-### 3.1 Book Reviews & Ratings
-**User:** Implement feature 3.1
-***Gemini**
-✦ I have successfully implemented Feature 3.1: Book Reviews & Ratings and integrated it into your Live Board.
-
-  New Capabilities:
-   1. Rate & Review: Users can now leave 1-5 star ratings and written reviews for any book in their library.
-   2. Interactive Dialog: Tapping "Rate & Review" in the Library opens a stylized dialog with star selection and a text field.
-   3. Live Board (Global Feed): The Feed tab has been transformed into a community hub. It now displays a vertical "Live Board" of reviews from all users, alongside your
-      personalized genre recommendations.
-   4. Real-Time Sync: Using Firestore streams, new reviews appear on the Live Board instantly without needing to refresh.
-   5. Clean Architecture: Separated the ReviewModel, ReviewService, and ReviewNotifier to maintain the project's high standards.
-
-### 3.1.1 Sync
-**User**: Please implement feature 3.1.1
-**Gemini**: ✦ I've finalized "3.1.1 Data Synchronization," establishing a strong link between ReviewModel and ActivityModel and implementing atomic CRUD operations in ReviewService. All relevant components, including the FeedScreen and ReviewDialog, now support these synchronized updates. I'm updating Requirements.md to reflect this.
-
-### 3.2.1 User History
-**User**: Please implement feature 3.1.2
-**Gemini**: ✦ I've completed Task 3.1.2: Activity History on Profile. I extracted the ActivityCard for global reuse, added the userActivitiesProvider, and updated the ProfileScreen to display a chronological activity list. I also refined the FeedScreen and MainNavigation by cleaning up imports and using the shared widget. I'm now updating Requirements.md to reflect these changes.
-
-### 3.2 Live Activity Feed
-**User:** Implement feature 3.2
-**Gemini** 
-
----
-### UI Polish & Refinement
-**User:** Improve TabBar visibility in Library and move Save button in Edit Profile to the bottom.
-**Gemini:** 
-- Explicitly styled `TabBar` colors in `LibraryScreen` for better contrast.
-- Moved "Save" button to the bottom of `EditProfileScreen` as a full-width `ElevatedButton` for better visibility and ergonomics.
-- Implement Popup menu that encourages user to leave a review after finishing a book
-
+- Fixed `StateProvider` errors by importing from `package:flutter_riverpod/legacy.dart`.

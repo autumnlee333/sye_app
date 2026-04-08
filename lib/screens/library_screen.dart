@@ -4,6 +4,7 @@ import '../models/library_book_model.dart';
 import '../providers/library_provider.dart';
 import '../widgets/book_card.dart';
 import '../widgets/review_dialog.dart';
+import 'book_details_screen.dart';
 
 class LibraryScreen extends ConsumerWidget {
   const LibraryScreen({super.key});
@@ -90,9 +91,15 @@ class _BookList extends ConsumerWidget {
               title: libraryBook.title,
               authors: libraryBook.authors,
               thumbnailUrl: libraryBook.thumbnailUrl,
-              onTap: libraryBook.status == ReadingStatus.reading 
-                ? () => _showUpdateProgressDialog(context, ref, libraryBook)
-                : null,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => BookDetailsScreen(
+                      bookId: libraryBook.bookId,
+                    ),
+                  ),
+                );
+              },
               trailing: PopupMenuButton<String>(
                 onSelected: (value) async {
                   if (value == 'review') {

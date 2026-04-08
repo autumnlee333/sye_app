@@ -4,6 +4,7 @@ import '../models/activity_model.dart';
 import '../providers/auth_provider.dart';
 import '../providers/activity_provider.dart';
 import '../screens/profile_screen.dart';
+import '../screens/book_details_screen.dart';
 
 class ActivityCard extends ConsumerWidget {
   final ActivityModel activity;
@@ -49,11 +50,26 @@ class ActivityCard extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(activity.userName, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      Text(
-                        _getActivityLabel(activity),
-                        style: const TextStyle(fontSize: 12, color: Colors.grey),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      InkWell(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => BookDetailsScreen(
+                                bookId: activity.bookId,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          _getActivityLabel(activity),
+                          style: const TextStyle(
+                            fontSize: 12, 
+                            color: Colors.blue,
+                            decoration: TextDecoration.underline,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ],
                   ),
