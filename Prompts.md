@@ -122,6 +122,14 @@ This document tracks the iterative development process of the SYE (Share Your Ex
 - Updated `ProfileScreen` to display a chronological "Activity History" section.
 - Verified functionality with a custom Firestore composite index.
 
+### 3.1.3 Book Details Screen
+**User:** Implement feature 3.1.3  
+**Gemini:** 
+- Created `BookDetailsScreen` to display full book descriptions and reader reviews.
+- Added `singleBookProvider` for efficient individual book fetching.
+- Enabled global navigation: tapping any book in the Feed, Search, or Library now opens its details.
+- Gracefully handled Web CORS issues with an `errorBuilder` for book covers.
+
 ### 3.2 Live Activity Feed
 **User:** Implement feature 3.2  
 **Gemini:** Successfully built the chronological "Live Board" hub that displays real-time updates (starting books, progress, reviews) from all users.

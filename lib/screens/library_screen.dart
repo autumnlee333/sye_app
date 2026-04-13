@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/library_book_model.dart';
 import '../providers/library_provider.dart';
+import '../providers/review_provider.dart';
 import '../widgets/book_card.dart';
 import '../widgets/review_dialog.dart';
 import 'book_details_screen.dart';
@@ -85,6 +86,8 @@ class _BookList extends ConsumerWidget {
       itemCount: books.length,
       itemBuilder: (context, index) {
         final libraryBook = books[index];
+        final userReviewAsync = ref.watch(userReviewForBookProvider(libraryBook.bookId));
+
         return Column(
           children: [
             BookCard(
@@ -103,7 +106,15 @@ class _BookList extends ConsumerWidget {
               trailing: PopupMenuButton<String>(
                 onSelected: (value) async {
                   if (value == 'review') {
-                    ReviewDialog.show(context, libraryBook);
+                    final existingReview = userReviewAsync.value;
+                    ReviewDialog.show(
+                      context, 
+                      libraryBook,
+                      id: existingReview?.id,
+                      initialRating: existingReview?.rating,
+                      initialText: existingReview?.reviewText,
+                      activityId: existingReview?.activityId,
+                    );
                   } else {
                     try {
                       final status = ReadingStatus.values.firstWhere((e) => e.name == value);
@@ -115,23 +126,29 @@ class _BookList extends ConsumerWidget {
                     }
                   }
                 },
-                itemBuilder: (context) => [
-                  ...ReadingStatus.values.map((status) {
-                    return PopupMenuItem(
-                      value: status.name,
-                      child: Text(status.label),
-                    );
-                  }),
-                  const PopupMenuDivider(),
-                  const PopupMenuItem(
-                    value: 'review',
-                    child: Text('Rate & Review', style: TextStyle(color: Colors.blue)),
-                  ),
-                  PopupMenuItem(
-                    onTap: () => ref.read(libraryActionProvider.notifier).removeBook(libraryBook.bookId),
-                    child: const Text('Remove from Library', style: TextStyle(color: Colors.red)),
-                  ),
-                ],
+                itemBuilder: (context) {
+                  final hasReview = userReviewAsync.value != null;
+                  return [
+                    ...ReadingStatus.values.map((status) {
+                      return PopupMenuItem(
+                        value: status.name,
+                        child: Text(status.label),
+                      );
+                    }),
+                    const PopupMenuDivider(),
+                    PopupMenuItem(
+                      value: 'review',
+                      child: Text(
+                        hasReview ? 'Edit Review' : 'Rate & Review', 
+                        style: const TextStyle(color: Colors.blue),
+                      ),
+                    ),
+                    PopupMenuItem(
+                      onTap: () => ref.read(libraryActionProvider.notifier).removeBook(libraryBook.bookId),
+                      child: const Text('Remove from Library', style: TextStyle(color: Colors.red)),
+                    ),
+                  ];
+                },
               ),
             ),
             if (libraryBook.status == ReadingStatus.reading) ...[
@@ -295,3 +312,4 @@ class _BookList extends ConsumerWidget {
     );
   }
 }
+.

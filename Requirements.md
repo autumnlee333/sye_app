@@ -95,10 +95,12 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
 
   [x] 3.1.2 Activity History on Profile: The "MainIdea" in Requirements.md mentions  an "Activity History" section on the profile (a list of the user's past reviews and milestones). Currently, the profile only shows the "Top 3 Favorites."
 
-   [x] 3.1.3 Book Details Screen: While we can see a global feed of reviews, there is no way to click on a book and see all reviews for just that specific book. Most onTap methods for books are currently marked with // TODO: Book Details.
+   [x] 3.1.3 Book Details Screen: While we can see a global feed of reviews, there is no way to click on a book and see all
+      reviews for just that specific book. Most onTap methods for books are currently marked with // TODO: Book
+      Details.
 
 
-   3.1.4. Review Management in Library: In the "Finished" tab of the Library, it would be a better user experience if
+   [x] 3.1.4 Review Management in Library: In the "Finished" tab of the Library, it would be a better user experience if
       the "Rate & Review" option changed to "Edit Review" or "View Review" if the user has already submitted one.
    3.1.5. Duplicate Prevention: There is currently no logic to prevent a user from accidentally posting multiple
       different reviews for the same book.
@@ -152,3 +154,4 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
  [ ] 8.1 **User-to-User Chat**
    - **Concept:** Foster community discussion through a direct messaging feature where readers can discuss books.
    - **Goal:** Implement a real-time chat service using Firestore for private 1-on-1 messaging.
+
