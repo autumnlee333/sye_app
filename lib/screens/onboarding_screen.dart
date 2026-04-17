@@ -12,7 +12,6 @@ class OnboardingScreen extends ConsumerStatefulWidget {
   @override
   ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
 }
-
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
@@ -21,7 +20,22 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   bool _isLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+    // Pre-fill display name from auth provider if available
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authUser = ref.read(authProvider).asData?.value;
+      if (authUser != null && authUser.displayName != null && _nameController.text.isEmpty) {
+        setState(() {
+          _nameController.text = authUser.displayName!;
+        });
+      }
+    });
+  }
+
+  @override
   void dispose() {
+
     _nameController.dispose();
     _bioController.dispose();
     super.dispose();

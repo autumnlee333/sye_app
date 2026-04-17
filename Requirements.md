@@ -113,45 +113,74 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
    - **Concept:** Build the social graph of the app, allowing readers to connect with others who share similar tastes.
    - **Goal:** Allow users to follow/unfollow each other and store these relationships in Firestore.
 
-**Feature 4: Community & Lists**
+**Feature 4: Advanced Experience Improvements (Post-MVP)**
 
- [ ] 4.1 **Custom & Shared Book Lists**
+ [ ] 4.1 **Advanced Search Logic**
+   - **Concept:** Improve the search experience by making it more forgiving and intuitive, handling typos and partial matches gracefully.
+   - **Goal:** Implement a fuzzy search algorithm or better API querying to ensure users find books even with minor misspellings.
+
+ [ ] 4.2 **Smart Recommendations Engine**
+   - **Concept:** Move beyond simple genre matching to a "Netflix-style" recommendation system based on specific tropes, authors, and niche themes.
+   - **Goal:** Leverage the Google Books API and internal user data to suggest books like "Books set in libraries" or specific tropes (e.g., "enemies-to-lovers").
+
+ [ ] 4.3 **Bulk Shelf Management**
+   - **Concept:** Streamline library organization by allowing users to manage multiple books simultaneously.
+   - **Goal:** Implement a "Batch Mode" in the Library where users can select multiple books to move between shelves or remove from their collection at once.
+
+ [ ] 4.4 **Enhanced Rating System (Half Stars)**
+     - **Concept:** Provide more nuance to book evaluations by allowing users to rate books using half-star increments.
+     - **Goal:** Update the rating UI and `ReviewModel` to support 0.5-step ratings (e.g., 4.5 stars).
+
+ [ ] 4.5 **Reading Memories**
+   - **Concept:** Foster nostalgia and re-engagement by reminding users of their past reading milestones.
+   - **Goal:** Implement a "On This Day" feature that notifies users about what they were reading or reviewing on the same date in previous years.
+
+ [ ] 4.6 **Customized Yearly Goals**
+   - **Concept:** Expand yearly challenges to include custom sub-goals (e.g., "Read 5 Non-fiction books", "Read 3 books over 500 pages").
+   - **Goal:** Update the goal tracking logic to support varied criteria beyond simple book counts.
+
+ [ ] 4.7 **Reading Statistics & Visualizations**
+   - **Concept:** Turn a user's reading history into actionable and visually appealing data.
+   - **Goal:** Create a dashboard on the profile with charts and stats showing reading habits (e.g., books per month, genre breakdown, page count trends).
+
+**Feature 5: Community & Lists**
+
+ [ ] 5.1 **Custom & Shared Book Lists**
    - **Concept:** Allow users to curate and share themed collections, including the ability to create "Shared Lists" between multiple users.
    - **Goal:** Enable users to create public, private, or collaborative themed lists (e.g., "Best Sci-Fi of 2024").
 
- [ ] 4.2 **Reading Goals & Gamification**
+ [ ] 5.2 **Reading Goals & Gamification**
    - **Concept:** Motivate users through yearly challenges, reading streaks, and unlockable badges that attach to their profile.
    - **Goal:** Implement a yearly challenge progress bar and logic for "Streak" and "Goal reached" badges.
 
-**Feature 5: Privacy and Settings**
+**Feature 6: Privacy and Settings**
 
- [ ] 5.1 **Private Shelves**
+ [ ] 6.1 **Private Shelves**
    - **Concept:** Respect user privacy by giving them control over which parts of their library are public or "eyes-only."
    - **Goal:** Option to make specific bookshelves or lists private from other users.
 
- [ ] 5.2 **Account Settings**
+ [ ] 6.2 **Account Settings**
    - **Concept:** Provide essential tools for users to manage their identity and account security.
    - **Goal:** Implement change password, delete account, and change username features.
 
- [ ] 5.3 **Theme Toggle**
+ [ ] 6.3 **Theme Toggle**
    - **Concept:** Enhance accessibility and visual comfort by offering a choice between light and dark aesthetics.
    - **Goal:** Use `shared_preferences` to persist light/dark mode selection.
 
-**Feature 6: Notifications**
+**Feature 7: Notifications**
 
- [ ] 6.1 **Push Notifications & Reminders**
+ [ ] 7.1 **Push Notifications & Reminders**
    - **Concept:** Keep users engaged with alerts for social interactions and inactivity reminders if they haven't opened the app in a while.
    - **Goal:** Notify users of new followers/likes, and implement a "reminder to read" system for inactive users.
 
-**Feature 7: Navigation and Structure**
+**Feature 8: Navigation and Structure**
 
- [ ] 7.1 **Main App Layout**
+ [ ] 8.1 **Main App Layout**
    - **Concept:** Establish a modern, "Instagram-like" hierarchy with a high-performance UI.
    - **Goal:** Implement a `BottomNavigationBar` with four main tabs: Home (Feed), Search, My Library, and Profile.
 
-**Feature 8: Real-Time Communication**
+**Feature 9: Real-Time Communication**
 
- [ ] 8.1 **User-to-User Chat**
+ [ ] 9.1 **User-to-User Chat**
    - **Concept:** Foster community discussion through a direct messaging feature where readers can discuss books.
    - **Goal:** Implement a real-time chat service using Firestore for private 1-on-1 messaging.
-

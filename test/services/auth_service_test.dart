@@ -11,6 +11,11 @@ class MockUser extends Mock implements User {}
 class MockGoogleSignIn extends Mock implements GoogleSignIn {}
 class MockGoogleSignInAccount extends Mock implements GoogleSignInAccount {}
 class MockGoogleSignInAuthentication extends Mock implements GoogleSignInAuthentication {}
+class MockGoogleSignInClientAuthorization extends Mock implements GoogleSignInClientAuthorization {}
+class MockGoogleSignInAuthorizationClient extends Mock implements GoogleSignInAuthorizationClient {}
+
+// Helper for Mocktail to handle complex types in any()
+class FakeAuthCredential extends Fake implements AuthCredential {}
 
 void main() {
   late AuthService authService;
@@ -18,12 +23,24 @@ void main() {
   late MockGoogleSignIn mockGoogleSignIn;
   late MockUserCredential mockUserCredential;
   late MockUser mockUser;
+  late MockGoogleSignInAccount mockGoogleAccount;
+  late MockGoogleSignInAuthentication mockGoogleAuth;
+  late MockGoogleSignInClientAuthorization mockGoogleClientAuth;
+  late MockGoogleSignInAuthorizationClient mockGoogleAuthorizationClient;
+
+  setUpAll(() {
+    registerFallbackValue(FakeAuthCredential());
+  });
 
   setUp(() {
     mockAuth = MockFirebaseAuth();
     mockGoogleSignIn = MockGoogleSignIn();
     mockUserCredential = MockUserCredential();
     mockUser = MockUser();
+    mockGoogleAccount = MockGoogleSignInAccount();
+    mockGoogleAuth = MockGoogleSignInAuthentication();
+    mockGoogleClientAuth = MockGoogleSignInClientAuthorization();
+    mockGoogleAuthorizationClient = MockGoogleSignInAuthorizationClient();
     
     // Inject mocks into the AuthService
     authService = AuthService(auth: mockAuth, googleSignIn: mockGoogleSignIn);
@@ -67,6 +84,35 @@ void main() {
             email: tEmail,
             password: tPassword,
           )).called(1);
+    });
+
+    test('signInWithGoogle returns UserCredential on success', () async {
+      // ARRANGE
+      const tAccessToken = 'access-token';
+      const tIdToken = 'id-token';
+
+      when(() => mockGoogleSignIn.initialize()).thenAnswer((_) async => {});
+      when(() => mockGoogleSignIn.authenticate()).thenAnswer((_) async => mockGoogleAccount);
+      when(() => mockGoogleAccount.authorizationClient).thenReturn(mockGoogleAuthorizationClient);
+      when(() => mockGoogleAuthorizationClient.authorizeScopes(any())).thenAnswer((_) async => mockGoogleClientAuth);
+      when(() => mockGoogleClientAuth.accessToken).thenReturn(tAccessToken);
+      
+      // In v7.2.0, authentication seems to be a getter returning the value directly (not a Future)
+      when(() => mockGoogleAccount.authentication).thenReturn(mockGoogleAuth);
+      when(() => mockGoogleAuth.idToken).thenReturn(tIdToken);
+      
+      // Mock Firebase's signInWithCredential
+      when(() => mockAuth.signInWithCredential(any())).thenAnswer((_) async => mockUserCredential);
+
+      // ACT
+      final result = await authService.signInWithGoogle();
+
+      // ASSERT
+      expect(result, mockUserCredential);
+      verify(() => mockGoogleSignIn.initialize()).called(1);
+      verify(() => mockGoogleSignIn.authenticate()).called(1);
+      verify(() => mockGoogleAuthorizationClient.authorizeScopes(['email', 'profile'])).called(1);
+      verify(() => mockAuth.signInWithCredential(any())).called(1);
     });
 
     test('signOut calls Firebase and Google signOut', () async {

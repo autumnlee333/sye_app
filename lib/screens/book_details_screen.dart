@@ -3,8 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/book_model.dart';
 import '../providers/book_provider.dart';
 import '../providers/review_provider.dart';
-import '../providers/auth_provider.dart';
-import '../widgets/activity_card.dart'; // We can't use ActivityCard directly for ReviewModel without converting
+// We can't use ActivityCard directly for ReviewModel without converting
 
 class BookDetailsScreen extends ConsumerWidget {
   final String bookId;

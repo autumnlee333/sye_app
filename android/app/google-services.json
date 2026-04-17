@@ -12,7 +12,12 @@
           "package_name": "com.example.sye_app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "553345211212-ml9st7nv6d9gk42fhiae5qtbqiuco427.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCXITXB_fchfa4pF8WQ9fTvvWocoTY3vgA"

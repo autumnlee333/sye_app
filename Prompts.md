@@ -153,3 +153,22 @@ This document tracks the iterative development process of the SYE (Share Your Ex
 - Resolved "missing implementation" errors in generated models.
 - Cleaned up lint warnings and missing icon references.
 - Fixed `StateProvider` errors by importing from `package:flutter_riverpod/legacy.dart`.
+
+### Google Sign-In & Onboarding UX
+**User:** The Google Sign-In feature isn't working on iOS/macOS, and the onboarding flow feels redundant.
+**Gemini:**
+- **Auth API Update:** Adapted `AuthService` to the **google_sign_in 7.2.0** breaking changes (decoupled auth and authorization).
+- **iOS/macOS Fix:** Added missing `GIDClientID` and `CFBundleURLTypes` to `Info.plist`, and updated `GoogleService-Info.plist` with necessary `CLIENT_ID` keys.
+- **Android Fix:** Restored the `oauth_client` section in `google-services.json`.
+- **Onboarding UX:** Enhanced `OnboardingScreen` to pre-fill the "Display Name" field using the user's authenticated Google account name.
+- **Verification:** Implemented comprehensive unit tests in `test/services/auth_service_test.dart` to validate the new sign-in flow.
+
+### Firestore Permissions Issue
+**User:** I'm getting a "Profile Error: [cloud_firestore/permission-denied]" even though Google Sign-In is working.
+**Gemini:**
+- **Root Cause:** Identified that the Firestore Security Rules were either in "Test Mode" (expired) or too restrictive, blocking the initial profile read for new Google users.
+- **Resolution:** Provided a comprehensive set of Firestore Security Rules to allow:
+    - Authenticated users to read any profile (for social features).
+    - Users to write only to their own profile and library.
+    - Owners to manage their own activities and reviews.
+    - Global read access for the activity feed.
