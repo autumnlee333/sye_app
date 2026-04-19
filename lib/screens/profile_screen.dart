@@ -80,6 +80,14 @@ class ProfileScreen extends ConsumerWidget {
                   user.displayName,
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
+                Text(
+                  '@${user.username}',
+                  style: TextStyle(
+                    fontSize: 16, 
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 Text(
                   user.bio,

@@ -25,6 +25,7 @@ abstract class UserModel with _$UserModel {
   const factory UserModel({
     required String uid,
     required String displayName,
+    required String username,
     required String bio,
     required String profilePicUrl,
     required List<String> favoriteGenres,

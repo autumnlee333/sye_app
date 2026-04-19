@@ -54,20 +54,40 @@ class UserService {
     });
   }
 
-  /// Searches for users by display name (case-insensitive prefix search).
+  /// Checks if a username is already taken.
+  Future<bool> isUsernameAvailable(String username) async {
+    final query = await _usersCollection
+        .where('username', isEqualTo: username.toLowerCase())
+        .limit(1)
+        .get();
+    return query.docs.isEmpty;
+  }
+
+  /// Searches for users by username or display name (case-insensitive prefix search).
   Future<List<UserModel>> searchUsers(String query) async {
     if (query.isEmpty) return [];
 
-    // Simple prefix search: displayName >= query and displayName < query + z
-    // Note: Firestore is case-sensitive, so we'd typically store a lowercase field 
-    // for true case-insensitive search. For now, we'll do a simple prefix search.
-    final snapshot = await _usersCollection
+    final searchTerm = query.toLowerCase();
+
+    // Search by username (most accurate for finding specific people)
+    final usernameSnapshot = await _usersCollection
+        .where('username', isGreaterThanOrEqualTo: searchTerm)
+        .where('username', isLessThanOrEqualTo: '$searchTerm\uf8ff')
+        .limit(20)
+        .get();
+
+    if (usernameSnapshot.docs.isNotEmpty) {
+      return usernameSnapshot.docs.map((doc) => UserModel.fromJson(doc.data())).toList();
+    }
+
+    // Fallback to display name if no exact username matches
+    final displayNameSnapshot = await _usersCollection
         .where('displayName', isGreaterThanOrEqualTo: query)
         .where('displayName', isLessThanOrEqualTo: '$query\uf8ff')
         .limit(20)
         .get();
 
-    return snapshot.docs.map((doc) => UserModel.fromJson(doc.data())).toList();
+    return displayNameSnapshot.docs.map((doc) => UserModel.fromJson(doc.data())).toList();
   }
   }
 

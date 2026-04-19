@@ -151,6 +151,11 @@ This document tracks the iterative development process of the SYE (Share Your Ex
 - **State Management:** Created `userSearchProvider` to manage asynchronous search states and results.
 - **Community UI:** Built `CommunityScreen` featuring a user search bar, results list with quick-follow actions, and seamless profile navigation.
 - **Navigation:** Integrated the new "Community" hub into the main bottom navigation bar.
+- **Unique Usernames:**
+    - Updated `UserModel` to include a mandatory `username` field.
+    - Enhanced `OnboardingScreen` to collect and validate unique usernames (at least 3 characters, alphanumeric/underscores).
+    - Implemented real-time username availability checks in `UserService`.
+    - Updated `CommunityScreen` and `ProfileScreen` to prominently display `@username` handles for easier identification.
 
 ---
 

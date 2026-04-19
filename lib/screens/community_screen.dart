@@ -105,10 +105,23 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
                           : null,
                     ),
                     title: Text(user.displayName),
-                    subtitle: Text(
-                      user.bio,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '@${user.username}',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                        Text(
+                          user.bio,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
                     trailing: ref.watch(isFollowingProvider(user.uid)).when(
                           data: (isFollowing) => TextButton(

@@ -15,6 +15,7 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _bioController = TextEditingController();
   final List<String> _selectedGenres = [];
   bool _isLoading = false;
@@ -28,6 +29,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       if (authUser != null && authUser.displayName != null && _nameController.text.isEmpty) {
         setState(() {
           _nameController.text = authUser.displayName!;
+          // Create a default username from display name (lowercase, no spaces)
+          _usernameController.text = authUser.displayName!.replaceAll(' ', '').toLowerCase();
         });
       }
     });
@@ -35,8 +38,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   void dispose() {
-
     _nameController.dispose();
+    _usernameController.dispose();
     _bioController.dispose();
     super.dispose();
   }
@@ -65,9 +68,24 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     setState(() => _isLoading = true);
 
     try {
+      final username = _usernameController.text.trim().toLowerCase();
+      
+      // Check for username availability
+      final isAvailable = await ref.read(userServiceProvider).isUsernameAvailable(username);
+      if (!isAvailable) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Username is already taken.')),
+          );
+          setState(() => _isLoading = false);
+        }
+        return;
+      }
+
       final userModel = UserModel(
         uid: authUser.uid,
         displayName: _nameController.text.trim(),
+        username: username,
         bio: _bioController.text.trim(),
         profilePicUrl: authUser.photoURL ?? '',
         favoriteGenres: _selectedGenres,
@@ -117,6 +135,28 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'Please enter your name';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _usernameController,
+                decoration: const InputDecoration(
+                  labelText: 'Username',
+                  hintText: 'Choose a unique handle...',
+                  prefixText: '@',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Please choose a username';
+                  }
+                  if (value.length < 3) {
+                    return 'Username must be at least 3 characters';
+                  }
+                  if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
+                    return 'Letters, numbers, and underscores only';
                   }
                   return null;
                 },
