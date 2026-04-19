@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/custom_list_model.dart';
@@ -22,7 +23,13 @@ class ListDetailsScreen extends ConsumerWidget {
         title: Text(currentList.name),
         actions: [
           IconButton(
+            icon: const Icon(Icons.playlist_add),
+            tooltip: 'Add Book',
+            onPressed: () => _showSearchToAddDialog(context, ref, currentList),
+          ),
+          IconButton(
             icon: const Icon(Icons.delete_outline),
+            tooltip: 'Delete List',
             onPressed: () => _confirmDelete(context, ref, currentList),
           ),
         ],
@@ -89,6 +96,15 @@ class ListDetailsScreen extends ConsumerWidget {
     );
   }
 
+  void _showSearchToAddDialog(BuildContext context, WidgetRef ref, CustomListModel list) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _ListSearchSheet(list: list),
+    );
+  }
+
   void _confirmDelete(BuildContext context, WidgetRef ref, CustomListModel list) {
     showDialog(
       context: context,
@@ -107,6 +123,111 @@ class ListDetailsScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ListSearchSheet extends ConsumerStatefulWidget {
+  final CustomListModel list;
+  const _ListSearchSheet({required this.list});
+
+  @override
+  ConsumerState<_ListSearchSheet> createState() => _ListSearchSheetState();
+}
+
+class _ListSearchSheetState extends ConsumerState<_ListSearchSheet> {
+  final _searchController = TextEditingController();
+  Timer? _debounce;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        ref.read(bookSearchProvider.notifier).search(query.trim());
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final searchResults = ref.watch(bookSearchProvider);
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.9,
+      minChildSize: 0.5,
+      maxChildSize: 0.95,
+      builder: (context, scrollController) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              const SizedBox(height: 12),
+              Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextField(
+                  controller: _searchController,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    hintText: 'Search books to add...',
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
+                    filled: true,
+                    fillColor: Colors.grey[100],
+                  ),
+                  onChanged: _onSearchChanged,
+                ),
+              ),
+              Expanded(
+                child: searchResults.when(
+                  data: (books) => ListView.builder(
+                    controller: scrollController,
+                    itemCount: books.length,
+                    itemBuilder: (context, index) {
+                      final book = books[index];
+                      // Use the updated list state from the provider to check containment
+                      final allLists = ref.watch(userListsProvider).value ?? [];
+                      final currentList = allLists.firstWhere((l) => l.id == widget.list.id, orElse: () => widget.list);
+                      final isAlreadyInList = currentList.bookIds.contains(book.id);
+
+                      return ListTile(
+                        leading: book.thumbnailUrl != null
+                            ? Image.network(book.thumbnailUrl!, width: 40, fit: BoxFit.cover)
+                            : const Icon(Icons.book),
+                        title: Text(book.title, maxLines: 1, overflow: TextOverflow.ellipsis),
+                        subtitle: Text(book.authors.isNotEmpty ? book.authors.first : 'Unknown Author'),
+                        trailing: isAlreadyInList
+                            ? const Icon(Icons.check_circle, color: Colors.green)
+                            : const Icon(Icons.add_circle_outline, color: Colors.blue),
+                        onTap: isAlreadyInList
+                            ? null
+                            : () {
+                                ref.read(listActionProvider.notifier).addBookToList(widget.list.id, book.id);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Added to ${widget.list.name}')),
+                                );
+                              },
+                      );
+                    },
+                  ),
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (e, _) => Center(child: Text('Error: $e')),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
