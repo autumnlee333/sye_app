@@ -173,8 +173,20 @@ This document tracks the iterative development process of the SYE (Share Your Ex
 **Gemini:** 
 - **Service Enhancement:** Expanded `BookService` with `getSimilarBooks`, utilizing author and category metadata from the user's "Top 3 Favorites" to build complex API queries.
 - **Data-Driven Discovery:** Created `smartRecommendationsProvider` to reactively fetch and manage personalized book suggestions.
-- **UI Integration:** Redesigned the `FeedScreen` to include a dedicated "More Like Your Favorites" horizontal discovery row, providing users with a "Netflix-style" browsing experience.
+- **Explore Hub (Architecture Update):** 
+    - Created a dedicated `ExploreTab` consolidating book search and discovery into one high-intent screen.
+    - Moved horizontal recommendation rows ("Explore by Genre" and "More Like Your Favorites") from the home screen to the top of the Explore tab.
+    - Refactored `FeedScreen` to focus exclusively on the social "Live Board", creating a cleaner Instagram-style social experience.
 - **Logic refinement:** Implemented filtering to ensure users are not recommended books they already have in their "Top Favorites."
+
+### 4.3 Custom Book Lists (Personalized Shelves)
+**User:** There are no personalized shelves. We need them before bulk management.
+**Gemini:** 
+- **Model:** Created `CustomListModel` for themed collections (name, description, privacy, book list).
+- **Service:** Implemented `ListService` with atomic array operations for adding/removing books.
+- **Library UI:** Redesigned `LibraryScreen` to include a new "My Custom Lists" section with a creation workflow.
+- **Discovery Integration:** Added a "Quick Add to List" feature to the `BookDetailsScreen`, allowing users to organize books while browsing.
+- **List Management:** Built `ListDetailsScreen` for viewing, editing, and deleting specific custom shelves.
 
 ---
 

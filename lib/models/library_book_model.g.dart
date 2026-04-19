@@ -18,6 +18,12 @@ _LibraryBookModel _$LibraryBookModelFromJson(Map<String, dynamic> json) =>
       addedAt: DateTime.parse(json['addedAt'] as String),
       currentPage: (json['currentPage'] as num?)?.toInt() ?? 0,
       totalPages: (json['totalPages'] as num?)?.toInt() ?? 0,
+      averageRating: (json['averageRating'] as num?)?.toDouble(),
+      categories:
+          (json['categories'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$LibraryBookModelToJson(_LibraryBookModel instance) =>
@@ -30,6 +36,8 @@ Map<String, dynamic> _$LibraryBookModelToJson(_LibraryBookModel instance) =>
       'addedAt': instance.addedAt.toIso8601String(),
       'currentPage': instance.currentPage,
       'totalPages': instance.totalPages,
+      'averageRating': instance.averageRating,
+      'categories': instance.categories,
     };
 
 const _$ReadingStatusEnumMap = {

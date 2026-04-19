@@ -127,31 +127,35 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
    - **Concept:** Move beyond simple genre matching to a "Netflix-style" recommendation system based on specific tropes, authors, and niche themes.
    - **Goal:** Leverage the Google Books API and internal user data to suggest books like "Books set in libraries" or specific tropes (e.g., "enemies-to-lovers").
 
- [ ] 4.3 **Bulk Shelf Management**
+ [x] 4.3 **Custom Book Lists (Personalized Shelves)**
+   - **Concept:** Empower users to curate themed collections beyond the three default statuses.
+   - **Goal:** Enable users to create, name, and add books to custom public or private lists (e.g. "Favorite Thrillers", "2024 TBR").
+
+ [ ] 4.4 **Bulk Shelf Management**
    - **Concept:** Streamline library organization by allowing users to manage multiple books simultaneously.
    - **Goal:** Implement a "Batch Mode" in the Library where users can select multiple books to move between shelves or remove from their collection at once.
 
- [ ] 4.4 **Enhanced Rating System (Half Stars)**
+ [ ] 4.5 **Enhanced Rating System (Half Stars)**
      - **Concept:** Provide more nuance to book evaluations by allowing users to rate books using half-star increments.
      - **Goal:** Update the rating UI and `ReviewModel` to support 0.5-step ratings (e.g., 4.5 stars).
 
- [ ] 4.5 **Reading Memories**
+ [ ] 4.6 **Reading Memories**
    - **Concept:** Foster nostalgia and re-engagement by reminding users of their past reading milestones.
    - **Goal:** Implement a "On This Day" feature that notifies users about what they were reading or reviewing on the same date in previous years.
 
- [ ] 4.6 **Customized Yearly Goals**
+ [ ] 4.7 **Customized Yearly Goals**
    - **Concept:** Expand yearly challenges to include custom sub-goals (e.g., "Read 5 Non-fiction books", "Read 3 books over 500 pages").
    - **Goal:** Update the goal tracking logic to support varied criteria beyond simple book counts.
 
- [ ] 4.7 **Reading Statistics & Visualizations**
+ [ ] 4.8 **Reading Statistics & Visualizations**
    - **Concept:** Turn a user's reading history into actionable and visually appealing data.
    - **Goal:** Create a dashboard on the profile with charts and stats showing reading habits (e.g., books per month, genre breakdown, page count trends).
 
-**Feature 5: Community & Lists**
+**Feature 5: Community & Gamification**
 
- [ ] 5.1 **Custom & Shared Book Lists**
-   - **Concept:** Allow users to curate and share themed collections, including the ability to create "Shared Lists" between multiple users.
-   - **Goal:** Enable users to create public, private, or collaborative themed lists (e.g., "Best Sci-Fi of 2024").
+ [ ] 5.1 **Shared Book Lists**
+   - **Concept:** Foster collaborative discovery by allowing users to curate lists together.
+   - **Goal:** Implement "Collaborative Lists" where multiple users can contribute books to a single shared collection.
 
  [ ] 5.2 **Reading Goals & Gamification**
    - **Concept:** Motivate users through yearly challenges, reading streaks, and unlockable badges that attach to their profile.
@@ -179,16 +183,11 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
 
 **Feature 8: Navigation and Structure**
 
- [ ] 8.1 **Main App Layout**
+ [x] 8.1 **Main App Layout**
    - **Concept:** Establish a modern, "Instagram-like" hierarchy with a high-performance UI.
-   - **Goal:** Implement a `BottomNavigationBar` with five main tabs: Home (Feed), Community (User Search), Search (Books), My Library, and Profile.
+   - **Goal:** Implement a `BottomNavigationBar` with five main tabs: Home (Social Feed), Explore (Discovery & Search), Community (User Search), My Library, and Profile.
 
 **Feature 9: Real-Time Communication**
-
- [ ] 9.1 **User-to-User Chat**
-   - **Concept:** Foster community discussion through a direct messaging feature where readers can discuss books.
-   - **Goal:** Implement a real-time chat service using Firestore for private 1-on-1 messaging.
-eature 9: Real-Time Communication**
 
  [ ] 9.1 **User-to-User Chat**
    - **Concept:** Foster community discussion through a direct messaging feature where readers can discuss books.

@@ -30,6 +30,17 @@ final userLibraryProvider = StreamProvider<List<LibraryBookModel>>((ref) {
   );
 });
 
+/// A provider that filters the user's library by [ReadingStatus].
+final libraryProvider = Provider.family<AsyncValue<List<LibraryBookModel>>, ReadingStatus>((ref, status) {
+  final libraryAsync = ref.watch(userLibraryProvider);
+  
+  return libraryAsync.when(
+    data: (books) => AsyncValue.data(books.where((b) => b.status == status).toList()),
+    loading: () => const AsyncValue.loading(),
+    error: (e, st) => AsyncValue.error(e, st),
+  );
+});
+
 /// A notifier to manage library operations.
 class LibraryNotifier extends AsyncNotifier<void> {
   @override

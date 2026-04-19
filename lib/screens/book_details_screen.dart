@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/book_model.dart';
 import '../providers/book_provider.dart';
 import '../providers/review_provider.dart';
-// We can't use ActivityCard directly for ReviewModel without converting
+import '../providers/list_provider.dart';
 
 class BookDetailsScreen extends ConsumerWidget {
   final String bookId;
-  final BookModel? initialBook; // Optional initial data to show while loading
+  final BookModel? initialBook;
 
   const BookDetailsScreen({
     super.key,
@@ -23,6 +23,17 @@ class BookDetailsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Book Details'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.playlist_add),
+            onPressed: () {
+              final book = bookAsync.value ?? initialBook;
+              if (book != null) {
+                _showAddToListDialog(context, ref, book.id);
+              }
+            },
+          ),
+        ],
       ),
       body: bookAsync.when(
         data: (book) {
@@ -173,6 +184,53 @@ class BookDetailsScreen extends ConsumerWidget {
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
+      ),
+    );
+  }
+
+  void _showAddToListDialog(BuildContext context, WidgetRef ref, String bookId) {
+    final listsAsync = ref.watch(userListsProvider);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add to Custom List'),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: listsAsync.when(
+            data: (lists) {
+              if (lists.isEmpty) {
+                return const Text('You haven\'t created any custom lists yet. Go to your Library to create one!');
+              }
+              return ListView.builder(
+                shrinkWrap: true,
+                itemCount: lists.length,
+                itemBuilder: (context, index) {
+                  final list = lists[index];
+                  final isAlreadyInList = list.bookIds.contains(bookId);
+
+                  return ListTile(
+                    leading: Icon(list.isPrivate ? Icons.lock_outline : Icons.list),
+                    title: Text(list.name),
+                    trailing: isAlreadyInList ? const Icon(Icons.check, color: Colors.green) : const Icon(Icons.add),
+                    onTap: isAlreadyInList ? null : () {
+                      ref.read(listActionProvider.notifier).addBookToList(list.id, bookId);
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Added to ${list.name}')),
+                      );
+                    },
+                  );
+                },
+              );
+            },
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, _) => Text('Error: $e'),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+        ],
       ),
     );
   }

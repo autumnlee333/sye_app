@@ -1,310 +1,169 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/library_book_model.dart';
+import '../models/custom_list_model.dart';
 import '../providers/library_provider.dart';
-import '../providers/review_provider.dart';
+import '../providers/list_provider.dart';
 import '../widgets/book_card.dart';
-import '../widgets/review_dialog.dart';
 import 'book_details_screen.dart';
+import 'list_details_screen.dart';
 
 class LibraryScreen extends ConsumerWidget {
   const LibraryScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final libraryAsync = ref.watch(userLibraryProvider);
+    final listsAsync = ref.watch(userListsProvider);
 
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('My Library'),
-          bottom: const TabBar(
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white70,
-            indicatorColor: Colors.white,
-            tabs: [
-              Tab(text: 'Reading'),
-              Tab(text: 'Want to Read'),
-              Tab(text: 'Finished'),
-            ],
-          ),
-        ),
-        body: libraryAsync.when(
-          data: (books) {
-            if (books.isEmpty) {
-              return const Center(
-                child: Text('Your library is empty. Start adding books!'),
-              );
-            }
-
-            final reading = books.where((b) => b.status == ReadingStatus.reading).toList();
-            final wantToRead = books.where((b) => b.status == ReadingStatus.wantToRead).toList();
-            final finished = books.where((b) => b.status == ReadingStatus.finished).toList();
-
-            return TabBarView(
-              children: [
-                _BookList(
-                  books: reading,
-                  emptyMessage: 'Not reading anything yet.',
-                ),
-                _BookList(
-                  books: wantToRead,
-                  emptyMessage: 'No books on your wishlist.',
-                ),
-                _BookList(
-                  books: finished,
-                  emptyMessage: 'No books finished yet.',
-                ),
-              ],
-            );
-          },
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(child: Text('Error loading library: $e')),
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('My Library'),
+        centerTitle: true,
       ),
-    );
-  }
-}
-
-class _BookList extends ConsumerWidget {
-  final List<LibraryBookModel> books;
-  final String emptyMessage;
-
-  const _BookList({
-    required this.books,
-    required this.emptyMessage,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    if (books.isEmpty) {
-      return Center(child: Text(emptyMessage, style: const TextStyle(color: Colors.grey)));
-    }
-
-    return ListView.builder(
-      itemCount: books.length,
-      itemBuilder: (context, index) {
-        final libraryBook = books[index];
-        final userReviewAsync = ref.watch(userReviewForBookProvider(libraryBook.bookId));
-
-        return Column(
-          children: [
-            BookCard(
-              title: libraryBook.title,
-              authors: libraryBook.authors,
-              thumbnailUrl: libraryBook.thumbnailUrl,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => BookDetailsScreen(
-                      bookId: libraryBook.bookId,
-                    ),
-                  ),
-                );
-              },
-              trailing: PopupMenuButton<String>(
-                onSelected: (value) async {
-                  if (value == 'review') {
-                    final existingReview = userReviewAsync.value;
-                    ReviewDialog.show(
-                      context, 
-                      libraryBook,
-                      id: existingReview?.id,
-                      initialRating: existingReview?.rating,
-                      initialText: existingReview?.reviewText,
-                      activityId: existingReview?.activityId,
-                    );
-                  } else {
-                    try {
-                      final status = ReadingStatus.values.firstWhere((e) => e.name == value);
-                      debugPrint('Updating status for ${libraryBook.title} to $status');
-                      
-                      await ref.read(libraryActionProvider.notifier).updateStatus(libraryBook, status);
-                    } catch (e) {
-                      debugPrint('Error updating status: $e');
-                    }
-                  }
-                },
-                itemBuilder: (context) {
-                  final hasReview = userReviewAsync.value != null;
-                  return [
-                    ...ReadingStatus.values.map((status) {
-                      return PopupMenuItem(
-                        value: status.name,
-                        child: Text(status.label),
-                      );
-                    }),
-                    const PopupMenuDivider(),
-                    PopupMenuItem(
-                      value: 'review',
-                      child: Text(
-                        hasReview ? 'Edit Review' : 'Rate & Review', 
-                        style: const TextStyle(color: Colors.blue),
-                      ),
-                    ),
-                    PopupMenuItem(
-                      onTap: () => ref.read(libraryActionProvider.notifier).removeBook(libraryBook.bookId),
-                      child: const Text('Remove from Library', style: TextStyle(color: Colors.red)),
-                    ),
-                  ];
-                },
+      body: CustomScrollView(
+        slivers: [
+          const SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Text(
+                'Status',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
-            if (libraryBook.status == ReadingStatus.reading) ...[
-              if (libraryBook.totalPages > 0)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0),
-                  child: Column(
-                    children: [
-                      LinearProgressIndicator(
-                        value: libraryBook.currentPage / libraryBook.totalPages,
-                        backgroundColor: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            '${((libraryBook.currentPage / libraryBook.totalPages) * 100).toInt()}% complete',
-                            style: const TextStyle(fontSize: 12, color: Colors.grey),
-                          ),
-                          Text(
-                            'Page ${libraryBook.currentPage} of ${libraryBook.totalPages}',
-                            style: const TextStyle(fontSize: 12, color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Row(
+          ),
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: 400, // Fixed height for status tabs
+              child: DefaultTabController(
+                length: 3,
+                child: Column(
                   children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        icon: const Icon(Icons.edit_note, size: 18),
-                        label: const Text('Update Progress'),
-                        onPressed: () => _showUpdateProgressDialog(context, ref, libraryBook),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        ),
-                      ),
+                    const TabBar(
+                      tabs: [
+                        Tab(text: 'Reading'),
+                        Tab(text: 'Want to Read'),
+                        Tab(text: 'Finished'),
+                      ],
+                      labelColor: Colors.blue,
+                      unselectedLabelColor: Colors.grey,
                     ),
-                    const SizedBox(width: 8),
                     Expanded(
-                      child: ElevatedButton.icon(
-                        icon: const Icon(Icons.send, size: 18),
-                        label: const Text('Post Thought'),
-                        onPressed: () => _showUpdateProgressDialog(context, ref, libraryBook, forcePost: true),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        ),
+                      child: TabBarView(
+                        children: [
+                          _LibraryList(status: ReadingStatus.reading),
+                          _LibraryList(status: ReadingStatus.wantToRead),
+                          _LibraryList(status: ReadingStatus.finished),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 8),
-            ],
-          ],
-        );
-      },
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'My Custom Lists',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.add_circle_outline, color: Colors.blue),
+                    onPressed: () => _showCreateListDialog(context, ref),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          listsAsync.when(
+            data: (lists) => lists.isEmpty
+                ? const SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.all(32.0),
+                      child: Center(
+                        child: Text(
+                          'No custom lists yet.\nCreate one to organize your books!',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                    ),
+                  )
+                : SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    sliver: SliverGrid(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 12,
+                        crossAxisSpacing: 12,
+                        childAspectRatio: 1.5,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final list = lists[index];
+                          return _CustomListCard(list: list);
+                        },
+                        childCount: lists.length,
+                      ),
+                    ),
+                  ),
+            loading: () => const SliverToBoxAdapter(child: Center(child: CircularProgressIndicator())),
+            error: (e, _) => SliverToBoxAdapter(child: Center(child: Text('Error: $e'))),
+          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 32)),
+        ],
+      ),
     );
   }
 
-  void _showUpdateProgressDialog(BuildContext context, WidgetRef ref, LibraryBookModel book, {bool forcePost = false}) {
-    final pageController = TextEditingController(text: book.currentPage.toString());
-    final totalController = TextEditingController(text: book.totalPages.toString());
-    final commentController = TextEditingController();
-    bool postToFeed = forcePost;
+  void _showCreateListDialog(BuildContext context, WidgetRef ref) {
+    final nameController = TextEditingController();
+    final descController = TextEditingController();
+    bool isPrivate = false;
 
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: Text(forcePost ? 'Post a Thought' : 'Update Progress'),
+          title: const Text('Create New List'),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(book.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: pageController,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Current Page',
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: TextField(
-                        controller: totalController,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Total Pages',
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
                 TextField(
-                  controller: commentController,
-                  decoration: const InputDecoration(
-                    labelText: 'What are your thoughts?',
-                    hintText: 'Share a quick update with your friends...',
-                    border: OutlineInputBorder(),
-                  ),
-                  maxLines: 3,
+                  controller: nameController,
+                  decoration: const InputDecoration(labelText: 'List Name (e.g. Summer 2024)'),
                 ),
-                if (!forcePost)
-                  CheckboxListTile(
-                    title: const Text('Post to Live Board', style: TextStyle(fontSize: 14)),
-                    value: postToFeed,
-                    onChanged: (value) => setState(() => postToFeed = value ?? false),
-                    contentPadding: EdgeInsets.zero,
-                  ),
+                TextField(
+                  controller: descController,
+                  decoration: const InputDecoration(labelText: 'Description (optional)'),
+                ),
+                SwitchListTile(
+                  title: const Text('Private List'),
+                  value: isPrivate,
+                  onChanged: (val) => setState(() => isPrivate = val),
+                ),
               ],
             ),
           ),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
             ElevatedButton(
               onPressed: () {
-                final currentPage = int.tryParse(pageController.text) ?? 0;
-                final totalPages = int.tryParse(totalController.text) ?? 0;
-                
-                ref.read(libraryActionProvider.notifier).updateProgress(
-                  book.bookId,
-                  currentPage,
-                  totalPages,
-                  comment: commentController.text.trim().isEmpty ? null : commentController.text.trim(),
-                  postToFeed: postToFeed,
-                );
-                Navigator.pop(context);
-                
-                if (postToFeed) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Thought posted to feed!')),
+                if (nameController.text.isNotEmpty) {
+                  ref.read(listActionProvider.notifier).createList(
+                    nameController.text.trim(),
+                    descController.text.trim(),
+                    isPrivate,
                   );
+                  Navigator.pop(context);
                 }
               },
-              child: Text(forcePost ? 'Post' : 'Update'),
+              child: const Text('Create'),
             ),
           ],
         ),
@@ -313,3 +172,90 @@ class _BookList extends ConsumerWidget {
   }
 }
 
+class _LibraryList extends ConsumerWidget {
+  final ReadingStatus status;
+  const _LibraryList({required this.status});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final booksAsync = ref.watch(libraryProvider(status));
+
+    return booksAsync.when(
+      data: (books) => books.isEmpty
+          ? Center(child: Text('No books in ${status.label}'))
+          : ListView.builder(
+              itemCount: books.length,
+              itemBuilder: (context, index) {
+                final book = books[index];
+                return BookCard(
+                  title: book.title,
+                  authors: book.authors,
+                  thumbnailUrl: book.thumbnailUrl,
+                  averageRating: book.averageRating,
+                  categories: book.categories,
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => BookDetailsScreen(bookId: book.bookId),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Error: $e')),
+    );
+  }
+}
+
+class _CustomListCard extends StatelessWidget {
+  final CustomListModel list;
+  const _CustomListCard({required this.list});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ListDetailsScreen(list: list),
+          ),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.blue.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
+        ),
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              children: [
+                Icon(list.isPrivate ? Icons.lock_outline : Icons.list, size: 20, color: Colors.blue),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    list.name,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '${list.bookIds.length} books',
+              style: TextStyle(color: Colors.blue[800], fontSize: 12),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
