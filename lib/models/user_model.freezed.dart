@@ -217,12 +217,12 @@ return $default(_that.uid,_that.displayName,_that.username,_that.bio,_that.profi
 @JsonSerializable()
 
 class _UserModel implements UserModel {
-  const _UserModel({required this.uid, required this.displayName, required this.username, required this.bio, required this.profilePicUrl, required final  List<String> favoriteGenres, final  List<String> topFavoriteBookIds = const [], this.followerCount = 0, this.followingCount = 0}): _favoriteGenres = favoriteGenres,_topFavoriteBookIds = topFavoriteBookIds;
+  const _UserModel({required this.uid, required this.displayName, this.username = '', required this.bio, required this.profilePicUrl, required final  List<String> favoriteGenres, final  List<String> topFavoriteBookIds = const [], this.followerCount = 0, this.followingCount = 0}): _favoriteGenres = favoriteGenres,_topFavoriteBookIds = topFavoriteBookIds;
   factory _UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
 
 @override final  String uid;
 @override final  String displayName;
-@override final  String username;
+@override@JsonKey() final  String username;
 @override final  String bio;
 @override final  String profilePicUrl;
  final  List<String> _favoriteGenres;

@@ -10,6 +10,7 @@ void main() {
     // These act as our "control group" for the following tests.
     const tUid = '123';
     const tDisplayName = 'Autumn Lee';
+    const tUsername = 'autumn_lee';
     const tBio = 'A book lover.';
     const tProfilePicUrl = 'https://example.com/pic.jpg';
     final tFavoriteGenres = ['Sci-Fi', 'Fantasy'];
@@ -17,6 +18,7 @@ void main() {
     final tUser = UserModel(
       uid: tUid,
       displayName: tDisplayName,
+      username: tUsername,
       bio: tBio,
       profilePicUrl: tProfilePicUrl,
       favoriteGenres: tFavoriteGenres,
@@ -25,10 +27,13 @@ void main() {
     final tJson = {
       'uid': tUid,
       'displayName': tDisplayName,
+      'username': tUsername,
       'bio': tBio,
       'profilePicUrl': tProfilePicUrl,
       'favoriteGenres': tFavoriteGenres,
       'topFavoriteBookIds': <String>[],
+      'followerCount': 0,
+      'followingCount': 0,
     };
 
     // 2. Test Deserialization (JSON -> Object)
@@ -38,8 +43,18 @@ void main() {
       final result = UserModel.fromJson(tJson);
 
       // ASSERT: Verify it matches our control user object.
-      // This passes because Freezed compares data values, not just memory addresses.
       expect(result, tUser);
+    });
+
+    test('should provide an empty string for username if missing from JSON', () {
+      // ARRANGE: A JSON map missing the 'username' key (legacy data)
+      final legacyJson = Map<String, dynamic>.from(tJson)..remove('username');
+
+      // ACT
+      final result = UserModel.fromJson(legacyJson);
+
+      // ASSERT
+      expect(result.username, '');
     });
 
     // 3. Test Serialization (Object -> JSON)

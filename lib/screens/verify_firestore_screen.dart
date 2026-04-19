@@ -48,6 +48,7 @@ class VerifyFirestoreScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Display Name: ${data.displayName}'),
+                        Text('Username: @${data.username}'),
                         Text('Bio: ${data.bio}'),
                         Text('Genres: ${data.favoriteGenres.join(", ")}'),
                       ],
@@ -72,10 +73,12 @@ class VerifyFirestoreScreen extends ConsumerWidget {
 
   Future<void> _createSampleUser(WidgetRef ref, String uid) async {
     final userService = ref.read(userServiceProvider);
+    final timestamp = DateTime.now().second;
     
     final sampleUser = UserModel(
       uid: uid,
-      displayName: 'Test User ${DateTime.now().second}',
+      displayName: 'Test User $timestamp',
+      username: 'testuser_$timestamp',
       bio: 'This is a sample bio created to verify Firestore logic.',
       profilePicUrl: 'https://via.placeholder.com/150',
       favoriteGenres: ['Sci-Fi', 'Mystery'],
