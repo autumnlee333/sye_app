@@ -11,12 +11,14 @@ class FeedScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final recommendationsAsync = ref.watch(recommendationsProvider);
+    final smartRecommendationsAsync = ref.watch(smartRecommendationsProvider);
     final activitiesAsync = ref.watch(allActivitiesProvider);
 
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(recommendationsProvider);
+          ref.invalidate(smartRecommendationsProvider);
           ref.invalidate(allActivitiesProvider);
         },
         child: CustomScrollView(
@@ -26,7 +28,7 @@ class FeedScreen extends ConsumerWidget {
               child: Padding(
                 padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
                 child: Text(
-                  'Recommended for You',
+                  'Explore by Genre',
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -50,6 +52,42 @@ class FeedScreen extends ConsumerWidget {
                   error: (e, _) => Center(child: Text('Error: $e')),
                 ),
               ),
+            ),
+            smartRecommendationsAsync.when(
+              data: (books) => books.isEmpty
+                  ? const SliverToBoxAdapter(child: SizedBox.shrink())
+                  : SliverToBoxAdapter(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.fromLTRB(16, 24, 16, 8),
+                            child: Text(
+                              'More Like Your Favorites',
+                              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 200,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              itemCount: books.length,
+                              itemBuilder: (context, index) {
+                                return _CompactBookCard(book: books[index]);
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+              loading: () => const SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 100,
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+              ),
+              error: (_, __) => const SliverToBoxAdapter(child: SizedBox.shrink()),
             ),
             const SliverToBoxAdapter(
               child: Padding(

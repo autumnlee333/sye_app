@@ -168,6 +168,14 @@ This document tracks the iterative development process of the SYE (Share Your Ex
 - **Search Optimization:** Increased API results pool (`maxResults: 40`) and implemented client-side re-ranking to prioritize books whose titles or authors best match the user's query.
 - **Verification:** Added comprehensive unit tests in `test/services/book_service_test.dart` to verify that typo-laden queries correctly prioritize relevant results.
 
+### 4.2 Smart Recommendations Engine
+**User:** Move beyond simple genre matching to a more personalized recommendation system.
+**Gemini:** 
+- **Service Enhancement:** Expanded `BookService` with `getSimilarBooks`, utilizing author and category metadata from the user's "Top 3 Favorites" to build complex API queries.
+- **Data-Driven Discovery:** Created `smartRecommendationsProvider` to reactively fetch and manage personalized book suggestions.
+- **UI Integration:** Redesigned the `FeedScreen` to include a dedicated "More Like Your Favorites" horizontal discovery row, providing users with a "Netflix-style" browsing experience.
+- **Logic refinement:** Implemented filtering to ensure users are not recommended books they already have in their "Top Favorites."
+
 ---
 
 ## Maintenance & Troubleshooting

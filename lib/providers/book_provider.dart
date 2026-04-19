@@ -58,3 +58,17 @@ final recommendationsProvider = FutureProvider<List<BookModel>>((ref) async {
   return await bookService.getRecommendations(userProfile.favoriteGenres);
 });
 
+/// Provider for "Smart" recommendations based on the user's actual favorite books.
+final smartRecommendationsProvider = FutureProvider<List<BookModel>>((ref) async {
+  final userProfile = ref.watch(currentUserDataProvider).value;
+  if (userProfile == null || userProfile.topFavoriteBookIds.isEmpty) return [];
+
+  final bookService = ref.read(bookServiceProvider);
+  
+  // First fetch the actual book details for the favorites
+  final favoriteBooks = await ref.watch(bookDetailsProvider(userProfile.topFavoriteBookIds).future);
+  
+  // Then get similar books based on those favorites
+  return await bookService.getSimilarBooks(favoriteBooks);
+});
+
