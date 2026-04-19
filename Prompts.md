@@ -134,6 +134,15 @@ This document tracks the iterative development process of the SYE (Share Your Ex
 **User:** Implement feature 3.2  
 **Gemini:** Successfully built the chronological "Live Board" hub that displays real-time updates (starting books, progress, reviews) from all users.
 
+### 3.3 Follow System
+**User:** Implement feature 3.3
+**Gemini:** 
+- **Model Update:** Added `followerCount` and `followingCount` to `UserModel`.
+- **Follow Service:** Created `FollowService` using Firestore atomic batches to manage relationships and sync counts.
+- **State Management:** Implemented `isFollowingProvider` (stream) and `followActionProvider` (notifier) for real-time UI updates.
+- **Profile UI:** Integrated follow stats and a dynamic "Follow/Unfollow" button on user profiles.
+- **Verification:** Added `test/services/follow_service_test.dart` to ensure atomic consistency of follow operations.
+
 ---
 
 ## Maintenance & Troubleshooting

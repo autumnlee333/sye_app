@@ -109,7 +109,7 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
    - **Concept:** A "clean", Instagram-style vertical feed where users see their friends' reading milestones and reviews in real-time.
    - **Goal:** Build a chronological feed showing updates like "Started reading" or "Rated [Book] 5 stars" with persistent posts.
 
- [ ] 3.3 **Follow System**
+ [x] 3.3 **Follow System**
    - **Concept:** Build the social graph of the app, allowing readers to connect with others who share similar tastes.
    - **Goal:** Allow users to follow/unfollow each other and store these relationships in Firestore.
 

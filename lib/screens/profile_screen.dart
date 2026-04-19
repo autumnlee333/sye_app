@@ -4,6 +4,7 @@ import '../providers/auth_provider.dart';
 import '../providers/user_provider.dart';
 import '../providers/book_provider.dart';
 import '../providers/activity_provider.dart';
+import '../providers/follow_provider.dart';
 import '../widgets/book_card.dart';
 import '../widgets/activity_card.dart';
 import 'select_favorites_screen.dart';
@@ -85,6 +86,42 @@ class ProfileScreen extends ConsumerWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                 ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _StatColumn(label: 'Followers', count: user.followerCount),
+                    const SizedBox(width: 32),
+                    _StatColumn(label: 'Following', count: user.followingCount),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                if (!isCurrentUser)
+                  ref.watch(isFollowingProvider(user.uid)).when(
+                        data: (isFollowing) => SizedBox(
+                          width: 200,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (isFollowing) {
+                                ref.read(followActionProvider.notifier).unfollow(user.uid);
+                              } else {
+                                ref.read(followActionProvider.notifier).follow(user.uid);
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: isFollowing ? Colors.grey[200] : null,
+                              foregroundColor: isFollowing ? Colors.black : null,
+                            ),
+                            child: Text(isFollowing ? 'Unfollow' : 'Follow'),
+                          ),
+                        ),
+                        loading: () => const SizedBox(
+                          height: 36,
+                          width: 36,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        error: (_, __) => const Text('Error'),
+                      ),
                 const SizedBox(height: 12),
                 Wrap(
                   spacing: 8,
@@ -217,6 +254,29 @@ class ProfileScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
       ),
+    );
+  }
+}
+
+class _StatColumn extends StatelessWidget {
+  final String label;
+  final int count;
+
+  const _StatColumn({required this.label, required this.count});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          count.toString(),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        Text(
+          label,
+          style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+        ),
+      ],
     );
   }
 }

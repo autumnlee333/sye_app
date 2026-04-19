@@ -29,6 +29,8 @@ abstract class UserModel with _$UserModel {
     required String profilePicUrl,
     required List<String> favoriteGenres,
     @Default([]) List<String> topFavoriteBookIds,
+    @Default(0) int followerCount,
+    @Default(0) int followingCount,
   }) = _UserModel;
 
   /// Connects to the generated `_$UserModelFromJson` in `user_model.g.dart`.
