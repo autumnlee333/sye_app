@@ -131,7 +131,7 @@ class BookService {
     final id = item['id'] as String;
     final title = volumeInfo['title'] as String? ?? 'No Title';
     final authors = (volumeInfo['authors'] as List<dynamic>?)?.cast<String>() ?? [];
-    final description = volumeInfo['description'] as String?;
+    final description = _stripHtml(volumeInfo['description'] as String?);
     final imageLinks = volumeInfo['imageLinks'] ?? {};
     final thumbnailUrl = (imageLinks['thumbnail'] as String?)?.replaceFirst('http://', 'https://');
     final pageCount = volumeInfo['pageCount'] as int?;
@@ -148,6 +148,12 @@ class BookService {
       averageRating: averageRating,
       categories: categories,
     );
+  }
+
+  String? _stripHtml(String? html) {
+    if (html == null) return null;
+    // Simple regex to remove HTML tags
+    return html.replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), ' ').replaceAll(RegExp(r'\s+'), ' ').trim();
   }
 
   /// Calculates the best similarity score for a book against a query.

@@ -39,6 +39,20 @@ class ListService {
     });
   }
 
+  /// Adds multiple books to a custom list.
+  Future<void> addBooksToList(String userId, String listId, List<String> bookIds) async {
+    await _listsCollection(userId).doc(listId).update({
+      'bookIds': FieldValue.arrayUnion(bookIds),
+    });
+  }
+
+  /// Removes multiple books from a custom list.
+  Future<void> removeBooksFromList(String userId, String listId, List<String> bookIds) async {
+    await _listsCollection(userId).doc(listId).update({
+      'bookIds': FieldValue.arrayRemove(bookIds),
+    });
+  }
+
   /// Streams all custom lists for a specific user.
   Stream<List<CustomListModel>> watchUserLists(String userId) {
     return _listsCollection(userId).snapshots().map((snapshot) {

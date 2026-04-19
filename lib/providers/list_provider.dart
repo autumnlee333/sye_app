@@ -58,6 +58,26 @@ class ListNotifier extends AsyncNotifier<void> {
     });
   }
 
+  Future<void> bulkAddBooksToList(String listId, List<String> bookIds) async {
+    final userId = ref.read(authProvider).value?.uid;
+    if (userId == null) return;
+
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      await ref.read(listServiceProvider).addBooksToList(userId, listId, bookIds);
+    });
+  }
+
+  Future<void> bulkRemoveBooksFromList(String listId, List<String> bookIds) async {
+    final userId = ref.read(authProvider).value?.uid;
+    if (userId == null) return;
+
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      await ref.read(listServiceProvider).removeBooksFromList(userId, listId, bookIds);
+    });
+  }
+
   Future<void> deleteList(String listId) async {
     final userId = ref.read(authProvider).value?.uid;
     if (userId == null) return;

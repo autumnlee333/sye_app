@@ -8,6 +8,8 @@ class BookCard extends StatelessWidget {
   final List<String> categories;
   final VoidCallback? onTap;
   final Widget? trailing;
+  final bool isSelected;
+  final ValueChanged<bool?>? onSelected;
 
   const BookCard({
     super.key,
@@ -18,6 +20,8 @@ class BookCard extends StatelessWidget {
     this.categories = const [],
     this.onTap,
     this.trailing,
+    this.isSelected = false,
+    this.onSelected,
   });
 
   @override
@@ -26,15 +30,29 @@ class BookCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: isSelected ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3) : null,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: isSelected 
+            ? BorderSide(color: Theme.of(context).colorScheme.primary, width: 2)
+            : BorderSide.none,
+      ),
       child: InkWell(
-        onTap: onTap,
+        onTap: onSelected != null ? () => onSelected!(!isSelected) : onTap,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(12.0),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (onSelected != null)
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0, top: 40),
+                  child: Checkbox(
+                    value: isSelected,
+                    onChanged: onSelected,
+                  ),
+                ),
               // Book Cover Thumbnail
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),

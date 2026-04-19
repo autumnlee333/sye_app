@@ -33,11 +33,31 @@ class LibraryService {
   Future<void> updateBookStatus(String uid, String bookId, ReadingStatus status) async {
     try {
       await _libraryCollection(uid).doc(bookId).update({
-        'status': status.name, // Using status.name because of @JsonValue mapping in model
+        'status': status.name,
       });
     } catch (e) {
       rethrow;
     }
+  }
+
+  /// Removes multiple books from the user's library.
+  Future<void> removeBooksFromLibrary(String uid, List<String> bookIds) async {
+    final batch = _firestore.batch();
+    for (final id in bookIds) {
+      batch.delete(_libraryCollection(uid).doc(id));
+    }
+    await batch.commit();
+  }
+
+  /// Updates the reading status of multiple books.
+  Future<void> updateBooksStatus(String uid, List<String> bookIds, ReadingStatus status) async {
+    final batch = _firestore.batch();
+    for (final id in bookIds) {
+      batch.update(_libraryCollection(uid).doc(id), {
+        'status': status.name,
+      });
+    }
+    await batch.commit();
   }
 
   /// Updates the reading progress of a book and adds an entry to the history.

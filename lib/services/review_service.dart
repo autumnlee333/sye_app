@@ -97,10 +97,12 @@ class ReviewService {
   Stream<List<ReviewModel>> watchReviewsForBook(String bookId) {
     return _reviewsCollection
         .where('bookId', isEqualTo: bookId)
-        .orderBy('timestamp', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) => ReviewModel.fromJson(doc.data())).toList();
+      final reviews = snapshot.docs.map((doc) => ReviewModel.fromJson(doc.data())).toList();
+      // Sort client-side to avoid index requirement
+      reviews.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      return reviews;
     });
   }
 

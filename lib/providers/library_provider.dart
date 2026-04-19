@@ -6,6 +6,7 @@ import '../models/activity_model.dart';
 import '../services/library_service.dart';
 import 'auth_provider.dart';
 import 'activity_provider.dart';
+import 'list_provider.dart';
 
 /// Provider for the [LibraryService].
 final libraryServiceProvider = Provider<LibraryService>((ref) {
@@ -62,6 +63,8 @@ class LibraryNotifier extends AsyncNotifier<void> {
         thumbnailUrl: book.thumbnailUrl,
         status: status,
         addedAt: DateTime.now(),
+        averageRating: book.averageRating,
+        categories: book.categories,
       );
       await ref.read(libraryServiceProvider).addBookToLibrary(user.uid, libraryBook);
       
@@ -113,6 +116,26 @@ class LibraryNotifier extends AsyncNotifier<void> {
     });
   }
 
+  Future<void> bulkRemoveBooks(List<String> bookIds) async {
+    final user = ref.read(authProvider).value;
+    if (user == null) return;
+
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      await ref.read(libraryServiceProvider).removeBooksFromLibrary(user.uid, bookIds);
+    });
+  }
+
+  Future<void> bulkUpdateStatus(List<String> bookIds, ReadingStatus status) async {
+    final user = ref.read(authProvider).value;
+    if (user == null) return;
+
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      await ref.read(libraryServiceProvider).updateBooksStatus(user.uid, bookIds, status);
+    });
+  }
+
   Future<void> updateProgress(
     String bookId, 
     int currentPage, 
@@ -153,6 +176,21 @@ class LibraryNotifier extends AsyncNotifier<void> {
         ));
       }
     });
+  }
+
+  /// Unifies adding a book to either a standard shelf or a custom list.
+  Future<void> addBookToAnyShelf({
+    required BookModel book,
+    ReadingStatus? status,
+    String? customListId,
+  }) async {
+    if (status != null) {
+      await addBook(book, status);
+    }
+    
+    if (customListId != null) {
+      await ref.read(listActionProvider.notifier).addBookToList(customListId, book.id);
+    }
   }
 }
 
