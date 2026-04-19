@@ -14,6 +14,9 @@ class EditProfileScreen extends ConsumerStatefulWidget {
 }
 
 class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
+  final _formKey = GlobalKey<FormState>();
+  late TextEditingController _nameController;
+  late TextEditingController _usernameController;
   late TextEditingController _bioController;
   late List<String> _selectedGenres;
   bool _isLoading = false;
@@ -21,12 +24,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
+    _nameController = TextEditingController(text: widget.user.displayName);
+    _usernameController = TextEditingController(text: widget.user.username);
     _bioController = TextEditingController(text: widget.user.bio);
     _selectedGenres = List<String>.from(widget.user.favoriteGenres);
   }
 
   @override
   void dispose() {
+    _nameController.dispose();
+    _usernameController.dispose();
     _bioController.dispose();
     super.dispose();
   }
@@ -42,6 +49,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   Future<void> _saveProfile() async {
+    if (!_formKey.currentState!.validate()) return;
+
     if (_selectedGenres.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select at least one genre')),
@@ -51,7 +60,25 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
     setState(() => _isLoading = true);
     try {
+      final newUsername = _usernameController.text.trim().toLowerCase();
+      
+      // If username changed, check availability
+      if (newUsername != widget.user.username.toLowerCase()) {
+        final isAvailable = await ref.read(userServiceProvider).isUsernameAvailable(newUsername);
+        if (!isAvailable) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Username is already taken.')),
+            );
+            setState(() => _isLoading = false);
+          }
+          return;
+        }
+      }
+
       final updatedUser = widget.user.copyWith(
+        displayName: _nameController.text.trim(),
+        username: newUsername,
         bio: _bioController.text.trim(),
         favoriteGenres: _selectedGenres,
       );
@@ -74,66 +101,108 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       appBar: AppBar(
         title: const Text('Edit Profile'),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
+      body: Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Display Name', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _nameController,
+                      decoration: const InputDecoration(
+                        hintText: 'What should we call you?',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Please enter your name';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    const Text('Username', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _usernameController,
+                      decoration: const InputDecoration(
+                        hintText: 'Choose a unique handle...',
+                        prefixText: '@',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Please choose a username';
+                        }
+                        if (value.length < 3) {
+                          return 'Username must be at least 3 characters';
+                        }
+                        if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
+                          return 'Letters, numbers, and underscores only';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    const Text('Bio', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _bioController,
+                      maxLines: 3,
+                      decoration: const InputDecoration(
+                        hintText: 'Tell us about your reading style...',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    const Text('Favorite Genres', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: bookGenres.map((genre) {
+                        final isSelected = _selectedGenres.contains(genre);
+                        return FilterChip(
+                          label: Text(genre),
+                          selected: isSelected,
+                          onSelected: (_) => _toggleGenre(genre),
+                          selectedColor: Theme.of(context).colorScheme.primaryContainer,
+                          checkmarkColor: Theme.of(context).colorScheme.primary,
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Bio', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _bioController,
-                    maxLines: 3,
-                    decoration: const InputDecoration(
-                      hintText: 'Tell us about your reading style...',
-                      border: OutlineInputBorder(),
+              child: SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _saveProfile,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  const Text('Favorite Genres', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: bookGenres.map((genre) {
-                      final isSelected = _selectedGenres.contains(genre);
-                      return FilterChip(
-                        label: Text(genre),
-                        selected: isSelected,
-                        onSelected: (_) => _toggleGenre(genre),
-                        selectedColor: Theme.of(context).colorScheme.primaryContainer,
-                        checkmarkColor: Theme.of(context).colorScheme.primary,
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: _isLoading ? null : _saveProfile,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text('Save Changes', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
-                child: _isLoading
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text('Save Changes', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
