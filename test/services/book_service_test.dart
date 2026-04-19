@@ -51,6 +51,42 @@ void main() {
       expect(results[0].thumbnailUrl, 'https://image.com/1'); // Check https conversion
     });
 
+    test('searchBooks re-ranks results based on fuzzy similarity', () async {
+      // The query has a typo 'fluttr'
+      const query = 'fluttr';
+      const mockResponseBody = '''
+      {
+        "items": [
+          {
+            "id": "1",
+            "volumeInfo": {
+              "title": "Random Book",
+              "authors": ["Someone"]
+            }
+          },
+          {
+            "id": "2",
+            "volumeInfo": {
+              "title": "Flutter in Action",
+              "authors": ["Eric Windmill"]
+            }
+          }
+        ]
+      }
+      ''';
+
+      when(() => mockHttpClient.get(any())).thenAnswer(
+        (_) async => http.Response(mockResponseBody, 200),
+      );
+
+      final results = await bookService.searchBooks(query);
+
+      expect(results.length, 2);
+      // 'Flutter in Action' (ID 2) should be first because it matches 'fluttr' better than 'Random Book'
+      expect(results[0].id, '2');
+      expect(results[0].title, 'Flutter in Action');
+    });
+
     test('searchBooks returns empty list if no items', () async {
       const mockResponseBody = '{"items": []}';
 

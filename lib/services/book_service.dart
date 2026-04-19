@@ -14,14 +14,29 @@ class BookService {
     if (query.isEmpty) return [];
 
     try {
-      final url = Uri.parse('$_baseUrl?q=${Uri.encodeComponent(query)}&maxResults=20&key=$_apiKey');
+      // Increase maxResults to 40 to have a larger pool for fuzzy re-ranking
+      final url = Uri.parse('$_baseUrl?q=${Uri.encodeComponent(query)}&maxResults=40&key=$_apiKey');
       final response = await _client.get(url);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final List<dynamic> items = data['items'] ?? [];
 
-        return items.map((item) => _parseBook(item)).toList();
+        final books = items.map((item) => _parseBook(item)).toList();
+
+        // Advanced Search Logic: Re-rank books based on fuzzy matching
+        // This helps handle typos by prioritizing books whose titles or authors 
+        // most closely match the query.
+        final queryLower = query.toLowerCase();
+        
+        books.sort((a, b) {
+          final scoreA = _calculateBestSimilarity(a, queryLower);
+          final scoreB = _calculateBestSimilarity(b, queryLower);
+          return scoreB.compareTo(scoreA); // Higher similarity score first
+        });
+
+        // Return the top 20 most relevant results
+        return books.take(20).toList();
       } else if (response.statusCode == 429) {
         throw Exception('Too many requests. Please wait a moment.');
       } else {
@@ -91,5 +106,37 @@ class BookService {
       categories: categories,
     );
   }
-}
 
+  /// Calculates the best similarity score for a book against a query.
+  /// Checks title and authors.
+  double _calculateBestSimilarity(BookModel book, String query) {
+    double maxScore = _diceCoefficient(book.title.toLowerCase(), query);
+    
+    for (final author in book.authors) {
+      final authorScore = _diceCoefficient(author.toLowerCase(), query);
+      if (authorScore > maxScore) maxScore = authorScore;
+    }
+    
+    return maxScore;
+  }
+
+  /// Simple string similarity using Sørensen–Dice coefficient.
+  /// Returns a value between 0.0 and 1.0.
+  double _diceCoefficient(String first, String second) {
+    if (first == second) return 1.0;
+    if (first.length < 2 || second.length < 2) return 0.0;
+
+    final firstBigrams = <String>{};
+    for (var i = 0; i < first.length - 1; i++) {
+      firstBigrams.add(first.substring(i, i + 2));
+    }
+
+    final secondBigrams = <String>{};
+    for (var i = 0; i < second.length - 1; i++) {
+      secondBigrams.add(second.substring(i, i + 2));
+    }
+
+    final intersection = firstBigrams.intersection(secondBigrams).length;
+    return (2.0 * intersection) / (firstBigrams.length + secondBigrams.length);
+  }
+}

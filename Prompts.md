@@ -156,6 +156,17 @@ This document tracks the iterative development process of the SYE (Share Your Ex
     - Enhanced `OnboardingScreen` to collect and validate unique usernames (at least 3 characters, alphanumeric/underscores).
     - Implemented real-time username availability checks in `UserService`.
     - Updated `CommunityScreen` and `ProfileScreen` to prominently display `@username` handles for easier identification.
+    - **Profile Editing:** Enhanced `EditProfileScreen` to allow users to update their `displayName` and `username` with full validation and availability checks.
+    - **Legacy Data Stability:** Added a default empty string for the `username` field in the model to prevent app crashes when reading older Firestore documents that lack this field.
+
+## Phase 4: Advanced Experience Improvements (Post-MVP)
+
+### 4.1 Advanced Search Logic
+**User:** Improve the search experience to handle typos and partial matches gracefully.
+**Gemini:** 
+- **Algorithm Implementation:** Integrated the Sørensen–Dice coefficient algorithm into `BookService` for fuzzy string matching.
+- **Search Optimization:** Increased API results pool (`maxResults: 40`) and implemented client-side re-ranking to prioritize books whose titles or authors best match the user's query.
+- **Verification:** Added comprehensive unit tests in `test/services/book_service_test.dart` to verify that typo-laden queries correctly prioritize relevant results.
 
 ---
 
