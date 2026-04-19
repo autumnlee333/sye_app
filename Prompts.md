@@ -143,6 +143,15 @@ This document tracks the iterative development process of the SYE (Share Your Ex
 - **Profile UI:** Integrated follow stats and a dynamic "Follow/Unfollow" button on user profiles.
 - **Verification:** Added `test/services/follow_service_test.dart` to ensure atomic consistency of follow operations.
 
+### 3.4 User Discovery & Community Hub
+**User:** There's no way for users to find each other. Can we add a community feature?
+**Gemini:** 
+- **Requirements Update:** Added Feature 3.4 (User Discovery) and updated the navigation structure to a 5-tab system.
+- **Service Enhancement:** Added `searchUsers` to `UserService` for prefix-based display name searching.
+- **State Management:** Created `userSearchProvider` to manage asynchronous search states and results.
+- **Community UI:** Built `CommunityScreen` featuring a user search bar, results list with quick-follow actions, and seamless profile navigation.
+- **Navigation:** Integrated the new "Community" hub into the main bottom navigation bar.
+
 ---
 
 ## Maintenance & Troubleshooting

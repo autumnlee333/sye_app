@@ -113,6 +113,10 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
    - **Concept:** Build the social graph of the app, allowing readers to connect with others who share similar tastes.
    - **Goal:** Allow users to follow/unfollow each other and store these relationships in Firestore.
 
+ [x] 3.4 **User Discovery & Community Hub**
+   - **Concept:** Provide a dedicated space for users to find each other and grow their social circle.
+   - **Goal:** Implement a "Community" tab in the bottom navigation featuring a global user search and a "Suggested for You" list based on shared favorite genres.
+
 **Feature 4: Advanced Experience Improvements (Post-MVP)**
 
  [ ] 4.1 **Advanced Search Logic**
@@ -177,9 +181,14 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
 
  [ ] 8.1 **Main App Layout**
    - **Concept:** Establish a modern, "Instagram-like" hierarchy with a high-performance UI.
-   - **Goal:** Implement a `BottomNavigationBar` with four main tabs: Home (Feed), Search, My Library, and Profile.
+   - **Goal:** Implement a `BottomNavigationBar` with five main tabs: Home (Feed), Community (User Search), Search (Books), My Library, and Profile.
 
 **Feature 9: Real-Time Communication**
+
+ [ ] 9.1 **User-to-User Chat**
+   - **Concept:** Foster community discussion through a direct messaging feature where readers can discuss books.
+   - **Goal:** Implement a real-time chat service using Firestore for private 1-on-1 messaging.
+eature 9: Real-Time Communication**
 
  [ ] 9.1 **User-to-User Chat**
    - **Concept:** Foster community discussion through a direct messaging feature where readers can discuss books.

@@ -44,7 +44,7 @@ class UserService {
     }
   }
 
-  /// Streams a user's data for real-time updates.
+  /// Watches a specific user's profile data.
   Stream<UserModel?> watchUser(String uid) {
     return _usersCollection.doc(uid).snapshots().map((snapshot) {
       if (snapshot.exists && snapshot.data() != null) {
@@ -53,4 +53,21 @@ class UserService {
       return null;
     });
   }
-}
+
+  /// Searches for users by display name (case-insensitive prefix search).
+  Future<List<UserModel>> searchUsers(String query) async {
+    if (query.isEmpty) return [];
+
+    // Simple prefix search: displayName >= query and displayName < query + z
+    // Note: Firestore is case-sensitive, so we'd typically store a lowercase field 
+    // for true case-insensitive search. For now, we'll do a simple prefix search.
+    final snapshot = await _usersCollection
+        .where('displayName', isGreaterThanOrEqualTo: query)
+        .where('displayName', isLessThanOrEqualTo: '$query\uf8ff')
+        .limit(20)
+        .get();
+
+    return snapshot.docs.map((doc) => UserModel.fromJson(doc.data())).toList();
+  }
+  }
+

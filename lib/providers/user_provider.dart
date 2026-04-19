@@ -27,3 +27,27 @@ final currentUserDataProvider = StreamProvider<UserModel?>((ref) {
 final userDataProvider = FutureProvider.family<UserModel?, String>((ref, uid) async {
   return ref.watch(userServiceProvider).getUser(uid);
 });
+
+/// Notifier to manage user search state.
+class UserSearchNotifier extends AsyncNotifier<List<UserModel>> {
+  @override
+  Future<List<UserModel>> build() async {
+    return [];
+  }
+
+  Future<void> search(String query) async {
+    if (query.isEmpty) {
+      state = const AsyncValue.data([]);
+      return;
+    }
+
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      return ref.read(userServiceProvider).searchUsers(query);
+    });
+  }
+}
+
+final userSearchProvider = AsyncNotifierProvider<UserSearchNotifier, List<UserModel>>(
+  UserSearchNotifier.new,
+);

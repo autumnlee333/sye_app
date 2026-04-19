@@ -11,6 +11,7 @@ import '../widgets/review_dialog.dart';
 import 'profile_screen.dart';
 import 'library_screen.dart';
 import 'feed_screen.dart';
+import 'community_screen.dart';
 import 'book_details_screen.dart';
 
 class MainNavigation extends ConsumerWidget {
@@ -36,6 +37,7 @@ class MainNavigation extends ConsumerWidget {
 
     final List<Widget> screens = [
       const FeedScreen(),
+      const CommunityScreen(),
       const BookSearchTab(),
       const LibraryScreen(),
       const ProfileScreen(),
@@ -43,13 +45,14 @@ class MainNavigation extends ConsumerWidget {
 
     final List<String> titles = [
       'Feed',
-      'Search',
+      'Community',
+      'Search Books',
       'My Library',
       'Profile',
     ];
 
     return Scaffold(
-      appBar: currentIndex != 2 // LibraryScreen has its own AppBar with tabs
+      appBar: currentIndex != 3 // LibraryScreen has its own AppBar with tabs
           ? AppBar(
               title: Text(titles[currentIndex]),
               centerTitle: true,
@@ -65,6 +68,7 @@ class MainNavigation extends ConsumerWidget {
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Community'),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
           BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Library'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
