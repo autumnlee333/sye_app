@@ -131,7 +131,7 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
    - **Concept:** Empower users to curate themed collections beyond the three default statuses.
    - **Goal:** Enable users to create, name, and add books to custom public or private lists (e.g. "Favorite Thrillers", "2024 TBR").
 
- [ ] 4.4 **Bulk Shelf Management**
+ [x] 4.4 **Bulk Shelf Management**
    - **Concept:** Streamline library organization by allowing users to manage multiple books simultaneously.
    - **Goal:** Implement a "Batch Mode" in the Library where users can select multiple books to move between shelves or remove from their collection at once.
 

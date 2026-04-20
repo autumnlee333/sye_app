@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/custom_list_model.dart';
 import '../providers/book_provider.dart';
 import '../providers/list_provider.dart';
+import '../providers/selection_provider.dart';
 import '../widgets/book_card.dart';
 import 'book_details_screen.dart';
 
@@ -14,82 +15,170 @@ class ListDetailsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Listen to changes for this specific list from the stream
     final allLists = ref.watch(userListsProvider).value ?? [];
     final currentList = allLists.firstWhere((l) => l.id == list.id, orElse: () => list);
+    final isBatchMode = ref.watch(isBatchModeProvider);
+    final selectedIds = ref.watch(selectedBookIdsProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(currentList.name),
+        title: isBatchMode 
+            ? Text('${selectedIds.length} Selected')
+            : Text(currentList.name),
+        leading: isBatchMode 
+            ? IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () {
+                  ref.read(isBatchModeProvider.notifier).state = false;
+                  ref.read(selectedBookIdsProvider.notifier).state = {};
+                },
+              )
+            : null,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.playlist_add),
-            tooltip: 'Add Book',
-            onPressed: () => _showSearchToAddDialog(context, ref, currentList),
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete_outline),
-            tooltip: 'Delete List',
-            onPressed: () => _confirmDelete(context, ref, currentList),
-          ),
+          if (!isBatchMode) ...[
+            IconButton(
+              icon: const Icon(Icons.playlist_add),
+              tooltip: 'Add Book',
+              onPressed: () => _showSearchToAddDialog(context, ref, currentList),
+            ),
+            IconButton(
+              icon: const Icon(Icons.checklist_rtl, color: Colors.blue),
+              tooltip: 'Batch Edit',
+              onPressed: () => ref.read(isBatchModeProvider.notifier).state = true,
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete_outline),
+              tooltip: 'Delete List',
+              onPressed: () => _confirmDelete(context, ref, currentList),
+            ),
+          ],
         ],
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      body: Stack(
         children: [
-          if (currentList.description.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                currentList.description,
-                style: const TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-            ),
-          Expanded(
-            child: currentList.bookIds.isEmpty
-                ? const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.bookmark_border, size: 64, color: Colors.grey),
-                        SizedBox(height: 16),
-                        Text('No books in this list yet.', style: TextStyle(color: Colors.grey)),
-                      ],
-                    ),
-                  )
-                : ref.watch(bookDetailsProvider(currentList.bookIds)).when(
-                      data: (books) => ListView.builder(
-                        itemCount: books.length,
-                        itemBuilder: (context, index) {
-                          final book = books[index];
-                          return BookCard(
-                            title: book.title,
-                            authors: book.authors,
-                            thumbnailUrl: book.thumbnailUrl,
-                            averageRating: book.averageRating,
-                            categories: book.categories,
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => BookDetailsScreen(
-                                    bookId: book.id,
-                                    initialBook: book,
-                                  ),
-                                ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (currentList.description.isNotEmpty && !isBatchMode)
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    currentList.description,
+                    style: const TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                ),
+              Expanded(
+                child: currentList.bookIds.isEmpty
+                    ? const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.bookmark_border, size: 64, color: Colors.grey),
+                            SizedBox(height: 16),
+                            Text('No books in this list yet.', style: TextStyle(color: Colors.grey)),
+                          ],
+                        ),
+                      )
+                    : ref.watch(bookDetailsProvider(currentList.bookIds)).when(
+                          data: (books) => ListView.builder(
+                            itemCount: books.length,
+                            itemBuilder: (context, index) {
+                              final book = books[index];
+                              final isSelected = selectedIds.contains(book.id);
+
+                              return BookCard(
+                                title: book.title,
+                                authors: book.authors,
+                                thumbnailUrl: book.thumbnailUrl,
+                                averageRating: book.averageRating,
+                                categories: book.categories,
+                                isSelected: isSelected,
+                                onSelected: isBatchMode 
+                                    ? (val) {
+                                        final current = Set<String>.from(ref.read(selectedBookIdsProvider));
+                                        if (val == true) {
+                                          current.add(book.id);
+                                        } else {
+                                          current.remove(book.id);
+                                        }
+                                        ref.read(selectedBookIdsProvider.notifier).state = current;
+                                      }
+                                    : null,
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => BookDetailsScreen(
+                                        bookId: book.id,
+                                        initialBook: book,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                trailing: !isBatchMode 
+                                    ? IconButton(
+                                        icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+                                        onPressed: () {
+                                          ref.read(listActionProvider.notifier).removeBookFromList(currentList.id, book.id);
+                                        },
+                                      )
+                                    : null,
                               );
                             },
-                            trailing: IconButton(
-                              icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
-                              onPressed: () {
-                                ref.read(listActionProvider.notifier).removeBookFromList(currentList.id, book.id);
-                              },
-                            ),
-                          );
-                        },
+                          ),
+                          loading: () => const Center(child: CircularProgressIndicator()),
+                          error: (e, _) => Center(child: Text('Error: $e')),
+                        ),
+              ),
+            ],
+          ),
+          if (isBatchMode && selectedIds.isNotEmpty)
+            Positioned(
+              bottom: 16,
+              left: 16,
+              right: 16,
+              child: Card(
+                elevation: 8,
+                color: Theme.of(context).colorScheme.primary,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton.icon(
+                        onPressed: () => _confirmBulkRemoveFromList(context, ref, currentList, selectedIds.toList()),
+                        icon: const Icon(Icons.delete_outline, color: Colors.white),
+                        label: Text('Remove from ${currentList.name}', style: const TextStyle(color: Colors.white)),
                       ),
-                      loading: () => const Center(child: CircularProgressIndicator()),
-                      error: (e, _) => Center(child: Text('Error: $e')),
-                    ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmBulkRemoveFromList(BuildContext context, WidgetRef ref, CustomListModel list, List<String> bookIds) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Remove Books?'),
+        content: Text('Are you sure you want to remove ${bookIds.length} books from "${list.name}"?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () {
+              ref.read(listActionProvider.notifier).bulkRemoveBooksFromList(list.id, bookIds);
+              ref.read(isBatchModeProvider.notifier).state = false;
+              ref.read(selectedBookIdsProvider.notifier).state = {};
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Removed ${bookIds.length} books from ${list.name}')),
+              );
+            },
+            child: const Text('Remove', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),

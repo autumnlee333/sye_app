@@ -188,6 +188,16 @@ This document tracks the iterative development process of the SYE (Share Your Ex
 - **Discovery Integration:** Added a "Quick Add to List" feature to the `BookDetailsScreen`, allowing users to organize books while browsing.
 - **List Management:** Built `ListDetailsScreen` for viewing, editing, and deleting specific custom shelves.
 
+### 4.4 Bulk Shelf Management
+**User:** Implement a way for users to manage multiple books simultaneously.
+**Gemini:** 
+- **Selection State:** Created `selection_provider.dart` to manage global batch mode and selected book IDs.
+- **Atomic Operations:** Added `bulkRemoveBooksFromLibrary`, `bulkUpdateStatus`, and `bulkRemoveBooksFromList` using Firestore atomic batches for efficient data updates.
+- **Dynamic UI:** 
+    - Updated `BookCard` with checkbox support and selection highlighting.
+    - Implemented a persistent bottom action bar in `LibraryScreen` and `ListDetailsScreen` for performing bulk actions.
+    - Added a "Batch Mode" toggle (Edit button) that updates the entire library interface for multi-selection.
+
 ---
 
 ## Maintenance & Troubleshooting

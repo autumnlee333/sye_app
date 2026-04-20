@@ -4,6 +4,7 @@ import '../models/library_book_model.dart';
 import '../models/custom_list_model.dart';
 import '../providers/library_provider.dart';
 import '../providers/list_provider.dart';
+import '../providers/selection_provider.dart';
 import '../widgets/book_card.dart';
 import 'book_details_screen.dart';
 import 'list_details_screen.dart';
@@ -14,107 +15,214 @@ class LibraryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final listsAsync = ref.watch(userListsProvider);
+    final isBatchMode = ref.watch(isBatchModeProvider);
+    final selectedIds = ref.watch(selectedBookIdsProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Library'),
+        title: isBatchMode 
+            ? Text('${selectedIds.length} Selected')
+            : const Text('My Library'),
         centerTitle: true,
-      ),
-      body: CustomScrollView(
-        slivers: [
-          const SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: Text(
-                'Status',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
+        leading: isBatchMode 
+            ? IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () {
+                  ref.read(isBatchModeProvider.notifier).state = false;
+                  ref.read(selectedBookIdsProvider.notifier).state = {};
+                },
+              )
+            : null,
+        actions: [
+          if (!isBatchMode)
+            IconButton(
+              icon: const Icon(Icons.checklist_rtl, color: Colors.blue),
+              tooltip: 'Batch Edit',
+              onPressed: () => ref.read(isBatchModeProvider.notifier).state = true,
             ),
-          ),
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: 400, // Fixed height for status tabs
-              child: DefaultTabController(
-                length: 3,
-                child: Column(
-                  children: [
-                    const TabBar(
-                      tabs: [
-                        Tab(text: 'Reading'),
-                        Tab(text: 'Want to Read'),
-                        Tab(text: 'Finished'),
+        ],
+      ),
+      body: Stack(
+        children: [
+          CustomScrollView(
+            slivers: [
+              const SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+                  child: Text(
+                    'Status',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 400, // Fixed height for status tabs
+                  child: DefaultTabController(
+                    length: 3,
+                    child: Column(
+                      children: [
+                        const TabBar(
+                          tabs: [
+                            Tab(text: 'Reading'),
+                            Tab(text: 'Want to Read'),
+                            Tab(text: 'Finished'),
+                          ],
+                          labelColor: Colors.blue,
+                          unselectedLabelColor: Colors.grey,
+                        ),
+                        Expanded(
+                          child: TabBarView(
+                            children: [
+                              _LibraryList(status: ReadingStatus.reading),
+                              _LibraryList(status: ReadingStatus.wantToRead),
+                              _LibraryList(status: ReadingStatus.finished),
+                            ],
+                          ),
+                        ),
                       ],
-                      labelColor: Colors.blue,
-                      unselectedLabelColor: Colors.grey,
                     ),
-                    Expanded(
-                      child: TabBarView(
-                        children: [
-                          _LibraryList(status: ReadingStatus.reading),
-                          _LibraryList(status: ReadingStatus.wantToRead),
-                          _LibraryList(status: ReadingStatus.finished),
-                        ],
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'My Custom Lists',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
-                    ),
-                  ],
+                      if (!isBatchMode)
+                        IconButton(
+                          icon: const Icon(Icons.add_circle_outline, color: Colors.blue),
+                          onPressed: () => _showCreateListDialog(context, ref),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              listsAsync.when(
+                data: (lists) => lists.isEmpty
+                    ? const SliverToBoxAdapter(
+                        child: Padding(
+                          padding: EdgeInsets.all(32.0),
+                          child: Center(
+                            child: Text(
+                              'No custom lists yet.\nCreate one to organize your books!',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                        ),
+                      )
+                    : SliverPadding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        sliver: SliverGrid(
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 12,
+                            childAspectRatio: 1.5,
+                          ),
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              final list = lists[index];
+                              return _CustomListCard(list: list);
+                            },
+                            childCount: lists.length,
+                          ),
+                        ),
+                      ),
+                loading: () => const SliverToBoxAdapter(child: Center(child: CircularProgressIndicator())),
+                error: (e, _) => SliverToBoxAdapter(child: Center(child: Text('Error: $e'))),
+              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 100)), // Space for bottom bar
+            ],
+          ),
+          if (isBatchMode && selectedIds.isNotEmpty)
+            Positioned(
+              bottom: 16,
+              left: 16,
+              right: 16,
+              child: Card(
+                elevation: 8,
+                color: Theme.of(context).colorScheme.primary,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      TextButton.icon(
+                        onPressed: () => _showBulkStatusDialog(context, ref, selectedIds.toList()),
+                        icon: const Icon(Icons.move_to_inbox, color: Colors.white),
+                        label: const Text('Move Status', style: TextStyle(color: Colors.white)),
+                      ),
+                      const SizedBox(height: 24, child: VerticalDivider(color: Colors.white24)),
+                      TextButton.icon(
+                        onPressed: () => _confirmBulkDelete(context, ref, selectedIds.toList()),
+                        icon: const Icon(Icons.delete_outline, color: Colors.white),
+                        label: const Text('Remove', style: TextStyle(color: Colors.white)),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
+        ],
+      ),
+    );
+  }
+
+  void _showBulkStatusDialog(BuildContext context, WidgetRef ref, List<String> bookIds) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Move Selected Books'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: ReadingStatus.values.map((status) {
+            return ListTile(
+              title: Text(status.label),
+              onTap: () {
+                ref.read(libraryActionProvider.notifier).bulkUpdateStatus(bookIds, status);
+                ref.read(isBatchModeProvider.notifier).state = false;
+                ref.read(selectedBookIdsProvider.notifier).state = {};
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Moved ${bookIds.length} books to ${status.label}')),
+                );
+              },
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
+  void _confirmBulkDelete(BuildContext context, WidgetRef ref, List<String> bookIds) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Remove Books?'),
+        content: Text('Are you sure you want to remove ${bookIds.length} books from your library?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () {
+              ref.read(libraryActionProvider.notifier).bulkRemoveBooks(bookIds);
+              ref.read(isBatchModeProvider.notifier).state = false;
+              ref.read(selectedBookIdsProvider.notifier).state = {};
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Removed ${bookIds.length} books')),
+              );
+            },
+            child: const Text('Remove', style: TextStyle(color: Colors.red)),
           ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'My Custom Lists',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.add_circle_outline, color: Colors.blue),
-                    onPressed: () => _showCreateListDialog(context, ref),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          listsAsync.when(
-            data: (lists) => lists.isEmpty
-                ? const SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.all(32.0),
-                      child: Center(
-                        child: Text(
-                          'No custom lists yet.\nCreate one to organize your books!',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ),
-                    ),
-                  )
-                : SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    sliver: SliverGrid(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 12,
-                        crossAxisSpacing: 12,
-                        childAspectRatio: 1.5,
-                      ),
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final list = lists[index];
-                          return _CustomListCard(list: list);
-                        },
-                        childCount: lists.length,
-                      ),
-                    ),
-                  ),
-            loading: () => const SliverToBoxAdapter(child: Center(child: CircularProgressIndicator())),
-            error: (e, _) => SliverToBoxAdapter(child: Center(child: Text('Error: $e'))),
-          ),
-          const SliverToBoxAdapter(child: SizedBox(height: 32)),
         ],
       ),
     );
@@ -179,6 +287,8 @@ class _LibraryList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final booksAsync = ref.watch(libraryProvider(status));
+    final isBatchMode = ref.watch(isBatchModeProvider);
+    final selectedIds = ref.watch(selectedBookIdsProvider);
 
     return booksAsync.when(
       data: (books) => books.isEmpty
@@ -187,12 +297,26 @@ class _LibraryList extends ConsumerWidget {
               itemCount: books.length,
               itemBuilder: (context, index) {
                 final book = books[index];
+                final isSelected = selectedIds.contains(book.bookId);
+
                 return BookCard(
                   title: book.title,
                   authors: book.authors,
                   thumbnailUrl: book.thumbnailUrl,
                   averageRating: book.averageRating,
                   categories: book.categories,
+                  isSelected: isSelected,
+                  onSelected: isBatchMode 
+                      ? (val) {
+                          final current = Set<String>.from(ref.read(selectedBookIdsProvider));
+                          if (val == true) {
+                            current.add(book.bookId);
+                          } else {
+                            current.remove(book.bookId);
+                          }
+                          ref.read(selectedBookIdsProvider.notifier).state = current;
+                        }
+                      : null,
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
