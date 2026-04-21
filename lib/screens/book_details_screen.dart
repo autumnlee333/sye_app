@@ -4,6 +4,7 @@ import '../models/book_model.dart';
 import '../providers/book_provider.dart';
 import '../providers/review_provider.dart';
 import '../widgets/unified_add_sheet.dart';
+import '../widgets/star_rating.dart';
 
 class BookDetailsScreen extends ConsumerWidget {
   final String bookId;
@@ -101,7 +102,7 @@ class BookDetailsScreen extends ConsumerWidget {
                                 if (displayBook.averageRating != null)
                                   Row(
                                     children: [
-                                      const Icon(Icons.star, color: Colors.amber, size: 20),
+                                      StarRating(rating: displayBook.averageRating!, size: 20),
                                       const SizedBox(width: 4),
                                       Text(
                                         '${displayBook.averageRating} / 5',
@@ -221,15 +222,7 @@ class _ReviewListItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(review.userName, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      Row(
-                        children: List.generate(5, (index) {
-                          return Icon(
-                            index < review.rating ? Icons.star : Icons.star_border,
-                            color: Colors.amber,
-                            size: 14,
-                          );
-                        }),
-                      ),
+                      StarRating(rating: review.rating, size: 14),
                     ],
                   ),
                 ),

@@ -24,6 +24,7 @@ class MainNavigation extends ConsumerWidget {
         SchedulerBinding.instance.addPostFrameCallback((_) {
           if (context.mounted) {
             _showReviewPrompt(context, ref, next);
+            // Clear the provider so we don't show it again on rebuild
             ref.read(finishedBookProvider.notifier).state = null;
           }
         });
@@ -76,7 +77,6 @@ class MainNavigation extends ConsumerWidget {
     showDialog(
       context: context,
       barrierDismissible: false,
-      useRootNavigator: true,
       builder: (context) => AlertDialog(
         title: const Text('Congratulations!'),
         content: Text('You\'ve finished "${book.title}". Would you like to leave a review?'),
@@ -87,7 +87,8 @@ class MainNavigation extends ConsumerWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(context); // Close prompt
+              // Use the context of the main navigation to show the review dialog
               ReviewDialog.show(context, book);
             },
             child: const Text('Leave Review'),

@@ -6,6 +6,7 @@ import '../providers/library_provider.dart';
 import '../providers/list_provider.dart';
 import '../providers/selection_provider.dart';
 import '../widgets/book_card.dart';
+import '../widgets/review_dialog.dart';
 import 'book_details_screen.dart';
 import 'list_details_screen.dart';
 
@@ -324,11 +325,89 @@ class _LibraryList extends ConsumerWidget {
                       ),
                     );
                   },
+                  trailing: !isBatchMode ? _getTrailingAction(context, ref, book) : null,
                 );
               },
             ),
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text('Error: $e')),
+    );
+  }
+
+  Widget? _getTrailingAction(BuildContext context, WidgetRef ref, LibraryBookModel book) {
+    if (status == ReadingStatus.reading) {
+      return IconButton(
+        icon: const Icon(Icons.edit_note, color: Colors.blue),
+        tooltip: 'Update Progress',
+        onPressed: () => _showUpdateProgressDialog(context, ref, book),
+      );
+    } else if (status == ReadingStatus.finished) {
+      return TextButton(
+        onPressed: () => ReviewDialog.show(context, book),
+        child: const Text('Rate & Review', style: TextStyle(fontSize: 12)),
+      );
+    }
+    return null;
+  }
+
+  void _showUpdateProgressDialog(BuildContext context, WidgetRef ref, LibraryBookModel book) {
+    final pageController = TextEditingController(text: book.currentPage.toString());
+    final commentController = TextEditingController();
+    bool postToFeed = true;
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: Text('Update Progress: ${book.title}'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: pageController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'Current Page (of ${book.totalPages ?? '??'})',
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: commentController,
+                  decoration: const InputDecoration(
+                    labelText: 'Add a thought (optional)',
+                    hintText: 'What\'s happening in the book?',
+                  ),
+                  maxLines: 2,
+                ),
+                CheckboxListTile(
+                  title: const Text('Post update to feed', style: TextStyle(fontSize: 14)),
+                  value: postToFeed,
+                  onChanged: (val) => setState(() => postToFeed = val ?? true),
+                  controlAffinity: ListTileControlAffinity.leading,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+            ElevatedButton(
+              onPressed: () {
+                final newPage = int.tryParse(pageController.text) ?? book.currentPage;
+                ref.read(libraryActionProvider.notifier).updateProgress(
+                  book.bookId,
+                  newPage,
+                  book.totalPages ?? 0,
+                  comment: commentController.text.trim(),
+                  postToFeed: postToFeed,
+                );
+                Navigator.pop(context);
+              },
+              child: const Text('Update'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

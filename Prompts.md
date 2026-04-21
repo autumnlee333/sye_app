@@ -198,6 +198,19 @@ This document tracks the iterative development process of the SYE (Share Your Ex
     - Implemented a persistent bottom action bar in `LibraryScreen` and `ListDetailsScreen` for performing bulk actions.
     - Added a "Batch Mode" toggle (Edit button) that updates the entire library interface for multi-selection.
 
+### 4.5 Enhanced Rating System (Half Stars)
+**User:** Provide more nuance to book evaluations by allowing users to rate books using half-star increments.
+**Gemini:** 
+- **Reusable Widget:** Created `StarRating` widget to accurately display partial stars (0.5 increments) using `Icons.star_half`.
+- **Gesture Selection:** Refactored `ReviewDialog` and `ActivityCard` edit flows to use a `GestureDetector` that calculates ratings based on tap/drag horizontal position, enabling 0.5-star precision.
+- **Consistent Display:** Updated all rating surfaces (Activity Feed, Book Details summary, and Review lists) to use the new `StarRating` component for visual consistency.
+
+### Top Favorites UX Tweak
+**User:** Can there be an easier way to remove a book from your top three favorites?
+**Gemini:** 
+- **Action Notifier:** Added `UserActionNotifier` to `user_provider.dart` to handle specific user interactions like removing favorites.
+- **Direct UI Removal:** Updated the `ProfileScreen` to display a red removal icon directly on favorite book cards when viewed by the profile owner, eliminating the need to use search screens for simple removals.
+
 ---
 
 ## Maintenance & Troubleshooting

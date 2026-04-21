@@ -5,6 +5,7 @@ import '../providers/auth_provider.dart';
 import '../providers/activity_provider.dart';
 import '../screens/profile_screen.dart';
 import '../screens/book_details_screen.dart';
+import 'star_rating.dart';
 
 class ActivityCard extends ConsumerWidget {
   final ActivityModel activity;
@@ -26,8 +27,6 @@ class ActivityCard extends ConsumerWidget {
               children: [
                 InkWell(
                   onTap: () {
-                    // Only navigate if it's NOT the current profile screen? 
-                    // For now keeping it simple as FeedScreen uses it.
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => ProfileScreen(userId: activity.userId),
@@ -75,15 +74,7 @@ class ActivityCard extends ConsumerWidget {
                   ),
                 ),
                 if (activity.type == ActivityType.review && activity.rating != null)
-                  Row(
-                    children: List.generate(5, (index) {
-                      return Icon(
-                        index < activity.rating! ? Icons.star : Icons.star_border,
-                        color: Colors.amber,
-                        size: 16,
-                      );
-                    }),
-                  ),
+                  StarRating(rating: activity.rating!, size: 16),
                 if (isOwnPost)
                   PopupMenuButton<String>(
                     icon: const Icon(Icons.more_vert, size: 20, color: Colors.grey),
@@ -136,40 +127,54 @@ class ActivityCard extends ConsumerWidget {
 
   void _showEditActivityDialog(BuildContext context, WidgetRef ref, ActivityModel activity) {
     final textController = TextEditingController(text: activity.text);
-    double? rating = activity.rating;
+    double rating = activity.rating ?? 0;
 
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
+        builder: (context, setDialogState) => AlertDialog(
           title: Text(activity.type == ActivityType.review ? 'Edit Review' : 'Edit Thought'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (activity.type == ActivityType.review)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(5, (index) {
-                    return IconButton(
-                      icon: Icon(
-                        index < (rating ?? 0) ? Icons.star : Icons.star_border,
-                        color: Colors.amber,
-                        size: 32,
-                      ),
-                      onPressed: () => setState(() => rating = index + 1.0),
-                    );
-                  }),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (activity.type == ActivityType.review) ...[
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      return GestureDetector(
+                        onTapDown: (details) {
+                          final double relativePosition = details.localPosition.dx / constraints.maxWidth;
+                          double newRating = (relativePosition * 5 * 2).ceil() / 2;
+                          if (newRating < 0.5) newRating = 0.5;
+                          if (newRating > 5.0) newRating = 5.0;
+                          setDialogState(() => rating = newRating);
+                        },
+                        onPanUpdate: (details) {
+                           RenderBox box = context.findRenderObject() as RenderBox;
+                           Offset localPosition = box.globalToLocal(details.globalPosition);
+                           final double relativePosition = localPosition.dx / constraints.maxWidth;
+                           double newRating = (relativePosition * 5 * 2).ceil() / 2;
+                           if (newRating < 0.5) newRating = 0.5;
+                           if (newRating > 5.0) newRating = 5.0;
+                           setDialogState(() => rating = newRating);
+                        },
+                        child: StarRating(rating: rating, size: 40),
+                      );
+                    },
+                  ),
+                  Text('$rating stars', style: const TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 16),
+                ],
+                TextField(
+                  controller: textController,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: 'Update your thoughts...',
+                  ),
                 ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: textController,
-                maxLines: 3,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Update your thoughts...',
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
           actions: [
             TextButton(
@@ -180,7 +185,7 @@ class ActivityCard extends ConsumerWidget {
               onPressed: () {
                 final updatedActivity = activity.copyWith(
                   text: textController.text.trim(),
-                  rating: rating,
+                  rating: rating > 0 ? rating : activity.rating,
                 );
                 ref.read(activityActionProvider.notifier).updateActivity(updatedActivity);
                 Navigator.pop(context);

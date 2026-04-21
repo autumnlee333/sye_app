@@ -135,7 +135,7 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
    - **Concept:** Streamline library organization by allowing users to manage multiple books simultaneously.
    - **Goal:** Implement a "Batch Mode" in the Library where users can select multiple books to move between shelves or remove from their collection at once.
 
- [ ] 4.5 **Enhanced Rating System (Half Stars)**
+ [x] 4.5 **Enhanced Rating System (Half Stars)**
      - **Concept:** Provide more nuance to book evaluations by allowing users to rate books using half-star increments.
      - **Goal:** Update the rating UI and `ReviewModel` to support 0.5-step ratings (e.g., 4.5 stars).
 

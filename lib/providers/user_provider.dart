@@ -51,3 +51,25 @@ class UserSearchNotifier extends AsyncNotifier<List<UserModel>> {
 final userSearchProvider = AsyncNotifierProvider<UserSearchNotifier, List<UserModel>>(
   UserSearchNotifier.new,
 );
+
+/// Notifier to manage user-related actions (like favorites).
+class UserActionNotifier extends AsyncNotifier<void> {
+  @override
+  Future<void> build() async {}
+
+  Future<void> removeFavoriteBook(String bookId) async {
+    final user = ref.read(currentUserDataProvider).value;
+    if (user == null) return;
+
+    final updatedFavorites = List<String>.from(user.topFavoriteBookIds)..remove(bookId);
+
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      await ref.read(userServiceProvider).updateFavoriteBooks(user.uid, updatedFavorites);
+    });
+  }
+}
+
+final userActionProvider = AsyncNotifierProvider<UserActionNotifier, void>(
+  UserActionNotifier.new,
+);

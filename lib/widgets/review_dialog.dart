@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/library_book_model.dart';
 import '../providers/review_provider.dart';
+import 'star_rating.dart';
 
 class ReviewDialog extends ConsumerStatefulWidget {
   final LibraryBookModel book;
@@ -29,7 +30,6 @@ class ReviewDialog extends ConsumerStatefulWidget {
   }) {
     showDialog(
       context: context,
-      useRootNavigator: true,
       builder: (context) => ReviewDialog(
         book: book,
         id: id,
@@ -61,41 +61,69 @@ class _ReviewDialogState extends ConsumerState<ReviewDialog> {
     super.dispose();
   }
 
+  void _updateRating(Offset localPosition, double maxWidth) {
+    final double relativePosition = localPosition.dx / maxWidth;
+    double newRating = (relativePosition * 5 * 2).ceil() / 2;
+    
+    if (newRating < 0.5) newRating = 0.5;
+    if (newRating > 5.0) newRating = 5.0;
+
+    setState(() {
+      _rating = newRating;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.id != null;
 
     return AlertDialog(
-      title: Text('${isEditing ? 'Edit' : 'Review'}: ${widget.book.title}'),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('What do you think?'),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(5, (index) {
-                return IconButton(
-                  icon: Icon(
-                    index < _rating ? Icons.star : Icons.star_border,
-                    color: Colors.amber,
-                    size: 32,
+      title: Text(
+        '${isEditing ? 'Edit' : 'Review'}: ${widget.book.title}',
+        style: const TextStyle(fontSize: 18),
+      ),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('What do you think?'),
+              const SizedBox(height: 16),
+              // Use a fixed width container for the gesture detector to ensure it has constraints
+              SizedBox(
+                width: 220, // 5 stars * 40 size + padding
+                child: GestureDetector(
+                  onTapDown: (details) => _updateRating(details.localPosition, 220),
+                  onPanUpdate: (details) => _updateRating(details.localPosition, 220),
+                  child: Center(
+                    child: StarRating(
+                      rating: _rating,
+                      size: 40,
+                    ),
                   ),
-                  onPressed: () => setState(() => _rating = index + 1.0),
-                );
-              }),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _reviewController,
-              maxLines: 3,
-              decoration: const InputDecoration(
-                hintText: 'Write your thoughts here...',
-                border: OutlineInputBorder(),
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              Text(
+                _rating == 0 ? 'Select a rating' : '$_rating stars',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 24),
+              TextField(
+                controller: _reviewController,
+                maxLines: 4,
+                decoration: const InputDecoration(
+                  hintText: 'Write your thoughts here...',
+                  border: OutlineInputBorder(),
+                  alignLabelWithHint: true,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
       actions: [

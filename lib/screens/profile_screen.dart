@@ -190,6 +190,14 @@ class ProfileScreen extends ConsumerWidget {
                               thumbnailUrl: book.thumbnailUrl,
                               averageRating: book.averageRating,
                               categories: book.categories,
+                              trailing: isCurrentUser
+                                  ? IconButton(
+                                      icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+                                      onPressed: () {
+                                        ref.read(userActionProvider.notifier).removeFavoriteBook(book.id);
+                                      },
+                                    )
+                                  : null,
                             );
                           },
                         ),
