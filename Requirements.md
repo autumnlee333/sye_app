@@ -139,7 +139,7 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
      - **Concept:** Provide more nuance to book evaluations by allowing users to rate books using half-star increments.
      - **Goal:** Update the rating UI and `ReviewModel` to support 0.5-step ratings (e.g., 4.5 stars).
 
- [ ] 4.6 **Reading Memories**
+ [x] 4.6 **Reading Memories**
    - **Concept:** Foster nostalgia and re-engagement by reminding users of their past reading milestones.
    - **Goal:** Implement a "On This Day" feature that notifies users about what they were reading or reviewing on the same date in previous years.
 

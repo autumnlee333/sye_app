@@ -205,6 +205,13 @@ This document tracks the iterative development process of the SYE (Share Your Ex
 - **Gesture Selection:** Refactored `ReviewDialog` and `ActivityCard` edit flows to use a `GestureDetector` that calculates ratings based on tap/drag horizontal position, enabling 0.5-star precision.
 - **Consistent Display:** Updated all rating surfaces (Activity Feed, Book Details summary, and Review lists) to use the new `StarRating` component for visual consistency.
 
+### 4.6 Reading Memories
+**User:** Implement a "Reading Memories" feature that reminds users of past milestones.
+**Gemini:** 
+- **Memories Logic:** Created `readingMemoriesProvider` in `activity_provider.dart` that filters the user's history for activities matching the current month and day from previous years.
+- **Nostalgic UI:** Integrated a `_MemorySection` into the `FeedScreen` with a custom gradient card. It surfaces "On This Day" milestones (started books, progress, reviews) with book thumbnails and "years ago" labels to foster re-engagement.
+- **Dynamic Interaction:** Included pull-to-refresh support to ensure memories stay current with the user's local time.
+
 ### Top Favorites UX Tweak
 **User:** Can there be an easier way to remove a book from your top three favorites?
 **Gemini:** 

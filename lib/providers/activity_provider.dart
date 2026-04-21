@@ -21,6 +21,27 @@ final userActivitiesProvider = StreamProvider.family<List<ActivityModel>, String
   return ref.watch(activityServiceProvider).watchActivitiesByUser(userId);
 });
 
+/// A provider that filters the current user's activities to find "On This Day" memories.
+final readingMemoriesProvider = Provider<List<ActivityModel>>((ref) {
+  final user = ref.watch(authProvider).value;
+  if (user == null) return [];
+  
+  final activitiesAsync = ref.watch(userActivitiesProvider(user.uid));
+  
+  return activitiesAsync.maybeWhen(
+    data: (activities) {
+      final now = DateTime.now();
+      return activities.where((a) {
+        // Match month and day, but only from previous years
+        return a.timestamp.month == now.month && 
+               a.timestamp.day == now.day && 
+               a.timestamp.year < now.year;
+      }).toList();
+    },
+    orElse: () => [],
+  );
+});
+
 /// A notifier to manage activity operations.
 class ActivityNotifier extends AsyncNotifier<void> {
   @override

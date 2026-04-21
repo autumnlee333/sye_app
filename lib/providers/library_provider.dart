@@ -65,6 +65,7 @@ class LibraryNotifier extends AsyncNotifier<void> {
         addedAt: DateTime.now(),
         averageRating: book.averageRating,
         categories: book.categories,
+        totalPages: book.pageCount ?? 0, // Fix: Use pageCount from BookModel
       );
       await ref.read(libraryServiceProvider).addBookToLibrary(user.uid, libraryBook);
       

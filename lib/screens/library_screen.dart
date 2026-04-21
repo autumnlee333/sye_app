@@ -306,6 +306,8 @@ class _LibraryList extends ConsumerWidget {
                   thumbnailUrl: book.thumbnailUrl,
                   averageRating: book.averageRating,
                   categories: book.categories,
+                  currentPage: book.currentPage,
+                  totalPages: book.totalPages,
                   isSelected: isSelected,
                   onSelected: isBatchMode 
                       ? (val) {
