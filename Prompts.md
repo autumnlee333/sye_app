@@ -218,6 +218,14 @@ This document tracks the iterative development process of the SYE (Share Your Ex
 - **Action Notifier:** Added `UserActionNotifier` to `user_provider.dart` to handle specific user interactions like removing favorites.
 - **Direct UI Removal:** Updated the `ProfileScreen` to display a red removal icon directly on favorite book cards when viewed by the profile owner, eliminating the need to use search screens for simple removals.
 
+### 4.7 Customized Yearly Goals
+**User:** Expand yearly challenges to include custom sub-goals.
+**Gemini:** 
+- **Goal Model:** Created `GoalModel` to support multiple types of reading targets: `totalBooks`, `genreCount`, and `pageThreshold`.
+- **Dynamic Logic:** Implemented `goalProgressProvider` in `goal_provider.dart` that reactively scans the user's finished library for the current year to calculate real-time progress for every goal.
+- **Progress Dashboard:** Built a "Yearly Reading Goals" section on the `ProfileScreen` with a visual progress bar and percentage display for each goal.
+- **Goal Management:** Integrated an "Add Goal" workflow with a type-specific configuration dialog and the ability to delete old goals.
+
 ---
 
 ## Maintenance & Troubleshooting

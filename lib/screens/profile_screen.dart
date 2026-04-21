@@ -5,6 +5,8 @@ import '../providers/user_provider.dart';
 import '../providers/book_provider.dart';
 import '../providers/activity_provider.dart';
 import '../providers/follow_provider.dart';
+import '../providers/goal_provider.dart';
+import '../models/goal_model.dart';
 import '../widgets/book_card.dart';
 import '../widgets/activity_card.dart';
 import 'select_favorites_screen.dart';
@@ -139,6 +141,11 @@ class ProfileScreen extends ConsumerWidget {
                   )).toList(),
                 ),
                 const SizedBox(height: 24),
+                if (isCurrentUser) ...[
+                  const Divider(),
+                  const _GoalSection(),
+                  const SizedBox(height: 24),
+                ],
                 const Divider(),
                 const SizedBox(height: 16),
                 Row(
@@ -293,6 +300,198 @@ class _StatColumn extends StatelessWidget {
           style: TextStyle(fontSize: 14, color: Colors.grey[600]),
         ),
       ],
+    );
+  }
+}
+
+class _GoalSection extends ConsumerWidget {
+  const _GoalSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final goals = ref.watch(goalProgressProvider);
+    final currentYear = DateTime.now().year;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              '$currentYear Reading Goals',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            IconButton(
+              icon: const Icon(Icons.add_circle_outline, color: Colors.blue),
+              onPressed: () => _showAddGoalDialog(context, ref),
+            ),
+          ],
+        ),
+        if (goals.isEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16.0),
+            child: Text(
+              'No goals set for this year yet.',
+              style: TextStyle(color: Colors.grey),
+            ),
+          )
+        else
+          ...goals.map((goal) => _GoalCard(goal: goal)),
+      ],
+    );
+  }
+
+  void _showAddGoalDialog(BuildContext context, WidgetRef ref) {
+    final targetController = TextEditingController();
+    final metadataController = TextEditingController();
+    GoalType selectedType = GoalType.totalBooks;
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: const Text('Add Reading Goal'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                DropdownButtonFormField<GoalType>(
+                  value: selectedType,
+                  items: GoalType.values.map((type) {
+                    String label = '';
+                    switch (type) {
+                      case GoalType.totalBooks: label = 'Total Books'; break;
+                      case GoalType.genreCount: label = 'Specific Genre'; break;
+                      case GoalType.pageThreshold: label = 'Books over X pages'; break;
+                    }
+                    return DropdownMenuItem(value: type, child: Text(label));
+                  }).toList(),
+                  onChanged: (val) => setState(() => selectedType = val!),
+                  decoration: const InputDecoration(labelText: 'Goal Type'),
+                ),
+                const SizedBox(height: 16),
+                if (selectedType == GoalType.genreCount)
+                  TextField(
+                    controller: metadataController,
+                    decoration: const InputDecoration(labelText: 'Genre (e.g. Fantasy)'),
+                  ),
+                if (selectedType == GoalType.pageThreshold)
+                  TextField(
+                    controller: metadataController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(labelText: 'Page Threshold (e.g. 500)'),
+                  ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: targetController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'Target Number'),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+            ElevatedButton(
+              onPressed: () {
+                final target = int.tryParse(targetController.text) ?? 0;
+                if (target > 0) {
+                  ref.read(goalActionProvider.notifier).addGoal(GoalModel(
+                    id: '',
+                    userId: '', // Set by service
+                    year: DateTime.now().year,
+                    type: selectedType,
+                    targetValue: target,
+                    metadata: metadataController.text.trim(),
+                  ));
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text('Add Goal'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _GoalCard extends ConsumerWidget {
+  final GoalModel goal;
+  const _GoalCard({required this.goal});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final progress = (goal.currentValue / goal.targetValue).clamp(0.0, 1.0);
+    final percentage = (progress * 100).toInt();
+
+    String title = '';
+    switch (goal.type) {
+      case GoalType.totalBooks:
+        title = 'Read ${goal.targetValue} books';
+        break;
+      case GoalType.genreCount:
+        title = 'Read ${goal.targetValue} ${goal.metadata} books';
+        break;
+      case GoalType.pageThreshold:
+        title = 'Read ${goal.targetValue} books over ${goal.metadata} pages';
+        break;
+    }
+
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      elevation: 0,
+      color: Colors.blue.withValues(alpha: 0.05),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Colors.blue.withValues(alpha: 0.2)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    title,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete_outline, size: 20, color: Colors.grey),
+                  onPressed: () => ref.read(goalActionProvider.notifier).deleteGoal(goal.id),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            LinearProgressIndicator(
+              value: progress,
+              backgroundColor: Colors.blue.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(4),
+              minHeight: 8,
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${goal.currentValue} / ${goal.targetValue} completed',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                ),
+                Text(
+                  '$percentage%',
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
