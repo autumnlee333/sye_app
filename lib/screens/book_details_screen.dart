@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../models/book_model.dart';
 import '../providers/book_provider.dart';
 import '../providers/review_provider.dart';
@@ -55,15 +56,21 @@ class BookDetailsScreen extends ConsumerWidget {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (displayBook.thumbnailUrl != null)
+                          if (displayBook.thumbnailUrl != null && displayBook.thumbnailUrl!.isNotEmpty)
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8),
-                              child: Image.network(
-                                displayBook.thumbnailUrl!,
+                              child: CachedNetworkImage(
+                                imageUrl: displayBook.thumbnailUrl!,
                                 width: 120,
                                 height: 180,
                                 fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) => Container(
+                                placeholder: (context, url) => Container(
+                                  width: 120,
+                                  height: 180,
+                                  color: Colors.grey[200],
+                                  child: const Icon(Icons.book, size: 50, color: Colors.grey),
+                                ),
+                                errorWidget: (context, url, error) => Container(
                                   width: 120,
                                   height: 180,
                                   color: Colors.grey[200],
@@ -209,12 +216,19 @@ class _ReviewListItem extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 16,
-                  backgroundImage: review.userProfilePic != null && review.userProfilePic!.isNotEmpty
-                      ? NetworkImage(review.userProfilePic!)
-                      : null,
-                  child: review.userProfilePic == null || review.userProfilePic!.isEmpty
-                      ? const Icon(Icons.person, size: 16)
-                      : null,
+                  backgroundColor: Colors.grey[200],
+                  child: review.userProfilePic != null && review.userProfilePic!.isNotEmpty
+                      ? ClipOval(
+                          child: CachedNetworkImage(
+                            imageUrl: review.userProfilePic!,
+                            width: 32,
+                            height: 32,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => const Icon(Icons.person, size: 16),
+                            errorWidget: (context, url, error) => const Icon(Icons.person, size: 16),
+                          ),
+                        )
+                      : const Icon(Icons.person, size: 16),
                 ),
                 const SizedBox(width: 8),
                 Expanded(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../providers/auth_provider.dart';
 import '../providers/user_provider.dart';
 import '../providers/book_provider.dart';
@@ -7,6 +8,7 @@ import '../providers/activity_provider.dart';
 import '../providers/follow_provider.dart';
 import '../providers/goal_provider.dart';
 import '../models/goal_model.dart';
+import '../models/library_book_model.dart';
 import '../widgets/book_card.dart';
 import '../widgets/activity_card.dart';
 import 'select_favorites_screen.dart';
@@ -19,7 +21,7 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentUserId = ref.watch(authProvider).value?.uid;
+    final currentUserId = ref.watch(authProvider.select((v) => v.value?.uid));
     final targetUserId = userId ?? currentUserId;
 
     if (targetUserId == null) {
@@ -49,12 +51,19 @@ class ProfileScreen extends ConsumerWidget {
                   children: [
                     CircleAvatar(
                       radius: 50,
-                      backgroundImage: user.profilePicUrl.isNotEmpty
-                          ? NetworkImage(user.profilePicUrl)
-                          : null,
-                      child: user.profilePicUrl.isEmpty
-                          ? const Icon(Icons.person, size: 50)
-                          : null,
+                      backgroundColor: Colors.grey[200],
+                      child: user.profilePicUrl.isNotEmpty
+                          ? ClipOval(
+                              child: CachedNetworkImage(
+                                imageUrl: user.profilePicUrl,
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => const Icon(Icons.person, size: 50),
+                                errorWidget: (context, url, error) => const Icon(Icons.person, size: 50),
+                              ),
+                            )
+                          : const Icon(Icons.person, size: 50),
                     ),
                     if (isCurrentUser)
                       Positioned(
@@ -309,7 +318,7 @@ class _GoalSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final goals = ref.watch(goalProgressProvider);
+    final goalsAsync = ref.watch(goalProgressProvider);
     final currentYear = DateTime.now().year;
 
     return Column(
@@ -329,16 +338,34 @@ class _GoalSection extends ConsumerWidget {
             ),
           ],
         ),
-        if (goals.isEmpty)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16.0),
-            child: Text(
-              'No goals set for this year yet.',
-              style: TextStyle(color: Colors.grey),
+        goalsAsync.when(
+          data: (goals) {
+            if (goals.isEmpty) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16.0),
+                child: Text(
+                  'No goals set for this year yet.',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              );
+            }
+            return Column(
+              children: goals.map((goal) => _GoalCard(goal: goal)).toList(),
+            );
+          },
+          loading: () => const Center(
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: CircularProgressIndicator(),
             ),
-          )
-        else
-          ...goals.map((goal) => _GoalCard(goal: goal)),
+          ),
+          error: (e, _) => Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text('Error loading goals: $e', style: const TextStyle(color: Colors.red)),
+            ),
+          ),
+        ),
       ],
     );
   }

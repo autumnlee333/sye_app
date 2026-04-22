@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../providers/book_provider.dart';
 import '../providers/library_provider.dart';
 import '../models/library_book_model.dart';
@@ -205,8 +206,19 @@ class _CompactBookCard extends StatelessWidget {
             Expanded(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: book.thumbnailUrl != null
-                    ? Image.network(book.thumbnailUrl!, fit: BoxFit.cover)
+                child: book.thumbnailUrl != null && book.thumbnailUrl!.isNotEmpty
+                    ? CachedNetworkImage(
+                        imageUrl: book.thumbnailUrl!,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Container(
+                          color: Colors.grey[200],
+                          child: const Icon(Icons.book, color: Colors.grey),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          color: Colors.grey[200],
+                          child: const Icon(Icons.book, color: Colors.grey),
+                        ),
+                      )
                     : Container(color: Colors.grey[200], child: const Icon(Icons.book)),
               ),
             ),

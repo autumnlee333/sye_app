@@ -17,9 +17,10 @@ class GoalService {
           ? _goalsCollection(uid).doc() 
           : _goalsCollection(uid).doc(goal.id);
       
-      final finalGoal = goal.id.isEmpty 
-          ? goal.copyWith(id: docRef.id) 
-          : goal;
+      final finalGoal = goal.copyWith(
+        id: docRef.id,
+        userId: uid,
+      );
 
       await docRef.set(finalGoal.toJson());
     } catch (e) {

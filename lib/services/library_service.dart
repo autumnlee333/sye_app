@@ -93,6 +93,7 @@ class LibraryService {
         .doc(bookId)
         .collection('progress_history')
         .orderBy('timestamp', descending: true)
+        .limit(50)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) {
@@ -110,6 +111,7 @@ class LibraryService {
   Stream<List<LibraryBookModel>> watchLibrary(String uid) {
     return _libraryCollection(uid)
         .orderBy('addedAt', descending: true)
+        .limit(200)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) => LibraryBookModel.fromJson(doc.data())).toList();

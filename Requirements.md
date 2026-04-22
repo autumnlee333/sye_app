@@ -143,7 +143,7 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
    - **Concept:** Foster nostalgia and re-engagement by reminding users of their past reading milestones.
    - **Goal:** Implement a "On This Day" feature that notifies users about what they were reading or reviewing on the same date in previous years.
 
- [ ] 4.7 **Customized Yearly Goals**
+ [x] 4.7 **Customized Yearly Goals**
    - **Concept:** Expand yearly challenges to include custom sub-goals (e.g., "Read 5 Non-fiction books", "Read 3 books over 500 pages").
    - **Goal:** Update the goal tracking logic to support varied criteria beyond simple book counts.
 

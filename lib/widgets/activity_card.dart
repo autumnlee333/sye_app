@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../models/activity_model.dart';
 import '../providers/auth_provider.dart';
 import '../providers/activity_provider.dart';
@@ -13,7 +14,7 @@ class ActivityCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentUserId = ref.watch(authProvider).value?.uid;
+    final currentUserId = ref.watch(authProvider.select((v) => v.value?.uid));
     final isOwnPost = currentUserId == activity.userId;
 
     return Card(
@@ -35,12 +36,19 @@ class ActivityCard extends ConsumerWidget {
                   },
                   child: CircleAvatar(
                     radius: 16,
-                    backgroundImage: activity.userProfilePic != null && activity.userProfilePic!.isNotEmpty
-                        ? NetworkImage(activity.userProfilePic!)
-                        : null,
-                    child: activity.userProfilePic == null || activity.userProfilePic!.isEmpty
-                        ? const Icon(Icons.person, size: 16)
-                        : null,
+                    backgroundColor: Colors.grey[200],
+                    child: activity.userProfilePic != null && activity.userProfilePic!.isNotEmpty
+                        ? ClipOval(
+                            child: CachedNetworkImage(
+                              imageUrl: activity.userProfilePic!,
+                              width: 32,
+                              height: 32,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => const Icon(Icons.person, size: 16),
+                              errorWidget: (context, url, error) => const Icon(Icons.person, size: 16),
+                            ),
+                          )
+                        : const Icon(Icons.person, size: 16),
                   ),
                 ),
                 const SizedBox(width: 8),

@@ -124,6 +124,7 @@ class ReviewService {
   Stream<List<ReviewModel>> watchAllReviews() {
     return _reviewsCollection
         .orderBy('timestamp', descending: true)
+        .limit(50)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) => ReviewModel.fromJson(doc.data())).toList();
@@ -135,6 +136,7 @@ class ReviewService {
     return _reviewsCollection
         .where('userId', isEqualTo: userId)
         .orderBy('timestamp', descending: true)
+        .limit(50)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) => ReviewModel.fromJson(doc.data())).toList();

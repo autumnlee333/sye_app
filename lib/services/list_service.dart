@@ -55,7 +55,10 @@ class ListService {
 
   /// Streams all custom lists for a specific user.
   Stream<List<CustomListModel>> watchUserLists(String userId) {
-    return _listsCollection(userId).snapshots().map((snapshot) {
+    return _listsCollection(userId)
+        .limit(50)
+        .snapshots()
+        .map((snapshot) {
       return snapshot.docs
           .map((doc) => CustomListModel.fromJson(doc.data()))
           .toList();

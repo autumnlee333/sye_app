@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class BookCard extends StatelessWidget {
   final String title;
@@ -69,12 +70,12 @@ class BookCard extends StatelessWidget {
                       width: 80,
                       height: 120,
                       color: Colors.grey[200],
-                      child: thumbnailUrl != null
-                          ? Image.network(
-                              thumbnailUrl!,
+                      child: thumbnailUrl != null && thumbnailUrl!.isNotEmpty
+                          ? CachedNetworkImage(
+                              imageUrl: thumbnailUrl!,
                               fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(Icons.book, size: 40, color: Colors.grey),
+                              placeholder: (context, url) => const Icon(Icons.book, size: 40, color: Colors.grey),
+                              errorWidget: (context, url, error) => const Icon(Icons.book, size: 40, color: Colors.grey),
                             )
                           : const Icon(Icons.book, size: 40, color: Colors.grey),
                     ),

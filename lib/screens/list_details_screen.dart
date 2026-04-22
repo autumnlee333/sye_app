@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../models/custom_list_model.dart';
 import '../providers/book_provider.dart';
 import '../providers/list_provider.dart';
@@ -290,8 +291,28 @@ class _ListSearchSheetState extends ConsumerState<_ListSearchSheet> {
                       final isAlreadyInList = currentList.bookIds.contains(book.id);
 
                       return ListTile(
-                        leading: book.thumbnailUrl != null
-                            ? Image.network(book.thumbnailUrl!, width: 40, fit: BoxFit.cover)
+                        leading: book.thumbnailUrl != null && book.thumbnailUrl!.isNotEmpty
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(4),
+                                child: CachedNetworkImage(
+                                  imageUrl: book.thumbnailUrl!,
+                                  width: 40,
+                                  height: 60,
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) => Container(
+                                    width: 40,
+                                    height: 60,
+                                    color: Colors.grey[200],
+                                    child: const Icon(Icons.book, size: 20, color: Colors.grey),
+                                  ),
+                                  errorWidget: (context, url, error) => Container(
+                                    width: 40,
+                                    height: 60,
+                                    color: Colors.grey[200],
+                                    child: const Icon(Icons.book, size: 20, color: Colors.grey),
+                                  ),
+                                ),
+                              )
                             : const Icon(Icons.book),
                         title: Text(book.title, maxLines: 1, overflow: TextOverflow.ellipsis),
                         subtitle: Text(book.authors.isNotEmpty ? book.authors.first : 'Unknown Author'),

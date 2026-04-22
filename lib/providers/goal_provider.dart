@@ -12,46 +12,67 @@ final goalServiceProvider = Provider<GoalService>((ref) {
 
 /// Streams all goals for the current user and year.
 final userGoalsProvider = StreamProvider<List<GoalModel>>((ref) {
-  final user = ref.watch(authProvider).value;
-  if (user == null) return Stream.value([]);
-  
-  return ref.watch(goalServiceProvider).watchGoals(user.uid, DateTime.now().year);
+  final authState = ref.watch(authProvider);
+  final goalService = ref.watch(goalServiceProvider);
+
+  return authState.when(
+    data: (user) {
+      if (user == null) return Stream.value([]);
+      // We pass the UID explicitly to ensure we are watching the correct path
+      return goalService.watchGoals(user.uid, DateTime.now().year);
+    },
+    loading: () => const Stream.empty(),
+    error: (e, st) => Stream.error(e, st),
+  );
 });
 
 /// A provider that calculates the current progress for all goals.
-final goalProgressProvider = Provider<List<GoalModel>>((ref) {
-  final goals = ref.watch(userGoalsProvider).value ?? [];
-  final library = ref.watch(userLibraryProvider).value ?? [];
-  final currentYear = DateTime.now().year;
+final goalProgressProvider = Provider<AsyncValue<List<GoalModel>>>((ref) {
+  final userGoalsAsync = ref.watch(userGoalsProvider);
+  final userLibraryAsync = ref.watch(userLibraryProvider);
 
-  // Only consider books finished this year
-  final finishedThisYear = library.where((b) => 
-    b.status == ReadingStatus.finished && 
-    b.addedAt.year == currentYear
-  ).toList();
+  return userGoalsAsync.when(
+    data: (goals) {
+      return userLibraryAsync.when(
+        data: (library) {
+          final currentYear = DateTime.now().year;
+          // Only consider books finished this year
+          final finishedThisYear = library.where((b) => 
+            b.status == ReadingStatus.finished && 
+            b.addedAt.year == currentYear
+          ).toList();
 
-  return goals.map((goal) {
-    int progress = 0;
-    switch (goal.type) {
-      case GoalType.totalBooks:
-        progress = finishedThisYear.length;
-        break;
-      case GoalType.genreCount:
-        if (goal.metadata != null) {
-          progress = finishedThisYear.where((b) => 
-            b.categories.any((c) => c.toLowerCase() == goal.metadata!.toLowerCase())
-          ).length;
-        }
-        break;
-      case GoalType.pageThreshold:
-        if (goal.metadata != null) {
-          final threshold = int.tryParse(goal.metadata!) ?? 0;
-          progress = finishedThisYear.where((b) => b.totalPages >= threshold).length;
-        }
-        break;
-    }
-    return goal.copyWith(currentValue: progress);
-  }).toList();
+          final processedGoals = goals.map((goal) {
+            int progress = 0;
+            switch (goal.type) {
+              case GoalType.totalBooks:
+                progress = finishedThisYear.length;
+                break;
+              case GoalType.genreCount:
+                if (goal.metadata != null && goal.metadata!.isNotEmpty) {
+                  progress = finishedThisYear.where((b) => 
+                    b.categories.any((c) => c.toLowerCase() == goal.metadata!.toLowerCase())
+                  ).length;
+                }
+                break;
+              case GoalType.pageThreshold:
+                if (goal.metadata != null) {
+                  final threshold = int.tryParse(goal.metadata!) ?? 0;
+                  progress = finishedThisYear.where((b) => b.totalPages >= threshold).length;
+                }
+                break;
+            }
+            return goal.copyWith(currentValue: progress);
+          }).toList();
+          return AsyncValue.data(processedGoals);
+        },
+        loading: () => const AsyncValue.loading(),
+        error: (e, st) => AsyncValue.error(e, st),
+      );
+    },
+    loading: () => const AsyncValue.loading(),
+    error: (e, st) => AsyncValue.error(e, st),
+  );
 });
 
 /// A notifier to manage goal actions.

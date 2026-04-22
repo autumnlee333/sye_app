@@ -51,6 +51,7 @@ class ActivityService {
   Stream<List<ActivityModel>> watchAllActivities() {
     return _activitiesCollection
         .orderBy('timestamp', descending: true)
+        .limit(50)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) => ActivityModel.fromJson(doc.data())).toList();
@@ -62,6 +63,7 @@ class ActivityService {
     return _activitiesCollection
         .where('userId', isEqualTo: userId)
         .orderBy('timestamp', descending: true)
+        .limit(50)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) => ActivityModel.fromJson(doc.data())).toList();

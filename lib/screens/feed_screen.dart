@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../providers/activity_provider.dart';
 import '../models/activity_model.dart';
 import '../widgets/activity_card.dart';
@@ -124,12 +125,18 @@ class _MemorySection extends ConsumerWidget {
                 if (m.bookThumbnail != null)
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
-                    child: Image.network(
-                      m.bookThumbnail!, 
+                    child: CachedNetworkImage(
+                      imageUrl: m.bookThumbnail!, 
                       width: 46, 
                       height: 68, 
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
+                      placeholder: (context, url) => Container(
+                        width: 46,
+                        height: 68,
+                        color: Colors.white24,
+                        child: const Icon(Icons.book, color: Colors.white70, size: 20),
+                      ),
+                      errorWidget: (context, url, error) => Container(
                         width: 46,
                         height: 68,
                         color: Colors.white24,

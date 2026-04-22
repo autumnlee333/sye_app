@@ -23,10 +23,10 @@ final userActivitiesProvider = StreamProvider.family<List<ActivityModel>, String
 
 /// A provider that filters the current user's activities to find "On This Day" memories.
 final readingMemoriesProvider = Provider<List<ActivityModel>>((ref) {
-  final user = ref.watch(authProvider).value;
-  if (user == null) return [];
+  final userId = ref.watch(authProvider.select((v) => v.value?.uid));
+  if (userId == null) return [];
   
-  final activitiesAsync = ref.watch(userActivitiesProvider(user.uid));
+  final activitiesAsync = ref.watch(userActivitiesProvider(userId));
   
   return activitiesAsync.maybeWhen(
     data: (activities) {
