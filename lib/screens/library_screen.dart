@@ -354,6 +354,7 @@ class _LibraryList extends ConsumerWidget {
 
   void _showUpdateProgressDialog(BuildContext context, WidgetRef ref, LibraryBookModel book) {
     final pageController = TextEditingController(text: book.currentPage.toString());
+    final totalPageController = TextEditingController(text: book.totalPages > 0 ? book.totalPages.toString() : '');
     final commentController = TextEditingController();
     bool postToFeed = true;
 
@@ -366,12 +367,33 @@ class _LibraryList extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextField(
-                  controller: pageController,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    labelText: 'Current Page (of ${book.totalPages ?? '??'})',
-                  ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: pageController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: 'Current Page',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: Text('of', style: TextStyle(fontSize: 16)),
+                    ),
+                    Expanded(
+                      child: TextField(
+                        controller: totalPageController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: 'Total Pages',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 TextField(
@@ -379,6 +401,7 @@ class _LibraryList extends ConsumerWidget {
                   decoration: const InputDecoration(
                     labelText: 'Add a thought (optional)',
                     hintText: 'What\'s happening in the book?',
+                    border: OutlineInputBorder(),
                   ),
                   maxLines: 2,
                 ),
@@ -387,6 +410,7 @@ class _LibraryList extends ConsumerWidget {
                   value: postToFeed,
                   onChanged: (val) => setState(() => postToFeed = val ?? true),
                   controlAffinity: ListTileControlAffinity.leading,
+                  contentPadding: EdgeInsets.zero,
                 ),
               ],
             ),
@@ -396,10 +420,19 @@ class _LibraryList extends ConsumerWidget {
             ElevatedButton(
               onPressed: () {
                 final newPage = int.tryParse(pageController.text) ?? book.currentPage;
+                final newTotal = int.tryParse(totalPageController.text) ?? book.totalPages;
+                
+                if (newPage > newTotal && newTotal > 0) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Current page cannot exceed total pages.')),
+                  );
+                  return;
+                }
+
                 ref.read(libraryActionProvider.notifier).updateProgress(
                   book.bookId,
                   newPage,
-                  book.totalPages ?? 0,
+                  newTotal,
                   comment: commentController.text.trim(),
                   postToFeed: postToFeed,
                 );
