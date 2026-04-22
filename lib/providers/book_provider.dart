@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/book_model.dart';
 import '../services/book_service.dart';
@@ -31,7 +32,7 @@ class BookSearchNotifier extends AsyncNotifier<List<BookModel>> {
 }
 
 /// Provider for book search results.
-final bookSearchProvider = AsyncNotifierProvider.autoDispose<BookSearchNotifier, List<BookModel>>(
+final bookSearchProvider = AsyncNotifierProvider<BookSearchNotifier, List<BookModel>>(
   BookSearchNotifier.new,
 );
 
@@ -51,8 +52,15 @@ final singleBookProvider = FutureProvider.family<BookModel?, String>((ref, id) a
 
 /// Provider for recommended books based on user's favorite genres.
 final recommendationsProvider = FutureProvider<List<BookModel>>((ref) async {
-  final userProfile = ref.watch(currentUserDataProvider).value;
-  if (userProfile == null || userProfile.favoriteGenres.isEmpty) return [];
+  final userAsync = ref.watch(currentUserDataProvider);
+
+  // Wait for the user profile to be available
+  final userProfile = userAsync.value;
+  if (userProfile == null) {
+    return Completer<List<BookModel>>().future;
+  }
+
+  if (userProfile.favoriteGenres.isEmpty) return [];
 
   final bookService = ref.read(bookServiceProvider);
   return await bookService.getRecommendations(userProfile.favoriteGenres);
@@ -60,14 +68,23 @@ final recommendationsProvider = FutureProvider<List<BookModel>>((ref) async {
 
 /// Provider for "Smart" recommendations based on the user's actual favorite books.
 final smartRecommendationsProvider = FutureProvider<List<BookModel>>((ref) async {
-  final userProfile = ref.watch(currentUserDataProvider).value;
-  if (userProfile == null || userProfile.topFavoriteBookIds.isEmpty) return [];
+  final userAsync = ref.watch(currentUserDataProvider);
+
+  final userProfile = userAsync.value;
+  if (userProfile == null) {
+    return Completer<List<BookModel>>().future;
+  }
+
+  if (userProfile.topFavoriteBookIds.isEmpty) return [];
 
   final bookService = ref.read(bookServiceProvider);
-  
-  // First fetch the actual book details for the favorites
-  final favoriteBooks = await ref.watch(bookDetailsProvider(userProfile.topFavoriteBookIds).future);
-  
+
+  // Optimization: Only fetch details for up to 3 favorites to speed up similarity search
+  final favoriteIds = List<String>.from(userProfile.topFavoriteBookIds)..shuffle();
+  final subsetIds = favoriteIds.take(3).toList();
+
+  final favoriteBooks = await ref.watch(bookDetailsProvider(subsetIds).future);
+
   // Then get similar books based on those favorites
   return await bookService.getSimilarBooks(favoriteBooks);
 });

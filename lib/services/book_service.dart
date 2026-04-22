@@ -87,20 +87,34 @@ class BookService {
   Future<List<BookModel>> getRecommendations(List<String> genres) async {
     if (genres.isEmpty) return [];
 
-    try {
-      final genre = (List<String>.from(genres)..shuffle()).first;
-      final url = Uri.parse('$_baseUrl?q=subject:${Uri.encodeComponent(genre)}&orderBy=relevance&maxResults=10&key=$_apiKey');
-      final response = await _getWithRetry(url);
+    final shuffledGenres = List<String>.from(genres)..shuffle();
+    final genresToTry = shuffledGenres.take(3).toList();
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final List<dynamic> items = data['items'] ?? [];
-        return items.map((item) => _parseBook(item)).toList();
-      }
-      return [];
-    } catch (e) {
-      return [];
+    // Fetch multiple genres in parallel for speed
+    final results = await Future.wait(
+      genresToTry.map((genre) async {
+        try {
+          final url = Uri.parse('$_baseUrl?q=subject:${Uri.encodeComponent(genre)}&orderBy=relevance&maxResults=10&key=$_apiKey');
+          final response = await _getWithRetry(url);
+
+          if (response.statusCode == 200) {
+            final data = json.decode(response.body);
+            final List<dynamic> items = data['items'] ?? [];
+            return items.map((item) => _parseBook(item)).toList();
+          }
+        } catch (_) {
+          // Individual genre failure is fine if others succeed
+        }
+        return <BookModel>[];
+      }),
+    );
+
+    // Return the first non-empty result
+    for (final result in results) {
+      if (result.isNotEmpty) return result;
     }
+
+    throw Exception('Failed to load recommendations. Please check your connection.');
   }
 
   /// Fetches books similar to a list of existing books.
@@ -136,9 +150,9 @@ class BookService {
             .where((book) => !originalIds.contains(book.id))
             .toList();
       }
-      return [];
+      throw Exception('Status ${response.statusCode}');
     } catch (e) {
-      return [];
+      throw Exception('Failed to load similar books.');
     }
   }
 

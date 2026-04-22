@@ -49,6 +49,16 @@ class ReviewNotifier extends AsyncNotifier<void> {
 
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
+      final reviewService = ref.read(reviewServiceProvider);
+      
+      // Duplicate Prevention: If we are not editing (id is null), check if a review already exists
+      if (id == null) {
+        final existingReview = await reviewService.getReviewByUserAndBook(user.uid, bookId);
+        if (existingReview != null) {
+          throw Exception('You have already reviewed this book.');
+        }
+      }
+
       final review = ReviewModel(
         id: id ?? '',
         userId: user.uid,
@@ -63,7 +73,7 @@ class ReviewNotifier extends AsyncNotifier<void> {
         reviewText: text,
         timestamp: DateTime.now(),
       );
-      await ref.read(reviewServiceProvider).saveReviewWithActivity(review);
+      await reviewService.saveReviewWithActivity(review);
     });
   }
 

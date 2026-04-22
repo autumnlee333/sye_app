@@ -106,6 +106,20 @@ class ReviewService {
     });
   }
 
+  /// Checks if a user has already reviewed a specific book.
+  Future<ReviewModel?> getReviewByUserAndBook(String userId, String bookId) async {
+    final snapshot = await _reviewsCollection
+        .where('userId', isEqualTo: userId)
+        .where('bookId', isEqualTo: bookId)
+        .limit(1)
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      return ReviewModel.fromJson(snapshot.docs.first.data());
+    }
+    return null;
+  }
+
   /// Streams all reviews (global feed).
   Stream<List<ReviewModel>> watchAllReviews() {
     return _reviewsCollection
