@@ -32,9 +32,17 @@ class LibraryService {
   /// Updates the reading status of a book in the library.
   Future<void> updateBookStatus(String uid, String bookId, ReadingStatus status) async {
     try {
-      await _libraryCollection(uid).doc(bookId).update({
+      final updates = <String, dynamic>{
         'status': status.name,
-      });
+      };
+      
+      if (status == ReadingStatus.finished) {
+        updates['completedAt'] = FieldValue.serverTimestamp();
+      } else {
+        updates['completedAt'] = null;
+      }
+
+      await _libraryCollection(uid).doc(bookId).update(updates);
     } catch (e) {
       rethrow;
     }
@@ -53,9 +61,17 @@ class LibraryService {
   Future<void> updateBooksStatus(String uid, List<String> bookIds, ReadingStatus status) async {
     final batch = _firestore.batch();
     for (final id in bookIds) {
-      batch.update(_libraryCollection(uid).doc(id), {
+      final updates = <String, dynamic>{
         'status': status.name,
-      });
+      };
+      
+      if (status == ReadingStatus.finished) {
+        updates['completedAt'] = FieldValue.serverTimestamp();
+      } else {
+        updates['completedAt'] = null;
+      }
+
+      batch.update(_libraryCollection(uid).doc(id), updates);
     }
     await batch.commit();
   }

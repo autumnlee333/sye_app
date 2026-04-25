@@ -147,7 +147,7 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
    - **Concept:** Expand yearly challenges to include custom sub-goals (e.g., "Read 5 Non-fiction books", "Read 3 books over 500 pages").
    - **Goal:** Update the goal tracking logic to support varied criteria beyond simple book counts.
 
- [ ] 4.8 **Reading Statistics & Visualizations**
+ [x] 4.8 **Reading Statistics & Visualizations**
    - **Concept:** Turn a user's reading history into actionable and visually appealing data.
    - **Goal:** Create a dashboard on the profile with charts and stats showing reading habits (e.g., books per month, genre breakdown, page count trends).
 

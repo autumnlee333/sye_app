@@ -34,6 +34,7 @@ abstract class LibraryBookModel with _$LibraryBookModel {
     String? thumbnailUrl,
     required ReadingStatus status,
     required DateTime addedAt,
+    DateTime? completedAt,
     @Default(0) int currentPage,
     @Default(0) int totalPages,
     double? averageRating,

@@ -11,6 +11,7 @@ import '../models/goal_model.dart';
 import '../models/library_book_model.dart';
 import '../widgets/book_card.dart';
 import '../widgets/activity_card.dart';
+import '../widgets/stats_dashboard.dart';
 import 'select_favorites_screen.dart';
 import 'edit_profile_screen.dart';
 
@@ -153,6 +154,8 @@ class ProfileScreen extends ConsumerWidget {
                 if (isCurrentUser) ...[
                   const Divider(),
                   const _GoalSection(),
+                  const Divider(),
+                  const StatsDashboard(),
                   const SizedBox(height: 24),
                 ],
                 const Divider(),

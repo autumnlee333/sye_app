@@ -56,16 +56,18 @@ class LibraryNotifier extends AsyncNotifier<void> {
     final finishedBookNotifier = ref.read(finishedBookProvider.notifier);
 
     state = await AsyncValue.guard(() async {
+      final now = DateTime.now();
       final libraryBook = LibraryBookModel(
         bookId: book.id,
         title: book.title,
         authors: book.authors,
         thumbnailUrl: book.thumbnailUrl,
         status: status,
-        addedAt: DateTime.now(),
+        addedAt: now,
+        completedAt: status == ReadingStatus.finished ? now : null,
         averageRating: book.averageRating,
         categories: book.categories,
-        totalPages: book.pageCount ?? 0, // Fix: Use pageCount from BookModel
+        totalPages: book.pageCount ?? 0,
       );
       await ref.read(libraryServiceProvider).addBookToLibrary(user.uid, libraryBook);
       
