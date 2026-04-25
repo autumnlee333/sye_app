@@ -16,6 +16,9 @@ _LibraryBookModel _$LibraryBookModelFromJson(Map<String, dynamic> json) =>
       thumbnailUrl: json['thumbnailUrl'] as String?,
       status: $enumDecode(_$ReadingStatusEnumMap, json['status']),
       addedAt: DateTime.parse(json['addedAt'] as String),
+      completedAt: json['completedAt'] == null
+          ? null
+          : DateTime.parse(json['completedAt'] as String),
       currentPage: (json['currentPage'] as num?)?.toInt() ?? 0,
       totalPages: (json['totalPages'] as num?)?.toInt() ?? 0,
       averageRating: (json['averageRating'] as num?)?.toDouble(),
@@ -34,6 +37,7 @@ Map<String, dynamic> _$LibraryBookModelToJson(_LibraryBookModel instance) =>
       'thumbnailUrl': instance.thumbnailUrl,
       'status': _$ReadingStatusEnumMap[instance.status]!,
       'addedAt': instance.addedAt.toIso8601String(),
+      'completedAt': instance.completedAt?.toIso8601String(),
       'currentPage': instance.currentPage,
       'totalPages': instance.totalPages,
       'averageRating': instance.averageRating,

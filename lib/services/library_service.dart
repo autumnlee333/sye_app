@@ -130,7 +130,19 @@ class LibraryService {
         .limit(200)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) => LibraryBookModel.fromJson(doc.data())).toList();
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+        
+        // Convert Timestamps to ISO8601 strings for the model's fromJson
+        if (data['addedAt'] is Timestamp) {
+          data['addedAt'] = (data['addedAt'] as Timestamp).toDate().toIso8601String();
+        }
+        if (data['completedAt'] is Timestamp) {
+          data['completedAt'] = (data['completedAt'] as Timestamp).toDate().toIso8601String();
+        }
+        
+        return LibraryBookModel.fromJson(data);
+      }).toList();
     });
   }
 }
