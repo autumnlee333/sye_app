@@ -120,6 +120,21 @@ class ReviewService {
     return null;
   }
 
+  /// Streams a specific user's review for a specific book.
+  Stream<ReviewModel?> watchReviewByUserAndBook(String userId, String bookId) {
+    return _reviewsCollection
+        .where('userId', isEqualTo: userId)
+        .where('bookId', isEqualTo: bookId)
+        .limit(1)
+        .snapshots()
+        .map((snapshot) {
+      if (snapshot.docs.isNotEmpty) {
+        return ReviewModel.fromJson(snapshot.docs.first.data());
+      }
+      return null;
+    });
+  }
+
   /// Streams all reviews (global feed).
   Stream<List<ReviewModel>> watchAllReviews() {
     return _reviewsCollection

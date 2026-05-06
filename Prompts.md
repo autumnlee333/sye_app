@@ -202,6 +202,227 @@ This document tracks the iterative development process of the SYE (Share Your Ex
 **User:** Provide more nuance to book evaluations by allowing users to rate books using half-star increments.
 **Gemini:** 
 - **Reusable Widget:** Created `StarRating` widget to accurately display partial stars (0.5 increments) using `Icons.star_half`.
+- **Gesture Selection:** Refactored `ReviewDialog` and `ActivityCard` edit flows to use a `GestureDetector` that calculates rating
+s based on tap/drag horizontal position, enabling 0.5-star precision.
+- **Consistent Display:** Updated all rating surfaces (Activity Feed, Book Details summary, and Review lists) to use the new `StarRating` component for visual consistency.
+
+### 4.6 Reading Memories
+**User:** Implement a "Reading Memories" feature that reminds users of past milestones.
+**Gemini:** 
+- **Memories Logic:** Created `readingMemoriesProvider` in `activity_provider.dart` that filters the user's history for activities matching the current month and day from previous years.
+- **Nostalgic UI:** Integrated a `_MemorySection` into the `FeedScreen` with a custom gradient card. It surfaces "On This Day" milestones (started books, progress, reviews) with book thumbnails and "years ago" labels to foster re-engagement.
+- **Dynamic Interaction:** Included pull-to-refresh support to ensure memories stay current with the user's local time.
+
+### Top Favorites UX Tweak
+**User:** Can there be an easier way to remove a book from your top three favorites?
+**Gemini:** 
+- **Action Notifier:** Added `UserActionNotifier` to `user_provider.dart` to handle specific user interactions like removing favorites.
+- **Direct UI Removal:** Updated the `ProfileScreen` to display a red removal icon directly on favorite book cards when viewed by the profile owner, eliminating the need to use search screens for simple removals.
+
+# SYE App Development Log: Conversation with Gemini
+
+This document tracks the iterative development process of the SYE (Share Your Experience) app.
+
+---
+
+## Phase 1: Project Foundation & User Profiles
+
+### 1.0 Initial Setup
+**User:** Read `requirements.md` and familiarize yourself with the basic idea of this app.  
+**Gemini:** Ready to begin implementation. Phase 1 focuses on creating user profiles and authentication.
+
+**User:** Can you get rid of the old counter code? It's not necessary for this app.  
+**Gemini:** Removed counter logic from `main.dart` and `widget_test.dart`. Simplified `MyHomePage` to a basic welcome screen.
+
+### 1.1 User Authentication
+**User:** Implement step 1.1. Don't jump ahead.  
+**Gemini:** 
+- Created `AuthService` for sign-in/up/out using Firebase Auth.
+- Created `authProvider` using Riverpod to track user sessions.
+- Standardized project directory structure.
+
+### 1.2 User Model
+**User:** Implement step 1.2.  
+**Gemini:** 
+- Integrated `freezed` and `json_serializable`.
+- Created `UserModel` with fields for `uid`, `displayName`, `bio`, and `favoriteGenres`.
+- Added unit tests for serialization and value equality.
+
+### 1.3 User Collection (Firestore)
+**User:** Implement Requirement 1.3.  
+**Gemini:** 
+- Created `UserService` for Firestore CRUD operations.
+- Added `currentUserDataProvider` to reactively sync profile data.
+- Added service tests with mocks.
+
+### 1.4 Onboarding Screen
+**User:** Implement Requirement 1.4.  
+**Gemini:** 
+- Created `StorageService` for local settings (onboarding status).
+- Built `OnboardingScreen` UI with multi-select genre chips.
+- Updated `main.dart` to initialize local storage.
+
+### 1.5 Auth Wrapper & Navigation
+**User:** Implement Requirement 1.5.  
+**Gemini:** 
+- Created `AuthWrapper` as the app's routing "brain."
+- Implemented `LoginScreen` and `MainNavigation` placeholders.
+- Added widget tests for all routing scenarios.
+
+**User:** Implement Requirement 1.6 (Home Screen Navigation).  
+**Gemini:** Built a modern bottom navigation bar with four hubs: Feed, Search, Library, and Profile.
+
+---
+
+## Phase 2: Book Tracking & Discovery
+
+### 2.1 Book Search Service
+**User:** Implement feature 2.1.  
+**Gemini:** 
+- Integrated Google Books API.
+- Built a modern search UI with debouncing and error handling.
+- Implemented the `BookCard` widget for results.
+
+### 2.2 Top Favorites Showcase
+**User:** Implement feature 2.2.  
+**Gemini:** 
+- Updated `UserModel` to store book IDs.
+- Created `SelectFavoritesScreen` for searching and picking favorites.
+- Integrated favorites showcase into the `ProfileScreen`.
+
+**User:** Can you change it to top 3 favorite books instead of 5?  
+**Gemini:** Updated limits and UI labels across the Profile and Selection screens to reflect a "Top 3" limit.
+
+### 2.3 Personal Bookshelves
+**User:** Implement feature 2.3.  
+**Gemini:** 
+- Created `LibraryBookModel` and `ReadingStatus` enum.
+- Implemented `LibraryService` for Firestore sub-collections.
+- Built `LibraryScreen` with a 3-tab layout (Reading, Want to Read, Finished).
+- Added "Quick Add" popup menus to search results.
+
+### 2.4 Reading Progress Updates
+**User:** Implement feature 2.4.  
+**Gemini:** 
+- Added `currentPage` and `totalPages` to the library model.
+- Created `ProgressUpdateModel` for history logging.
+- Added progress bars and an `UpdateProgressDialog` to the Library UI.
+
+### 2.5 Genre Recommendations
+**User:** Implement feature 2.5.  
+**Gemini:** 
+- Added genre-based search logic to `BookService`.
+- Replaced the Home placeholder with a functional `FeedScreen`.
+- Implemented pull-to-refresh for personalized book suggestions.
+
+---
+
+## Phase 3: Social Interactions
+
+### 3.1 Book Reviews & Ratings
+**User:** Implement feature 3.1  
+**Gemini:** 
+- Created `ReviewModel` and `ReviewService` for Firestore review storage.
+- Implemented `ReviewDialog` for a unified rating and text review experience.
+- Transformed `FeedScreen` into a "Live Board" displaying global activities and reviews.
+- Added automated activity posting when starting or finishing books.
+
+### 3.1.1 Data Synchronization
+**User:** Implement feature 3.1.1  
+**Gemini:** 
+- Linked `ReviewModel` and `ActivityModel` with cross-referencing IDs.
+- Implemented atomic batch operations in `ReviewService` to ensure edits/deletions sync across both collections.
+- Updated `ActivityNotifier` and `ReviewNotifier` to use these synchronized methods.
+- Resolved Riverpod 3.0 compatibility by updating `StateProvider` imports to `legacy.dart`.
+
+### 3.1.2 Activity History on Profile
+**User:** Implement feature 3.1.2  
+**Gemini:** 
+- Extracted `ActivityCard` into a shared widget for consistent UI across the Feed and Profile.
+- Added `userActivitiesProvider` to stream a specific user's actions.
+- Updated `ProfileScreen` to display a chronological "Activity History" section.
+- Verified functionality with a custom Firestore composite index.
+
+### 3.1.3 Book Details Screen
+**User:** Implement feature 3.1.3  
+**Gemini:** 
+- Created `BookDetailsScreen` to display full book descriptions and reader reviews.
+- Added `singleBookProvider` for efficient individual book fetching.
+- Enabled global navigation: tapping any book in the Feed, Search, or Library now opens its details.
+- Gracefully handled Web CORS issues with an `errorBuilder` for book covers.
+
+### 3.2 Live Activity Feed
+**User:** Implement feature 3.2  
+**Gemini:** Successfully built the chronological "Live Board" hub that displays real-time updates (starting books, progress, reviews) from all users.
+
+### 3.3 Follow System
+**User:** Implement feature 3.3
+**Gemini:** 
+- **Model Update:** Added `followerCount` and `followingCount` to `UserModel`.
+- **Follow Service:** Created `FollowService` using Firestore atomic batches to manage relationships and sync counts.
+- **State Management:** Implemented `isFollowingProvider` (stream) and `followActionProvider` (notifier) for real-time UI updates.
+- **Profile UI:** Integrated follow stats and a dynamic "Follow/Unfollow" button on user profiles.
+- **Verification:** Added `test/services/follow_service_test.dart` to ensure atomic consistency of follow operations.
+
+### 3.4 User Discovery & Community Hub
+**User:** There's no way for users to find each other. Can we add a community feature?
+**Gemini:** 
+- **Requirements Update:** Added Feature 3.4 (User Discovery) and updated the navigation structure to a 5-tab system.
+- **Service Enhancement:** Added `searchUsers` to `UserService` for prefix-based display name searching.
+- **State Management:** Created `userSearchProvider` to manage asynchronous search states and results.
+- **Community UI:** Built `CommunityScreen` featuring a user search bar, results list with quick-follow actions, and seamless profile navigation.
+- **Navigation:** Integrated the new "Community" hub into the main bottom navigation bar.
+- **Unique Usernames:**
+    - Updated `UserModel` to include a mandatory `username` field.
+    - Enhanced `OnboardingScreen` to collect and validate unique usernames (at least 3 characters, alphanumeric/underscores).
+    - Implemented real-time username availability checks in `UserService`.
+    - Updated `CommunityScreen` and `ProfileScreen` to prominently display `@username` handles for easier identification.
+    - **Profile Editing:** Enhanced `EditProfileScreen` to allow users to update their `displayName` and `username` with full validation and availability checks.
+    - **Legacy Data Stability:** Added a default empty string for the `username` field in the model to prevent app crashes when reading older Firestore documents that lack this field.
+
+## Phase 4: Advanced Experience Improvements (Post-MVP)
+
+### 4.1 Advanced Search Logic
+**User:** Improve the search experience to handle typos and partial matches gracefully.
+**Gemini:** 
+- **Algorithm Implementation:** Integrated the Sørensen–Dice coefficient algorithm into `BookService` for fuzzy string matching.
+- **Search Optimization:** Increased API results pool (`maxResults: 40`) and implemented client-side re-ranking to prioritize books whose titles or authors best match the user's query.
+- **Verification:** Added comprehensive unit tests in `test/services/book_service_test.dart` to verify that typo-laden queries correctly prioritize relevant results.
+
+### 4.2 Smart Recommendations Engine
+**User:** Move beyond simple genre matching to a more personalized recommendation system.
+**Gemini:** 
+- **Service Enhancement:** Expanded `BookService` with `getSimilarBooks`, utilizing author and category metadata from the user's "Top 3 Favorites" to build complex API queries.
+- **Data-Driven Discovery:** Created `smartRecommendationsProvider` to reactively fetch and manage personalized book suggestions.
+- **Explore Hub (Architecture Update):** 
+    - Created a dedicated `ExploreTab` consolidating book search and discovery into one high-intent screen.
+    - Moved horizontal recommendation rows ("Explore by Genre" and "More Like Your Favorites") from the home screen to the top of the Explore tab.
+    - Refactored `FeedScreen` to focus exclusively on the social "Live Board", creating a cleaner Instagram-style social experience.
+- **Logic refinement:** Implemented filtering to ensure users are not recommended books they already have in their "Top Favorites."
+
+### 4.3 Custom Book Lists (Personalized Shelves)
+**User:** There are no personalized shelves. We need them before bulk management.
+**Gemini:** 
+- **Model:** Created `CustomListModel` for themed collections (name, description, privacy, book list).
+- **Service:** Implemented `ListService` with atomic array operations for adding/removing books.
+- **Library UI:** Redesigned `LibraryScreen` to include a new "My Custom Lists" section with a creation workflow.
+- **Discovery Integration:** Added a "Quick Add to List" feature to the `BookDetailsScreen`, allowing users to organize books while browsing.
+- **List Management:** Built `ListDetailsScreen` for viewing, editing, and deleting specific custom shelves.
+
+### 4.4 Bulk Shelf Management
+**User:** Implement a way for users to manage multiple books simultaneously.
+**Gemini:** 
+- **Selection State:** Created `selection_provider.dart` to manage global batch mode and selected book IDs.
+- **Atomic Operations:** Added `bulkRemoveBooksFromLibrary`, `bulkUpdateStatus`, and `bulkRemoveBooksFromList` using Firestore atomic batches for efficient data updates.
+- **Dynamic UI:** 
+    - Updated `BookCard` with checkbox support and selection highlighting.
+    - Implemented a persistent bottom action bar in `LibraryScreen` and `ListDetailsScreen` for performing bulk actions.
+    - Added a "Batch Mode" toggle (Edit button) that updates the entire library interface for multi-selection.
+
+### 4.5 Enhanced Rating System (Half Stars)
+**User:** Provide more nuance to book evaluations by allowing users to rate books using half-star increments.
+**Gemini:** 
+- **Reusable Widget:** Created `StarRating` widget to accurately display partial stars (0.5 increments) using `Icons.star_half`.
 - **Gesture Selection:** Refactored `ReviewDialog` and `ActivityCard` edit flows to use a `GestureDetector` that calculates ratings based on tap/drag horizontal position, enabling 0.5-star precision.
 - **Consistent Display:** Updated all rating surfaces (Activity Feed, Book Details summary, and Review lists) to use the new `StarRating` component for visual consistency.
 
@@ -225,6 +446,16 @@ This document tracks the iterative development process of the SYE (Share Your Ex
 - **Dynamic Logic:** Implemented `goalProgressProvider` in `goal_provider.dart` that reactively scans the user's finished library for the current year to calculate real-time progress for every goal.
 - **Progress Dashboard:** Built a "Yearly Reading Goals" section on the `ProfileScreen` with a visual progress bar and percentage display for each goal.
 - **Goal Management:** Integrated an "Add Goal" workflow with a type-specific configuration dialog and the ability to delete old goals.
+
+### 4.8 Reading Statistics & Visualizations
+**User:** Implement reading statistics and visualizations on the profile.
+**Gemini:** 
+- **Model Update:** Added `completedAt` field to `LibraryBookModel` to track exactly when books are finished.
+- **Service Enhancement:** Updated `LibraryService` and `LibraryNotifier` to automatically set `completedAt` when a book's status is changed to "finished" using Firestore server timestamps.
+- **Data Processing:** Created `readingStatsProvider` in `stats_provider.dart` to calculate monthly books finished, genre distribution, and page count trends.
+- **Visual Dashboard:** Built the `StatsDashboard` widget using the `fl_chart` package, featuring bar charts for monthly progress and pie charts for genre breakdowns.
+- **Integration:** Embedded the dashboard into the `ProfileScreen` for profile owners.
+- **Optimization:** Fixed Firestore type mismatches by converting `Timestamp` objects to ISO8601 strings in the service layer to ensure reliable model parsing.
 
 ---
 
@@ -260,7 +491,21 @@ This document tracks the iterative development process of the SYE (Share Your Ex
 **Gemini:**
 - **Root Cause:** Identified that the Firestore Security Rules were either in "Test Mode" (expired) or too restrictive, blocking the initial profile read for new Google users.
 - **Resolution:** Provided a comprehensive set of Firestore Security Rules to allow:
-    - Authenticated users to read any profile (for social features).
-    - Users to write only to their own profile and library.
-    - Owners to manage their own activities and reviews.
-    - Global read access for the activity feed.
+- Authenticated users to read any profile (for social features).
+- Users to write only to their own profile and library.
+- Owners to manage their own activities and reviews.
+- Global read access for the activity feed.
+
+### 5.1 Shared Book Lists
+**User:** Implement feature 5.1 without jumping to 5.2.
+**Gemini:**
+- **Architecture Refactor:** Moved custom lists from a nested user sub-collection to a top-level `customLists` collection. This allows for multi-user access (owners and collaborators) without deep-nesting constraints.
+- **Model Update:** Added `collaboratorIds` to `CustomListModel` to track secondary editors.
+- **Service Enhancement:** Refactored `ListService` to use a global collection and implemented `Filter.or` queries to fetch lists where a user is either the owner or a collaborator.
+- **Collaboration UI:**
+- **Management:** Built a `_CollaboratorSearchSheet` allowing owners to find users by username and toggle their collaborator status.
+- **Visual Feedback:** Updated `LibraryScreen` to show a "people" icon and a "Shared" badge for collaborative lists.
+- **Permissions:** Restricted list deletion and collaborator management to owners only.
+- **Robustness:** Fixed missing bulk book addition/removal methods in the service and provider layers.
+- **Security Rules:** Provided updated Firestore rules for the new top-level collection to ensure proper access control for owners and collaborators.
+

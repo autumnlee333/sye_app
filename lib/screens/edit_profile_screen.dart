@@ -1,7 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../models/user_model.dart';
 import '../providers/user_provider.dart';
+import '../providers/storage_provider.dart';
 import '../constants/genres.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
@@ -19,6 +23,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController _usernameController;
   late TextEditingController _bioController;
   late List<String> _selectedGenres;
+  File? _pickedImage;
   bool _isLoading = false;
 
   @override
@@ -36,6 +41,21 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     _usernameController.dispose();
     _bioController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 70,
+      maxWidth: 500,
+    );
+
+    if (pickedFile != null) {
+      setState(() {
+        _pickedImage = File(pickedFile.path);
+      });
+    }
   }
 
   void _toggleGenre(String genre) {
@@ -76,11 +96,30 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         }
       }
 
+      String profilePicUrl = widget.user.profilePicUrl;
+
+      // Skip upload for now due to Firebase Storage billing requirements
+      /*
+      if (_pickedImage != null) {
+        profilePicUrl = await ref.read(firebaseStorageServiceProvider).uploadProfilePicture(
+          widget.user.uid,
+          _pickedImage!,
+        );
+      }
+      */
+
+      if (_pickedImage != null && mounted) {
+         ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Note: Image upload is temporarily disabled.')),
+        );
+      }
+
       final updatedUser = widget.user.copyWith(
         displayName: _nameController.text.trim(),
         username: newUsername,
         bio: _bioController.text.trim(),
         favoriteGenres: _selectedGenres,
+        profilePicUrl: profilePicUrl,
       );
       await ref.read(userServiceProvider).saveUser(updatedUser);
       if (mounted) Navigator.pop(context);
@@ -111,6 +150,37 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Center(
+                      child: Stack(
+                        children: [
+                          CircleAvatar(
+                            radius: 60,
+                            backgroundColor: Colors.grey[200],
+                            backgroundImage: _pickedImage != null
+                                ? FileImage(_pickedImage!)
+                                : (widget.user.profilePicUrl.isNotEmpty
+                                    ? CachedNetworkImageProvider(widget.user.profilePicUrl) as ImageProvider
+                                    : null),
+                            child: _pickedImage == null && widget.user.profilePicUrl.isEmpty
+                                ? const Icon(Icons.person, size: 60, color: Colors.grey)
+                                : null,
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: CircleAvatar(
+                              backgroundColor: Theme.of(context).colorScheme.primary,
+                              radius: 20,
+                              child: IconButton(
+                                icon: const Icon(Icons.camera_alt, size: 20, color: Colors.white),
+                                onPressed: _pickImage,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 32),
                     const Text('Display Name', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
                     TextFormField(

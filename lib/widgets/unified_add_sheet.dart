@@ -23,7 +23,7 @@ class UnifiedAddSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final listsAsync = ref.watch(userListsProvider);
+    final listsAsync = ref.watch(accessibleListsProvider);
 
     return DraggableScrollableSheet(
       initialChildSize: 0.6,

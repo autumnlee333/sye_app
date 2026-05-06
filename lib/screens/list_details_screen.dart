@@ -2,12 +2,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:sye_app/providers/auth_provider.dart';
 import '../models/custom_list_model.dart';
 import '../providers/book_provider.dart';
 import '../providers/list_provider.dart';
 import '../providers/selection_provider.dart';
 import '../widgets/book_card.dart';
 import 'book_details_screen.dart';
+import '../providers/user_provider.dart';
 
 class ListDetailsScreen extends ConsumerWidget {
   final CustomListModel list;
@@ -16,10 +18,12 @@ class ListDetailsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final allLists = ref.watch(userListsProvider).value ?? [];
+    final allLists = ref.watch(accessibleListsProvider).value ?? [];
     final currentList = allLists.firstWhere((l) => l.id == list.id, orElse: () => list);
     final isBatchMode = ref.watch(isBatchModeProvider);
     final selectedIds = ref.watch(selectedBookIdsProvider);
+    final userId = ref.watch(authProvider).value?.uid;
+    final isOwner = currentList.ownerId == userId;
 
     return Scaffold(
       appBar: AppBar(
@@ -37,6 +41,12 @@ class ListDetailsScreen extends ConsumerWidget {
             : null,
         actions: [
           if (!isBatchMode) ...[
+            if (isOwner)
+              IconButton(
+                icon: const Icon(Icons.group_add),
+                tooltip: 'Collaborators',
+                onPressed: () => _showCollaboratorsDialog(context, ref, currentList),
+              ),
             IconButton(
               icon: const Icon(Icons.playlist_add),
               tooltip: 'Add Book',
@@ -47,11 +57,12 @@ class ListDetailsScreen extends ConsumerWidget {
               tooltip: 'Batch Edit',
               onPressed: () => ref.read(isBatchModeProvider.notifier).state = true,
             ),
-            IconButton(
-              icon: const Icon(Icons.delete_outline),
-              tooltip: 'Delete List',
-              onPressed: () => _confirmDelete(context, ref, currentList),
-            ),
+            if (isOwner)
+              IconButton(
+                icon: const Icon(Icons.delete_outline),
+                tooltip: 'Delete List',
+                onPressed: () => _confirmDelete(context, ref, currentList),
+              ),
           ],
         ],
       ),
@@ -195,6 +206,15 @@ class ListDetailsScreen extends ConsumerWidget {
     );
   }
 
+  void _showCollaboratorsDialog(BuildContext context, WidgetRef ref, CustomListModel list) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _CollaboratorSearchSheet(list: list),
+    );
+  }
+
   void _confirmDelete(BuildContext context, WidgetRef ref, CustomListModel list) {
     showDialog(
       context: context,
@@ -286,7 +306,7 @@ class _ListSearchSheetState extends ConsumerState<_ListSearchSheet> {
                     itemBuilder: (context, index) {
                       final book = books[index];
                       // Use the updated list state from the provider to check containment
-                      final allLists = ref.watch(userListsProvider).value ?? [];
+                      final allLists = ref.watch(accessibleListsProvider).value ?? [];
                       final currentList = allLists.firstWhere((l) => l.id == widget.list.id, orElse: () => widget.list);
                       final isAlreadyInList = currentList.bookIds.contains(book.id);
 
@@ -330,6 +350,128 @@ class _ListSearchSheetState extends ConsumerState<_ListSearchSheet> {
                       );
                     },
                   ),
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (e, _) => Center(child: Text('Error: $e')),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _CollaboratorSearchSheet extends ConsumerStatefulWidget {
+  final CustomListModel list;
+  const _CollaboratorSearchSheet({required this.list});
+
+  @override
+  ConsumerState<_CollaboratorSearchSheet> createState() => _CollaboratorSearchSheetState();
+}
+
+class _CollaboratorSearchSheetState extends ConsumerState<_CollaboratorSearchSheet> {
+  final _searchController = TextEditingController();
+  Timer? _debounce;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        ref.read(userSearchProvider.notifier).search(query.trim());
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final searchResults = ref.watch(userSearchProvider);
+    final allLists = ref.watch(accessibleListsProvider).value ?? [];
+    final currentList = allLists.firstWhere((l) => l.id == widget.list.id, orElse: () => widget.list);
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.9,
+      minChildSize: 0.5,
+      maxChildSize: 0.95,
+      builder: (context, scrollController) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              const SizedBox(height: 12),
+              Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))),
+              const Padding(
+                padding: EdgeInsets.only(top: 16.0),
+                child: Text('Add Collaborators', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextField(
+                  controller: _searchController,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    hintText: 'Search by username...',
+                    prefixIcon: const Icon(Icons.person_search),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
+                    filled: true,
+                    fillColor: Colors.grey[100],
+                  ),
+                  onChanged: _onSearchChanged,
+                ),
+              ),
+              Expanded(
+                child: searchResults.when(
+                  data: (users) {
+                    // Filter out the owner
+                    final potentialCollaborators = users.where((u) => u.uid != currentList.ownerId).toList();
+                    
+                    if (potentialCollaborators.isEmpty && _searchController.text.isNotEmpty) {
+                      return const Center(child: Text('No users found.'));
+                    }
+
+                    return ListView.builder(
+                      controller: scrollController,
+                      itemCount: potentialCollaborators.length,
+                      itemBuilder: (context, index) {
+                        final user = potentialCollaborators[index];
+                        final isCollaborator = currentList.collaboratorIds.contains(user.uid);
+
+                        return ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: user.profilePicUrl.isNotEmpty 
+                                ? CachedNetworkImageProvider(user.profilePicUrl) 
+                                : null,
+                            child: user.profilePicUrl.isEmpty ? const Icon(Icons.person) : null,
+                          ),
+                          title: Text(user.displayName),
+                          subtitle: Text('@${user.username}'),
+                          trailing: IconButton(
+                            icon: Icon(
+                              isCollaborator ? Icons.remove_circle : Icons.add_circle,
+                              color: isCollaborator ? Colors.red : Colors.blue,
+                            ),
+                            onPressed: () {
+                              if (isCollaborator) {
+                                ref.read(listActionProvider.notifier).removeCollaborator(currentList.id, user.uid);
+                              } else {
+                                ref.read(listActionProvider.notifier).addCollaborator(currentList.id, user.uid);
+                              }
+                            },
+                          ),
+                        );
+                      },
+                    );
+                  },
                   loading: () => const Center(child: CircularProgressIndicator()),
                   error: (e, _) => Center(child: Text('Error: $e')),
                 ),

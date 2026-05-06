@@ -1,5 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../constants/genres.dart';
 import '../models/user_model.dart';
 import '../providers/auth_provider.dart';
@@ -12,12 +15,14 @@ class OnboardingScreen extends ConsumerStatefulWidget {
   @override
   ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
 }
+
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _usernameController = TextEditingController();
   final _bioController = TextEditingController();
   final List<String> _selectedGenres = [];
+  File? _pickedImage;
   bool _isLoading = false;
 
   @override
@@ -42,6 +47,21 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     _usernameController.dispose();
     _bioController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 70,
+      maxWidth: 500,
+    );
+
+    if (pickedFile != null) {
+      setState(() {
+        _pickedImage = File(pickedFile.path);
+      });
+    }
   }
 
   void _onGenreTapped(String genre) {
@@ -82,13 +102,29 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         return;
       }
 
+      String profilePicUrl = authUser.photoURL ?? '';
+
+      // Upload image if picked
+      if (_pickedImage != null) {
+        profilePicUrl = await ref.read(firebaseStorageServiceProvider).uploadProfilePicture(
+          authUser.uid,
+          _pickedImage!,
+        );
+      }
+
+      // Fetch existing user data to preserve counts if they already exist
+      final existingUser = await ref.read(userServiceProvider).getUser(authUser.uid);
+
       final userModel = UserModel(
         uid: authUser.uid,
         displayName: _nameController.text.trim(),
         username: username,
         bio: _bioController.text.trim(),
-        profilePicUrl: authUser.photoURL ?? '',
+        profilePicUrl: profilePicUrl,
         favoriteGenres: _selectedGenres,
+        followerCount: existingUser?.followerCount ?? 0,
+        followingCount: existingUser?.followingCount ?? 0,
+        topFavoriteBookIds: existingUser?.topFavoriteBookIds ?? [],
       );
 
       // Save to Firestore
@@ -111,6 +147,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authUser = ref.watch(authProvider).asData?.value;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Set Up Your Profile')),
       body: SingleChildScrollView(
@@ -118,13 +156,42 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         child: Form(
           key: _formKey,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const Text(
                 'Welcome! Let\'s get to know you better.',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 24),
+              Stack(
+                children: [
+                  CircleAvatar(
+                    radius: 60,
+                    backgroundColor: Colors.grey[200],
+                    backgroundImage: _pickedImage != null
+                        ? FileImage(_pickedImage!)
+                        : (authUser?.photoURL != null
+                            ? CachedNetworkImageProvider(authUser!.photoURL!) as ImageProvider
+                            : null),
+                    child: _pickedImage == null && authUser?.photoURL == null
+                        ? const Icon(Icons.person, size: 60, color: Colors.grey)
+                        : null,
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: CircleAvatar(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      radius: 20,
+                      child: IconButton(
+                        icon: const Icon(Icons.camera_alt, size: 20, color: Colors.white),
+                        onPressed: _pickImage,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 32),
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(
@@ -178,24 +245,30 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 },
               ),
               const SizedBox(height: 24),
-              const Text(
-                'Favorite Genres',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Favorite Genres',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
               ),
               const SizedBox(height: 8),
-              Wrap(
-                spacing: 8.0,
-                runSpacing: 4.0,
-                children: bookGenres.map((genre) {
-                  final isSelected = _selectedGenres.contains(genre);
-                  return FilterChip(
-                    label: Text(genre),
-                    selected: isSelected,
-                    onSelected: (_) => _onGenreTapped(genre),
-                    selectedColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
-                    checkmarkColor: Theme.of(context).colorScheme.primary,
-                  );
-                }).toList(),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Wrap(
+                  spacing: 8.0,
+                  runSpacing: 4.0,
+                  children: bookGenres.map((genre) {
+                    final isSelected = _selectedGenres.contains(genre);
+                    return FilterChip(
+                      label: Text(genre),
+                      selected: isSelected,
+                      onSelected: (_) => _onGenreTapped(genre),
+                      selectedColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                      checkmarkColor: Theme.of(context).colorScheme.primary,
+                    );
+                  }).toList(),
+                ),
               ),
               const SizedBox(height: 40),
               SizedBox(

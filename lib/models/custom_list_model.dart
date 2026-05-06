@@ -12,6 +12,7 @@ abstract class CustomListModel with _$CustomListModel {
     @Default('') String description,
     @Default(false) bool isPrivate,
     @Default([]) List<String> bookIds,
+    @Default([]) List<String> collaboratorIds,
     required DateTime createdAt,
   }) = _CustomListModel;
 

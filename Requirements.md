@@ -147,13 +147,13 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
    - **Concept:** Expand yearly challenges to include custom sub-goals (e.g., "Read 5 Non-fiction books", "Read 3 books over 500 pages").
    - **Goal:** Update the goal tracking logic to support varied criteria beyond simple book counts.
 
- [ ] 4.8 **Reading Statistics & Visualizations**
+ [x] 4.8 **Reading Statistics & Visualizations**
    - **Concept:** Turn a user's reading history into actionable and visually appealing data.
    - **Goal:** Create a dashboard on the profile with charts and stats showing reading habits (e.g., books per month, genre breakdown, page count trends).
 
 **Feature 5: Community & Gamification**
 
- [ ] 5.1 **Shared Book Lists**
+ [x] 5.1 **Shared Book Lists**
    - **Concept:** Foster collaborative discovery by allowing users to curate lists together.
    - **Goal:** Implement "Collaborative Lists" where multiple users can contribute books to a single shared collection.
 
@@ -175,11 +175,6 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
    - **Concept:** Enhance accessibility and visual comfort by offering a choice between light and dark aesthetics.
    - **Goal:** Use `shared_preferences` to persist light/dark mode selection.
 
-**Feature 7: Notifications**
-
- [ ] 7.1 **Push Notifications & Reminders**
-   - **Concept:** Keep users engaged with alerts for social interactions and inactivity reminders if they haven't opened the app in a while.
-   - **Goal:** Notify users of new followers/likes, and implement a "reminder to read" system for inactive users.
 
 **Feature 8: Navigation and Structure**
 

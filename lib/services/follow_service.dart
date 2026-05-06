@@ -81,4 +81,11 @@ class FollowService {
         .snapshots()
         .map((snapshot) => snapshot.exists);
   }
+
+  /// Streams the list of user IDs that a user is following.
+  Stream<List<String>> watchFollowingIds(String uid) {
+    return _followingCollection(uid).snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) => doc.id).toList();
+    });
+  }
 }

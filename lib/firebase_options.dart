@@ -46,7 +46,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '553345211212',
     projectId: 'mysyeapp',
     authDomain: 'mysyeapp.firebaseapp.com',
-    storageBucket: 'mysyeapp.firebasestorage.app',
+    storageBucket: 'mysyeapp.appspot.com',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
@@ -54,7 +54,7 @@ class DefaultFirebaseOptions {
     appId: '1:553345211212:android:0bbb33d80cfa8c13040de9',
     messagingSenderId: '553345211212',
     projectId: 'mysyeapp',
-    storageBucket: 'mysyeapp.firebasestorage.app',
+    storageBucket: 'mysyeapp.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
@@ -62,7 +62,7 @@ class DefaultFirebaseOptions {
     appId: '1:553345211212:ios:3f4e95a082953006040de9',
     messagingSenderId: '553345211212',
     projectId: 'mysyeapp',
-    storageBucket: 'mysyeapp.firebasestorage.app',
+    storageBucket: 'mysyeapp.appspot.com',
     iosBundleId: 'com.example.syeApp',
   );
 
@@ -71,7 +71,7 @@ class DefaultFirebaseOptions {
     appId: '1:553345211212:ios:3f4e95a082953006040de9',
     messagingSenderId: '553345211212',
     projectId: 'mysyeapp',
-    storageBucket: 'mysyeapp.firebasestorage.app',
+    storageBucket: 'mysyeapp.appspot.com',
     iosBundleId: 'com.example.syeApp',
   );
 
@@ -81,6 +81,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '553345211212',
     projectId: 'mysyeapp',
     authDomain: 'mysyeapp.firebaseapp.com',
-    storageBucket: 'mysyeapp.firebasestorage.app',
+    storageBucket: 'mysyeapp.appspot.com',
   );
 }

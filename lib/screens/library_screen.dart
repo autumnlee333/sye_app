@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/library_book_model.dart';
 import '../models/custom_list_model.dart';
+import '../models/review_model.dart';
 import '../providers/library_provider.dart';
 import '../providers/list_provider.dart';
 import '../providers/selection_provider.dart';
+import '../providers/review_provider.dart';
 import '../widgets/book_card.dart';
 import '../widgets/review_dialog.dart';
 import 'book_details_screen.dart';
@@ -15,7 +17,7 @@ class LibraryScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final listsAsync = ref.watch(userListsProvider);
+    final listsAsync = ref.watch(accessibleListsProvider);
     final isBatchMode = ref.watch(isBatchModeProvider);
     final selectedIds = ref.watch(selectedBookIdsProvider);
 
@@ -344,9 +346,38 @@ class _LibraryList extends ConsumerWidget {
         onPressed: () => _showUpdateProgressDialog(context, ref, book),
       );
     } else if (status == ReadingStatus.finished) {
-      return TextButton(
-        onPressed: () => ReviewDialog.show(context, book),
-        child: const Text('Rate & Review', style: TextStyle(fontSize: 12)),
+      final userReviewAsync = ref.watch(userReviewForBookProvider(book.bookId));
+
+      return userReviewAsync.when(
+        data: (review) => TextButton(
+          onPressed: () {
+            if (review != null) {
+              ReviewDialog.show(
+                context, 
+                book,
+                id: review.id,
+                initialRating: review.rating,
+                initialText: review.reviewText,
+                activityId: review.activityId,
+              );
+            } else {
+              ReviewDialog.show(context, book);
+            }
+          },
+          child: Text(
+            review != null ? 'Edit Review' : 'Rate & Review', 
+            style: const TextStyle(fontSize: 12),
+          ),
+        ),
+        loading: () => const SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+        error: (_, __) => TextButton(
+          onPressed: () => ReviewDialog.show(context, book),
+          child: const Text('Rate & Review', style: TextStyle(fontSize: 12)),
+        ),
       );
     }
     return null;
@@ -474,7 +505,13 @@ class _CustomListCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(list.isPrivate ? Icons.lock_outline : Icons.list, size: 20, color: Colors.blue),
+                Icon(
+                  list.isPrivate 
+                      ? Icons.lock_outline 
+                      : (list.collaboratorIds.isNotEmpty ? Icons.people_outline : Icons.list), 
+                  size: 20, 
+                  color: Colors.blue,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -487,9 +524,27 @@ class _CustomListCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 4),
-            Text(
-              '${list.bookIds.length} books',
-              style: TextStyle(color: Colors.blue[800], fontSize: 12),
+            Row(
+              children: [
+                Text(
+                  '${list.bookIds.length} books',
+                  style: TextStyle(color: Colors.blue[800], fontSize: 12),
+                ),
+                if (list.collaboratorIds.isNotEmpty) ...[
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Text(
+                      'Shared',
+                      style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ],
             ),
           ],
         ),

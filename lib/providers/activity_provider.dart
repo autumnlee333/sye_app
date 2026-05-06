@@ -5,15 +5,37 @@ import '../services/activity_service.dart';
 import '../services/review_service.dart';
 import 'auth_provider.dart';
 import 'user_provider.dart';
+import 'follow_provider.dart';
 
 /// Provider for the [ActivityService].
 final activityServiceProvider = Provider<ActivityService>((ref) {
   return ActivityService();
 });
 
-/// Streams all activities for the global feed.
+/// Streams activities filtered for the current user's feed (self + following).
 final allActivitiesProvider = StreamProvider<List<ActivityModel>>((ref) {
-  return ref.watch(activityServiceProvider).watchAllActivities();
+  final currentUserId = ref.watch(authProvider.select((v) => v.value?.uid));
+  final followingIdsAsync = ref.watch(followingIdsProvider);
+  final activityService = ref.watch(activityServiceProvider);
+
+  // If not logged in, show nothing
+  if (currentUserId == null) return Stream.value([]);
+
+  return followingIdsAsync.when(
+    data: (ids) {
+      // Include self in the feed
+      final feedIds = [currentUserId, ...ids];
+      
+      // Note: Firestore whereIn is limited to 10 IDs. 
+      // For MVP, we fetch all recent activities and filter client-side 
+      // to avoid complex fan-out logic for now.
+      return activityService.watchAllActivities().map((activities) {
+        return activities.where((activity) => feedIds.contains(activity.userId)).toList();
+      });
+    },
+    loading: () => const Stream.empty(),
+    error: (e, st) => Stream.error(e, st),
+  );
 });
 
 /// Streams activities for a specific user.

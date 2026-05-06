@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$CustomListModel {
 
- String get id; String get ownerId; String get name; String get description; bool get isPrivate; List<String> get bookIds; DateTime get createdAt;
+ String get id; String get ownerId; String get name; String get description; bool get isPrivate; List<String> get bookIds; List<String> get collaboratorIds; DateTime get createdAt;
 /// Create a copy of CustomListModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $CustomListModelCopyWith<CustomListModel> get copyWith => _$CustomListModelCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CustomListModel&&(identical(other.id, id) || other.id == id)&&(identical(other.ownerId, ownerId) || other.ownerId == ownerId)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.isPrivate, isPrivate) || other.isPrivate == isPrivate)&&const DeepCollectionEquality().equals(other.bookIds, bookIds)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CustomListModel&&(identical(other.id, id) || other.id == id)&&(identical(other.ownerId, ownerId) || other.ownerId == ownerId)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.isPrivate, isPrivate) || other.isPrivate == isPrivate)&&const DeepCollectionEquality().equals(other.bookIds, bookIds)&&const DeepCollectionEquality().equals(other.collaboratorIds, collaboratorIds)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,ownerId,name,description,isPrivate,const DeepCollectionEquality().hash(bookIds),createdAt);
+int get hashCode => Object.hash(runtimeType,id,ownerId,name,description,isPrivate,const DeepCollectionEquality().hash(bookIds),const DeepCollectionEquality().hash(collaboratorIds),createdAt);
 
 @override
 String toString() {
-  return 'CustomListModel(id: $id, ownerId: $ownerId, name: $name, description: $description, isPrivate: $isPrivate, bookIds: $bookIds, createdAt: $createdAt)';
+  return 'CustomListModel(id: $id, ownerId: $ownerId, name: $name, description: $description, isPrivate: $isPrivate, bookIds: $bookIds, collaboratorIds: $collaboratorIds, createdAt: $createdAt)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $CustomListModelCopyWith<$Res>  {
   factory $CustomListModelCopyWith(CustomListModel value, $Res Function(CustomListModel) _then) = _$CustomListModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String ownerId, String name, String description, bool isPrivate, List<String> bookIds, DateTime createdAt
+ String id, String ownerId, String name, String description, bool isPrivate, List<String> bookIds, List<String> collaboratorIds, DateTime createdAt
 });
 
 
@@ -65,7 +65,7 @@ class _$CustomListModelCopyWithImpl<$Res>
 
 /// Create a copy of CustomListModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? ownerId = null,Object? name = null,Object? description = null,Object? isPrivate = null,Object? bookIds = null,Object? createdAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? ownerId = null,Object? name = null,Object? description = null,Object? isPrivate = null,Object? bookIds = null,Object? collaboratorIds = null,Object? createdAt = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,ownerId: null == ownerId ? _self.ownerId : ownerId // ignore: cast_nullable_to_non_nullable
@@ -73,6 +73,7 @@ as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,isPrivate: null == isPrivate ? _self.isPrivate : isPrivate // ignore: cast_nullable_to_non_nullable
 as bool,bookIds: null == bookIds ? _self.bookIds : bookIds // ignore: cast_nullable_to_non_nullable
+as List<String>,collaboratorIds: null == collaboratorIds ? _self.collaboratorIds : collaboratorIds // ignore: cast_nullable_to_non_nullable
 as List<String>,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
   ));
@@ -159,10 +160,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String ownerId,  String name,  String description,  bool isPrivate,  List<String> bookIds,  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String ownerId,  String name,  String description,  bool isPrivate,  List<String> bookIds,  List<String> collaboratorIds,  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CustomListModel() when $default != null:
-return $default(_that.id,_that.ownerId,_that.name,_that.description,_that.isPrivate,_that.bookIds,_that.createdAt);case _:
+return $default(_that.id,_that.ownerId,_that.name,_that.description,_that.isPrivate,_that.bookIds,_that.collaboratorIds,_that.createdAt);case _:
   return orElse();
 
 }
@@ -180,10 +181,10 @@ return $default(_that.id,_that.ownerId,_that.name,_that.description,_that.isPriv
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String ownerId,  String name,  String description,  bool isPrivate,  List<String> bookIds,  DateTime createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String ownerId,  String name,  String description,  bool isPrivate,  List<String> bookIds,  List<String> collaboratorIds,  DateTime createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _CustomListModel():
-return $default(_that.id,_that.ownerId,_that.name,_that.description,_that.isPrivate,_that.bookIds,_that.createdAt);case _:
+return $default(_that.id,_that.ownerId,_that.name,_that.description,_that.isPrivate,_that.bookIds,_that.collaboratorIds,_that.createdAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -200,10 +201,10 @@ return $default(_that.id,_that.ownerId,_that.name,_that.description,_that.isPriv
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String ownerId,  String name,  String description,  bool isPrivate,  List<String> bookIds,  DateTime createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String ownerId,  String name,  String description,  bool isPrivate,  List<String> bookIds,  List<String> collaboratorIds,  DateTime createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _CustomListModel() when $default != null:
-return $default(_that.id,_that.ownerId,_that.name,_that.description,_that.isPrivate,_that.bookIds,_that.createdAt);case _:
+return $default(_that.id,_that.ownerId,_that.name,_that.description,_that.isPrivate,_that.bookIds,_that.collaboratorIds,_that.createdAt);case _:
   return null;
 
 }
@@ -215,7 +216,7 @@ return $default(_that.id,_that.ownerId,_that.name,_that.description,_that.isPriv
 @JsonSerializable()
 
 class _CustomListModel implements CustomListModel {
-  const _CustomListModel({required this.id, required this.ownerId, required this.name, this.description = '', this.isPrivate = false, final  List<String> bookIds = const [], required this.createdAt}): _bookIds = bookIds;
+  const _CustomListModel({required this.id, required this.ownerId, required this.name, this.description = '', this.isPrivate = false, final  List<String> bookIds = const [], final  List<String> collaboratorIds = const [], required this.createdAt}): _bookIds = bookIds,_collaboratorIds = collaboratorIds;
   factory _CustomListModel.fromJson(Map<String, dynamic> json) => _$CustomListModelFromJson(json);
 
 @override final  String id;
@@ -228,6 +229,13 @@ class _CustomListModel implements CustomListModel {
   if (_bookIds is EqualUnmodifiableListView) return _bookIds;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_bookIds);
+}
+
+ final  List<String> _collaboratorIds;
+@override@JsonKey() List<String> get collaboratorIds {
+  if (_collaboratorIds is EqualUnmodifiableListView) return _collaboratorIds;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_collaboratorIds);
 }
 
 @override final  DateTime createdAt;
@@ -245,16 +253,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CustomListModel&&(identical(other.id, id) || other.id == id)&&(identical(other.ownerId, ownerId) || other.ownerId == ownerId)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.isPrivate, isPrivate) || other.isPrivate == isPrivate)&&const DeepCollectionEquality().equals(other._bookIds, _bookIds)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CustomListModel&&(identical(other.id, id) || other.id == id)&&(identical(other.ownerId, ownerId) || other.ownerId == ownerId)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.isPrivate, isPrivate) || other.isPrivate == isPrivate)&&const DeepCollectionEquality().equals(other._bookIds, _bookIds)&&const DeepCollectionEquality().equals(other._collaboratorIds, _collaboratorIds)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,ownerId,name,description,isPrivate,const DeepCollectionEquality().hash(_bookIds),createdAt);
+int get hashCode => Object.hash(runtimeType,id,ownerId,name,description,isPrivate,const DeepCollectionEquality().hash(_bookIds),const DeepCollectionEquality().hash(_collaboratorIds),createdAt);
 
 @override
 String toString() {
-  return 'CustomListModel(id: $id, ownerId: $ownerId, name: $name, description: $description, isPrivate: $isPrivate, bookIds: $bookIds, createdAt: $createdAt)';
+  return 'CustomListModel(id: $id, ownerId: $ownerId, name: $name, description: $description, isPrivate: $isPrivate, bookIds: $bookIds, collaboratorIds: $collaboratorIds, createdAt: $createdAt)';
 }
 
 
@@ -265,7 +273,7 @@ abstract mixin class _$CustomListModelCopyWith<$Res> implements $CustomListModel
   factory _$CustomListModelCopyWith(_CustomListModel value, $Res Function(_CustomListModel) _then) = __$CustomListModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String ownerId, String name, String description, bool isPrivate, List<String> bookIds, DateTime createdAt
+ String id, String ownerId, String name, String description, bool isPrivate, List<String> bookIds, List<String> collaboratorIds, DateTime createdAt
 });
 
 
@@ -282,7 +290,7 @@ class __$CustomListModelCopyWithImpl<$Res>
 
 /// Create a copy of CustomListModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? ownerId = null,Object? name = null,Object? description = null,Object? isPrivate = null,Object? bookIds = null,Object? createdAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? ownerId = null,Object? name = null,Object? description = null,Object? isPrivate = null,Object? bookIds = null,Object? collaboratorIds = null,Object? createdAt = null,}) {
   return _then(_CustomListModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,ownerId: null == ownerId ? _self.ownerId : ownerId // ignore: cast_nullable_to_non_nullable
@@ -290,6 +298,7 @@ as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,isPrivate: null == isPrivate ? _self.isPrivate : isPrivate // ignore: cast_nullable_to_non_nullable
 as bool,bookIds: null == bookIds ? _self._bookIds : bookIds // ignore: cast_nullable_to_non_nullable
+as List<String>,collaboratorIds: null == collaboratorIds ? _self._collaboratorIds : collaboratorIds // ignore: cast_nullable_to_non_nullable
 as List<String>,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
   ));

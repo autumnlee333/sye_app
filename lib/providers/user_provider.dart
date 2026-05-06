@@ -23,9 +23,9 @@ final currentUserDataProvider = StreamProvider<UserModel?>((ref) {
   );
 });
 
-/// Fetches any user's profile data by UID.
-final userDataProvider = FutureProvider.family<UserModel?, String>((ref, uid) async {
-  return ref.watch(userServiceProvider).getUser(uid);
+/// Streams any user's profile data by UID.
+final userDataProvider = StreamProvider.family<UserModel?, String>((ref, uid) {
+  return ref.watch(userServiceProvider).watchUser(uid);
 });
 
 /// Notifier to manage user search state.

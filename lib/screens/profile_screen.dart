@@ -15,26 +15,47 @@ import '../widgets/stats_dashboard.dart';
 import 'select_favorites_screen.dart';
 import 'edit_profile_screen.dart';
 
-class ProfileScreen extends ConsumerWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   final String? userId;
 
   const ProfileScreen({super.key, this.userId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+  bool _isActivitiesExpanded = true;
+
+  @override
+  Widget build(BuildContext context) {
+    // Listen for errors in follow actions
+    ref.listen(followActionProvider, (previous, next) {
+      next.whenOrNull(
+        error: (error, stackTrace) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Follow action failed: $error'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        },
+      );
+    });
+
     final currentUserId = ref.watch(authProvider.select((v) => v.value?.uid));
-    final targetUserId = userId ?? currentUserId;
+    final targetUserId = widget.userId ?? currentUserId;
 
     if (targetUserId == null) {
       return const Center(child: Text('User not found'));
     }
 
-    final userProfileAsync = userId == null 
+    final userProfileAsync = widget.userId == null 
         ? ref.watch(currentUserDataProvider) 
-        : ref.watch(userDataProvider(userId!));
+        : ref.watch(userDataProvider(widget.userId!));
 
     return Scaffold(
-      appBar: userId != null ? AppBar(title: const Text('Profile')) : null,
+      appBar: widget.userId != null ? AppBar(title: const Text('Profile')) : null,
       body: userProfileAsync.when(
         data: (user) {
           if (user == null) {
@@ -117,11 +138,17 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 16),
                 if (!isCurrentUser)
-                  ref.watch(isFollowingProvider(user.uid)).when(
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final isFollowingAsync = ref.watch(isFollowingProvider(user.uid));
+                      final actionState = ref.watch(followActionProvider);
+                      final isLoading = actionState.isLoading;
+
+                      return isFollowingAsync.when(
                         data: (isFollowing) => SizedBox(
                           width: 200,
                           child: ElevatedButton(
-                            onPressed: () {
+                            onPressed: isLoading ? null : () {
                               if (isFollowing) {
                                 ref.read(followActionProvider.notifier).unfollow(user.uid);
                               } else {
@@ -132,7 +159,9 @@ class ProfileScreen extends ConsumerWidget {
                               backgroundColor: isFollowing ? Colors.grey[200] : null,
                               foregroundColor: isFollowing ? Colors.black : null,
                             ),
-                            child: Text(isFollowing ? 'Unfollow' : 'Follow'),
+                            child: isLoading 
+                              ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                              : Text(isFollowing ? 'Unfollow' : 'Follow'),
                           ),
                         ),
                         loading: () => const SizedBox(
@@ -141,7 +170,9 @@ class ProfileScreen extends ConsumerWidget {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         ),
                         error: (_, __) => const Text('Error'),
-                      ),
+                      );
+                    }
+                  ),
                 const SizedBox(height: 12),
                 Wrap(
                   spacing: 8,
@@ -235,40 +266,54 @@ class ProfileScreen extends ConsumerWidget {
                       ),
                 const SizedBox(height: 24),
                 const Divider(),
-                const SizedBox(height: 16),
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Activity History',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                ref.watch(userActivitiesProvider(user.uid)).when(
-                  data: (activities) => activities.isEmpty
-                      ? const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 32.0),
-                          child: Text(
-                            'No activities yet.',
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        )
-                      : ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: activities.length,
-                          itemBuilder: (context, index) {
-                            return ActivityCard(activity: activities[index]);
-                          },
+                const SizedBox(height: 8),
+                InkWell(
+                  onTap: () => setState(() => _isActivitiesExpanded = !_isActivitiesExpanded),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Activity History',
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         ),
-                  loading: () => const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(32.0),
-                      child: CircularProgressIndicator(),
+                        Icon(
+                          _isActivitiesExpanded ? Icons.expand_less : Icons.expand_more,
+                          color: Colors.grey,
+                        ),
+                      ],
                     ),
                   ),
-                  error: (e, _) => Center(child: Text('Error: $e')),
                 ),
+                if (_isActivitiesExpanded) ...[
+                  const SizedBox(height: 16),
+                  ref.watch(userActivitiesProvider(user.uid)).when(
+                    data: (activities) => activities.isEmpty
+                        ? const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 32.0),
+                            child: Text(
+                              'No activities yet.',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          )
+                        : ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: activities.length,
+                            itemBuilder: (context, index) {
+                              return ActivityCard(activity: activities[index]);
+                            },
+                          ),
+                    loading: () => const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(32.0),
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                    error: (e, _) => Center(child: Text('Error: $e')),
+                  ),
+                ],
                 if (isCurrentUser) ...[
                   const SizedBox(height: 32),
                   ElevatedButton.icon(

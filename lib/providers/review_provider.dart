@@ -19,13 +19,7 @@ final userReviewForBookProvider = StreamProvider.family<ReviewModel?, String>((r
   final user = ref.watch(authProvider).value;
   if (user == null) return Stream.value(null);
   
-  return ref.watch(reviewServiceProvider).watchReviewsByUser(user.uid).map((reviews) {
-    try {
-      return reviews.firstWhere((r) => r.bookId == bookId);
-    } catch (_) {
-      return null;
-    }
-  });
+  return ref.watch(reviewServiceProvider).watchReviewByUserAndBook(user.uid, bookId);
 });
 
 /// A notifier to manage review operations.

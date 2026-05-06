@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "553345211212",
     "project_id": "mysyeapp",
-    "storage_bucket": "mysyeapp.firebasestorage.app"
+    "storage_bucket": "mysyeapp.appspot.com"
   },
   "client": [
     {

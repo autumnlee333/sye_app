@@ -52,7 +52,8 @@ final singleBookProvider = FutureProvider.family<BookModel?, String>((ref, id) a
 
 /// Provider for recommended books based on user's favorite genres.
 final recommendationsProvider = FutureProvider<List<BookModel>>((ref) async {
-  final userAsync = ref.watch(currentUserDataProvider);
+  // Explicitly watch the provider to ensure we rebuild when data changes
+  ref.watch(currentUserDataProvider);
 
   // Use the value if available, otherwise wait
   final userProfile = await ref.watch(currentUserDataProvider.future);
@@ -64,6 +65,9 @@ final recommendationsProvider = FutureProvider<List<BookModel>>((ref) async {
 
 /// Provider for "Smart" recommendations based on the user's actual favorite books.
 final smartRecommendationsProvider = FutureProvider<List<BookModel>>((ref) async {
+  // Explicitly watch the provider to ensure we rebuild when data changes
+  ref.watch(currentUserDataProvider);
+
   // Use the future to ensure we wait for data without hanging
   final userProfile = await ref.watch(currentUserDataProvider.future);
   if (userProfile == null || userProfile.topFavoriteBookIds.isEmpty) return [];

@@ -18,6 +18,11 @@ _CustomListModel _$CustomListModelFromJson(Map<String, dynamic> json) =>
               ?.map((e) => e as String)
               .toList() ??
           const [],
+      collaboratorIds:
+          (json['collaboratorIds'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
       createdAt: DateTime.parse(json['createdAt'] as String),
     );
 
@@ -29,5 +34,6 @@ Map<String, dynamic> _$CustomListModelToJson(_CustomListModel instance) =>
       'description': instance.description,
       'isPrivate': instance.isPrivate,
       'bookIds': instance.bookIds,
+      'collaboratorIds': instance.collaboratorIds,
       'createdAt': instance.createdAt.toIso8601String(),
     };

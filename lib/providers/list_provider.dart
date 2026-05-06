@@ -9,12 +9,12 @@ final listServiceProvider = Provider<ListService>((ref) {
   return ListService();
 });
 
-/// Streams all custom lists for the currently authenticated user.
-final userListsProvider = StreamProvider<List<CustomListModel>>((ref) {
+/// Streams all custom lists for the currently authenticated user (owned or collaborating).
+final accessibleListsProvider = StreamProvider<List<CustomListModel>>((ref) {
   final userId = ref.watch(authProvider).value?.uid;
   if (userId == null) return Stream.value([]);
   
-  return ref.watch(listServiceProvider).watchUserLists(userId);
+  return ref.watch(listServiceProvider).watchUserAccessibleLists(userId);
 });
 
 /// Notifier to manage custom list actions.
@@ -41,49 +41,46 @@ class ListNotifier extends AsyncNotifier<void> {
   }
 
   Future<void> addBookToList(String listId, String bookId) async {
-    final userId = ref.read(authProvider).value?.uid;
-    if (userId == null) return;
-
     state = await AsyncValue.guard(() async {
-      await ref.read(listServiceProvider).addBookToList(userId, listId, bookId);
+      await ref.read(listServiceProvider).addBookToList(listId, bookId);
     });
   }
 
   Future<void> removeBookFromList(String listId, String bookId) async {
-    final userId = ref.read(authProvider).value?.uid;
-    if (userId == null) return;
-
     state = await AsyncValue.guard(() async {
-      await ref.read(listServiceProvider).removeBookFromList(userId, listId, bookId);
+      await ref.read(listServiceProvider).removeBookFromList(listId, bookId);
     });
   }
 
   Future<void> bulkAddBooksToList(String listId, List<String> bookIds) async {
-    final userId = ref.read(authProvider).value?.uid;
-    if (userId == null) return;
-
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await ref.read(listServiceProvider).addBooksToList(userId, listId, bookIds);
+      await ref.read(listServiceProvider).addBooksToList(listId, bookIds);
     });
   }
 
   Future<void> bulkRemoveBooksFromList(String listId, List<String> bookIds) async {
-    final userId = ref.read(authProvider).value?.uid;
-    if (userId == null) return;
-
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await ref.read(listServiceProvider).removeBooksFromList(userId, listId, bookIds);
+      await ref.read(listServiceProvider).removeBooksFromList(listId, bookIds);
+    });
+  }
+
+  Future<void> addCollaborator(String listId, String collaboratorId) async {
+    state = await AsyncValue.guard(() async {
+      await ref.read(listServiceProvider).addCollaborator(listId, collaboratorId);
+    });
+  }
+
+  Future<void> removeCollaborator(String listId, String collaboratorId) async {
+    state = await AsyncValue.guard(() async {
+      await ref.read(listServiceProvider).removeCollaborator(listId, collaboratorId);
     });
   }
 
   Future<void> deleteList(String listId) async {
-    final userId = ref.read(authProvider).value?.uid;
-    if (userId == null) return;
-
     state = await AsyncValue.guard(() async {
-      await ref.read(listServiceProvider).deleteList(userId, listId);
+      await ref.read(listServiceProvider).deleteList(listId);
     });
   }
 }

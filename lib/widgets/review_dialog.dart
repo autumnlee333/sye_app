@@ -77,6 +77,23 @@ class _ReviewDialogState extends ConsumerState<ReviewDialog> {
   Widget build(BuildContext context) {
     final isEditing = widget.id != null;
 
+    // Listen for errors in review actions
+    ref.listen(reviewActionProvider, (previous, next) {
+      next.whenOrNull(
+        error: (error, stackTrace) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error: ${error.toString().replaceAll('Exception: ', '')}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        },
+      );
+    });
+
+    final actionState = ref.watch(reviewActionProvider);
+    final isLoading = actionState.isLoading;
+
     return AlertDialog(
       title: Text(
         '${isEditing ? 'Edit' : 'Review'}: ${widget.book.title}',
@@ -94,8 +111,8 @@ class _ReviewDialogState extends ConsumerState<ReviewDialog> {
               SizedBox(
                 width: 220, // 5 stars * 40 size + padding
                 child: GestureDetector(
-                  onTapDown: (details) => _updateRating(details.localPosition, 220),
-                  onPanUpdate: (details) => _updateRating(details.localPosition, 220),
+                  onTapDown: isLoading ? null : (details) => _updateRating(details.localPosition, 220),
+                  onPanUpdate: isLoading ? null : (details) => _updateRating(details.localPosition, 220),
                   child: Center(
                     child: StarRating(
                       rating: _rating,
@@ -115,6 +132,7 @@ class _ReviewDialogState extends ConsumerState<ReviewDialog> {
               const SizedBox(height: 24),
               TextField(
                 controller: _reviewController,
+                enabled: !isLoading,
                 maxLines: 4,
                 decoration: const InputDecoration(
                   hintText: 'Write your thoughts here...',
@@ -128,14 +146,14 @@ class _ReviewDialogState extends ConsumerState<ReviewDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: isLoading ? null : () => Navigator.pop(context),
           child: const Text('Cancel'),
         ),
         ElevatedButton(
-          onPressed: _rating == 0 
+          onPressed: _rating == 0 || isLoading
               ? null 
-              : () {
-                  ref.read(reviewActionProvider.notifier).postReview(
+              : () async {
+                  await ref.read(reviewActionProvider.notifier).postReview(
                     bookId: widget.book.bookId,
                     bookTitle: widget.book.title,
                     bookAuthors: widget.book.authors,
@@ -145,12 +163,20 @@ class _ReviewDialogState extends ConsumerState<ReviewDialog> {
                     id: widget.id,
                     activityId: widget.activityId,
                   );
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(isEditing ? 'Review updated!' : 'Review posted!')),
-                  );
+                  
+                  // Only close and show success if there was no error
+                  if (!ref.read(reviewActionProvider).hasError) {
+                    if (mounted) {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(isEditing ? 'Review updated!' : 'Review posted!')),
+                      );
+                    }
+                  }
                 },
-          child: Text(isEditing ? 'Save Changes' : 'Post Review'),
+          child: isLoading 
+              ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+              : Text(isEditing ? 'Save Changes' : 'Post Review'),
         ),
       ],
     );

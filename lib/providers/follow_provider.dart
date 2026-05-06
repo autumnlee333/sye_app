@@ -15,6 +15,14 @@ final isFollowingProvider = StreamProvider.family<bool, String>((ref, targetUser
   return ref.watch(followServiceProvider).isFollowing(currentUserId, targetUserId);
 });
 
+/// Streams the list of IDs that the current user is following.
+final followingIdsProvider = StreamProvider<List<String>>((ref) {
+  final currentUserId = ref.watch(authProvider).value?.uid;
+  if (currentUserId == null) return Stream.value([]);
+
+  return ref.watch(followServiceProvider).watchFollowingIds(currentUserId);
+});
+
 /// A notifier to manage follow/unfollow actions.
 class FollowNotifier extends AsyncNotifier<void> {
   @override

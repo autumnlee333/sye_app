@@ -14,7 +14,7 @@ class ReadingStats {
   ReadingStats({
     required this.booksPerMonth,
     required this.genreBreakdown,
-    required this.totalBooksFinished,
+  required this.totalBooksFinished,
     required this.totalPagesRead,
     required this.pagesPerMonth,
   });
