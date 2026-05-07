@@ -123,9 +123,45 @@ class ActivityCard extends ConsumerWidget {
               Text(activity.text!),
             ],
             const SizedBox(height: 8),
-            Text(
-              _formatDate(activity.timestamp),
-              style: const TextStyle(fontSize: 10, color: Colors.grey),
+            Row(
+              children: [
+                Text(
+                  _formatDate(activity.timestamp),
+                  style: const TextStyle(fontSize: 10, color: Colors.grey),
+                ),
+                const Spacer(),
+                InkWell(
+                  onTap: () => ref.read(activityActionProvider.notifier).toggleLike(activity),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          activity.likedBy.contains(currentUserId) 
+                              ? Icons.favorite 
+                              : Icons.favorite_border,
+                          size: 18,
+                          color: activity.likedBy.contains(currentUserId) 
+                              ? Colors.red 
+                              : Colors.grey,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          activity.likedBy.length.toString(),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: activity.likedBy.contains(currentUserId) 
+                                ? Colors.red 
+                                : Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

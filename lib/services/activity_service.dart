@@ -69,4 +69,31 @@ class ActivityService {
       return snapshot.docs.map((doc) => ActivityModel.fromJson(doc.data())).toList();
     });
   }
+
+  /// Toggles a like on an activity.
+  /// If the activity is linked to a review, it updates both documents atomically.
+  Future<void> toggleLike(String userId, ActivityModel activity) async {
+    final bool isLiked = activity.likedBy.contains(userId);
+    final batch = _firestore.batch();
+
+    // 1. Update Activity
+    final activityRef = _activitiesCollection.doc(activity.id);
+    batch.update(activityRef, {
+      'likedBy': isLiked 
+          ? FieldValue.arrayRemove([userId]) 
+          : FieldValue.arrayUnion([userId]),
+    });
+
+    // 2. Update Linked Review (if exists)
+    if (activity.reviewId != null && activity.reviewId!.isNotEmpty) {
+      final reviewRef = _firestore.collection('reviews').doc(activity.reviewId);
+      batch.update(reviewRef, {
+        'likedBy': isLiked 
+            ? FieldValue.arrayRemove([userId]) 
+            : FieldValue.arrayUnion([userId]),
+      });
+    }
+
+    await batch.commit();
+  }
 }

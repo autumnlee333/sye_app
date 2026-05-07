@@ -569,3 +569,17 @@ This document tracks the iterative development process of the SYE (Share Your Ex
     - **Component Polish:** Redesigned buttons with softer radii (12px), implemented subtle filled inputs, and added soft-border card styling across the app.
 - **Branding:** Renamed the app entry experience to **"Book Club"** for a warmer, community-centric first impression.
 
+### Franchise-First Search & Social Interactions
+**User:** Lord of the Rings and Harry Potter searches return academic books first. Add a like system for posts.
+**Gemini:**
+- **Search Overhaul:**
+    - Implemented a "Title Noise Filter" to penalize academic/meta-books (e.g., "Economics of...", "Study of...") during franchise searches.
+    - Added "Length Ratio" scoring to prioritize shorter, exact titles (e.g., "It" vs. "Cooking It").
+    - Hardened "Prefix Matching" to ensure series books (e.g., "Harry Potter and...") always outrank lateral titles.
+- **Social Like System:**
+    - Updated `ActivityModel` and `ReviewModel` with `likedBy` fields for multi-user interactions.
+    - Implemented atomic like-toggling in `ActivityService` and `ReviewService` to ensure likes stay synchronized between the social feed and book details.
+    - Enhanced UI in `ActivityCard` and `BookDetailsScreen` with permanent heart icons and real-time like counts.
+    - Added error reporting (SnackBar) to help diagnose database permission issues.
+- **Security Rules:** Provided optimized Firestore rules to allow non-owners to update only the `likedBy` field on global posts.
+

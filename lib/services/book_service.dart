@@ -47,38 +47,54 @@ class BookService {
         final queryLower = query.toLowerCase().trim();
         
         books.sort((a, b) {
-          // 1. POPULARITY SCORE (Exponential)
+          // 1. MATCH QUALITY SCORE (0.0 to 1.0)
+          double getMatchQuality(BookModel book) {
+            final titleLower = book.title.toLowerCase();
+            
+            // A. EXACT MATCH (The strongest signal)
+            if (titleLower == queryLower) return 1.0;
+            
+            // B. FRANCHISE PREFIX MATCH ("Harry Potter and...")
+            double bonus = 0.0;
+            if (titleLower.startsWith('$queryLower ') || 
+                titleLower.startsWith('$queryLower:') || 
+                titleLower.startsWith('$queryLower,')) {
+              bonus = 0.9;
+            } else if (titleLower.startsWith(queryLower)) {
+              bonus = 0.8;
+            }
+
+            // C. NOISE PENALTY
+            // If the title contains academic/meta words that aren't in the query, penalize heavily.
+            final noiseWords = ['economics', 'study', 'analysis', 'guide', 'companion', 'history', 'science', 'introduction'];
+            double penalty = 0.0;
+            for (var word in noiseWords) {
+              if (titleLower.contains(word) && !queryLower.contains(word)) {
+                penalty += 0.4;
+              }
+            }
+
+            // D. LENGTH RATIO
+            // Iconic books have short titles. Meta-books have long titles.
+            double lengthRatio = queryLower.length / titleLower.length;
+            
+            // E. FUZZY / CONTAINS
+            final dice = _calculateBestSimilarity(book, queryLower);
+            
+            return (math.max(bonus, dice) + (lengthRatio * 0.2) - penalty).clamp(0.0, 1.0);
+          }
+
+          // 2. POPULARITY SCORE (0.0 to 1.0)
           double getPopScore(BookModel book) {
             final count = (book.ratingsCount > 0 ? (math.log(book.ratingsCount) / math.log(1000000)) : 0.0).clamp(0.0, 1.0);
             final rating = (book.averageRating ?? 3.0) / 5.0;
             return math.pow((count * 0.8) + (rating * 0.2), 2.0).toDouble();
           }
 
-          // 2. MATCH QUALITY
-          double getMatchQuality(BookModel book) {
-            final titleLower = book.title.toLowerCase();
-            
-            // A. EXACT MATCH (The "Stephen King It" fix)
-            if (titleLower == queryLower) return 1.0;
-            
-            // B. SERIES MATCH (Starts with)
-            if (titleLower.startsWith('$queryLower ') || titleLower.startsWith('$queryLower:')) return 0.9;
-            
-            // C. AUTHOR MATCH
-            for (var author in book.authors) {
-              if (author.toLowerCase() == queryLower) return 0.8;
-            }
-
-            // D. FUZZY / CONTAINS
-            final dice = _calculateBestSimilarity(book, queryLower);
-            final contains = titleLower.contains(queryLower) ? 0.3 : 0.0;
-            return math.max(dice, contains);
-          }
-
-          // 3. FINAL SCORE
-          // Increase Match Quality weight to 70% to ensure exact titles win over popular side-books
-          final scoreA = (getMatchQuality(a) * 0.7) + (getPopScore(a) * 0.3);
-          final scoreB = (getMatchQuality(b) * 0.7) + (getPopScore(b) * 0.3);
+          // 3. FINAL RANKING
+          // Match quality is the foundation (80%), popularity breaks the tie (20%)
+          final scoreA = (getMatchQuality(a) * 0.8) + (getPopScore(a) * 0.2);
+          final scoreB = (getMatchQuality(b) * 0.8) + (getPopScore(b) * 0.2);
 
           return scoreB.compareTo(scoreA);
         });

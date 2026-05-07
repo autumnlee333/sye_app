@@ -105,6 +105,7 @@ class ActivityNotifier extends AsyncNotifier<void> {
           rating: activity.rating ?? 0,
           reviewText: activity.text ?? '',
           timestamp: activity.timestamp,
+          likedBy: activity.likedBy,
         );
         
         final reviewService = ReviewService(firestore: ref.read(activityServiceProvider).firestore);
@@ -126,6 +127,18 @@ class ActivityNotifier extends AsyncNotifier<void> {
         await ref.read(activityServiceProvider).deleteActivity(activity.id);
       }
     });
+  }
+
+  Future<void> toggleLike(ActivityModel activity) async {
+    final userId = ref.read(authProvider).value?.uid;
+    if (userId == null) return;
+
+    try {
+      await ref.read(activityServiceProvider).toggleLike(userId, activity);
+    } catch (e) {
+      // Report error to UI (usually permission denied)
+      state = AsyncValue.error(e, StackTrace.current);
+    }
   }
 }
 

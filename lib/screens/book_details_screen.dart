@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:sye_app/models/review_model.dart';
+import 'package:sye_app/providers/auth_provider.dart';
 import '../models/book_model.dart';
 import '../providers/book_provider.dart';
 import '../providers/review_provider.dart';
@@ -198,13 +200,15 @@ class BookDetailsScreen extends ConsumerWidget {
   }
 }
 
-class _ReviewListItem extends StatelessWidget {
-  final dynamic review;
+class _ReviewListItem extends ConsumerWidget {
+  final ReviewModel review;
 
   const _ReviewListItem({required this.review});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentUserId = ref.watch(authProvider.select((v) => v.value?.uid));
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Padding(
@@ -250,6 +254,44 @@ class _ReviewListItem extends StatelessWidget {
               const SizedBox(height: 12),
               Text(review.reviewText),
             ],
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                InkWell(
+                  onTap: () => ref.read(reviewActionProvider.notifier).toggleLike(review),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                    child: Row(
+                      children: [
+                        Icon(
+                          review.likedBy.contains(currentUserId) 
+                              ? Icons.favorite 
+                              : Icons.favorite_border,
+                          size: 18,
+                          color: review.likedBy.contains(currentUserId) 
+                              ? Colors.red 
+                              : Colors.grey,
+                        ),
+                        if (review.likedBy.isNotEmpty) ...[
+                          const SizedBox(width: 4),
+                          Text(
+                            review.likedBy.length.toString(),
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: review.likedBy.contains(currentUserId) 
+                                  ? Colors.red 
+                                  : Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),

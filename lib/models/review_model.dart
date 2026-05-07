@@ -17,6 +17,7 @@ abstract class ReviewModel with _$ReviewModel {
     String? activityId,
     required double rating,
     required String reviewText,
+    @Default([]) List<String> likedBy,
     required DateTime timestamp,
   }) = _ReviewModel;
 

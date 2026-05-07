@@ -47,6 +47,7 @@ class ReviewService {
       rating: finalReview.rating,
       reviewId: finalReview.id,
       timestamp: finalReview.timestamp,
+      likedBy: finalReview.likedBy,
     );
 
     batch.set(reviewDocRef, finalReview.toJson());
@@ -156,5 +157,32 @@ class ReviewService {
         .map((snapshot) {
       return snapshot.docs.map((doc) => ReviewModel.fromJson(doc.data())).toList();
     });
+  }
+
+  /// Toggles a like on a review.
+  /// Updates both the review and its linked activity atomically.
+  Future<void> toggleLike(String userId, ReviewModel review) async {
+    final bool isLiked = review.likedBy.contains(userId);
+    final batch = _firestore.batch();
+
+    // 1. Update Review
+    final reviewRef = _reviewsCollection.doc(review.id);
+    batch.update(reviewRef, {
+      'likedBy': isLiked 
+          ? FieldValue.arrayRemove([userId]) 
+          : FieldValue.arrayUnion([userId]),
+    });
+
+    // 2. Update Linked Activity (if exists)
+    if (review.activityId != null && review.activityId!.isNotEmpty) {
+      final activityRef = _activitiesCollection.doc(review.activityId);
+      batch.update(activityRef, {
+        'likedBy': isLiked 
+            ? FieldValue.arrayRemove([userId]) 
+            : FieldValue.arrayUnion([userId]),
+      });
+    }
+
+    await batch.commit();
   }
 }

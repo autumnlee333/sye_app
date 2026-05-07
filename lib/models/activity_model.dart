@@ -29,6 +29,7 @@ abstract class ActivityModel with _$ActivityModel {
     String? reviewId, // Linked review document ID
     int? page, // Current page for progress updates
     int? totalPages, // Total pages for progress updates
+    @Default([]) List<String> likedBy,
     required DateTime timestamp,
   }) = _ActivityModel;
 

@@ -26,6 +26,11 @@ _ActivityModel _$ActivityModelFromJson(Map<String, dynamic> json) =>
       reviewId: json['reviewId'] as String?,
       page: (json['page'] as num?)?.toInt(),
       totalPages: (json['totalPages'] as num?)?.toInt(),
+      likedBy:
+          (json['likedBy'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
       timestamp: DateTime.parse(json['timestamp'] as String),
     );
 
@@ -45,6 +50,7 @@ Map<String, dynamic> _$ActivityModelToJson(_ActivityModel instance) =>
       'reviewId': instance.reviewId,
       'page': instance.page,
       'totalPages': instance.totalPages,
+      'likedBy': instance.likedBy,
       'timestamp': instance.timestamp.toIso8601String(),
     };
 

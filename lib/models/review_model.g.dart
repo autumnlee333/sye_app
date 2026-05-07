@@ -22,6 +22,9 @@ _ReviewModel _$ReviewModelFromJson(Map<String, dynamic> json) => _ReviewModel(
   activityId: json['activityId'] as String?,
   rating: (json['rating'] as num).toDouble(),
   reviewText: json['reviewText'] as String,
+  likedBy:
+      (json['likedBy'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      const [],
   timestamp: DateTime.parse(json['timestamp'] as String),
 );
 
@@ -38,5 +41,6 @@ Map<String, dynamic> _$ReviewModelToJson(_ReviewModel instance) =>
       'activityId': instance.activityId,
       'rating': instance.rating,
       'reviewText': instance.reviewText,
+      'likedBy': instance.likedBy,
       'timestamp': instance.timestamp.toIso8601String(),
     };
