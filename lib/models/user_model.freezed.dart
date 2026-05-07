@@ -15,7 +15,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UserModel {
 
- String get uid; String get displayName; String get username; String get bio; String get profilePicUrl; List<String> get favoriteGenres; List<String> get topFavoriteBookIds; int get followerCount; int get followingCount;
+ String get uid; String get displayName; String get username; String get bio; String get profilePicUrl; List<String> get favoriteGenres; List<String> get topFavoriteBookIds; int get followerCount; int get followingCount; int get currentStreak; int get longestStreak; String? get lastReadingDate;// ISO string for consistency
+ List<String> get unlockedBadgeIds;
 /// Create a copy of UserModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +29,16 @@ $UserModelCopyWith<UserModel> get copyWith => _$UserModelCopyWithImpl<UserModel>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.username, username) || other.username == username)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.profilePicUrl, profilePicUrl) || other.profilePicUrl == profilePicUrl)&&const DeepCollectionEquality().equals(other.favoriteGenres, favoriteGenres)&&const DeepCollectionEquality().equals(other.topFavoriteBookIds, topFavoriteBookIds)&&(identical(other.followerCount, followerCount) || other.followerCount == followerCount)&&(identical(other.followingCount, followingCount) || other.followingCount == followingCount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.username, username) || other.username == username)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.profilePicUrl, profilePicUrl) || other.profilePicUrl == profilePicUrl)&&const DeepCollectionEquality().equals(other.favoriteGenres, favoriteGenres)&&const DeepCollectionEquality().equals(other.topFavoriteBookIds, topFavoriteBookIds)&&(identical(other.followerCount, followerCount) || other.followerCount == followerCount)&&(identical(other.followingCount, followingCount) || other.followingCount == followingCount)&&(identical(other.currentStreak, currentStreak) || other.currentStreak == currentStreak)&&(identical(other.longestStreak, longestStreak) || other.longestStreak == longestStreak)&&(identical(other.lastReadingDate, lastReadingDate) || other.lastReadingDate == lastReadingDate)&&const DeepCollectionEquality().equals(other.unlockedBadgeIds, unlockedBadgeIds));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,uid,displayName,username,bio,profilePicUrl,const DeepCollectionEquality().hash(favoriteGenres),const DeepCollectionEquality().hash(topFavoriteBookIds),followerCount,followingCount);
+int get hashCode => Object.hash(runtimeType,uid,displayName,username,bio,profilePicUrl,const DeepCollectionEquality().hash(favoriteGenres),const DeepCollectionEquality().hash(topFavoriteBookIds),followerCount,followingCount,currentStreak,longestStreak,lastReadingDate,const DeepCollectionEquality().hash(unlockedBadgeIds));
 
 @override
 String toString() {
-  return 'UserModel(uid: $uid, displayName: $displayName, username: $username, bio: $bio, profilePicUrl: $profilePicUrl, favoriteGenres: $favoriteGenres, topFavoriteBookIds: $topFavoriteBookIds, followerCount: $followerCount, followingCount: $followingCount)';
+  return 'UserModel(uid: $uid, displayName: $displayName, username: $username, bio: $bio, profilePicUrl: $profilePicUrl, favoriteGenres: $favoriteGenres, topFavoriteBookIds: $topFavoriteBookIds, followerCount: $followerCount, followingCount: $followingCount, currentStreak: $currentStreak, longestStreak: $longestStreak, lastReadingDate: $lastReadingDate, unlockedBadgeIds: $unlockedBadgeIds)';
 }
 
 
@@ -48,7 +49,7 @@ abstract mixin class $UserModelCopyWith<$Res>  {
   factory $UserModelCopyWith(UserModel value, $Res Function(UserModel) _then) = _$UserModelCopyWithImpl;
 @useResult
 $Res call({
- String uid, String displayName, String username, String bio, String profilePicUrl, List<String> favoriteGenres, List<String> topFavoriteBookIds, int followerCount, int followingCount
+ String uid, String displayName, String username, String bio, String profilePicUrl, List<String> favoriteGenres, List<String> topFavoriteBookIds, int followerCount, int followingCount, int currentStreak, int longestStreak, String? lastReadingDate, List<String> unlockedBadgeIds
 });
 
 
@@ -65,7 +66,7 @@ class _$UserModelCopyWithImpl<$Res>
 
 /// Create a copy of UserModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? uid = null,Object? displayName = null,Object? username = null,Object? bio = null,Object? profilePicUrl = null,Object? favoriteGenres = null,Object? topFavoriteBookIds = null,Object? followerCount = null,Object? followingCount = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? uid = null,Object? displayName = null,Object? username = null,Object? bio = null,Object? profilePicUrl = null,Object? favoriteGenres = null,Object? topFavoriteBookIds = null,Object? followerCount = null,Object? followingCount = null,Object? currentStreak = null,Object? longestStreak = null,Object? lastReadingDate = freezed,Object? unlockedBadgeIds = null,}) {
   return _then(_self.copyWith(
 uid: null == uid ? _self.uid : uid // ignore: cast_nullable_to_non_nullable
 as String,displayName: null == displayName ? _self.displayName : displayName // ignore: cast_nullable_to_non_nullable
@@ -76,7 +77,11 @@ as String,favoriteGenres: null == favoriteGenres ? _self.favoriteGenres : favori
 as List<String>,topFavoriteBookIds: null == topFavoriteBookIds ? _self.topFavoriteBookIds : topFavoriteBookIds // ignore: cast_nullable_to_non_nullable
 as List<String>,followerCount: null == followerCount ? _self.followerCount : followerCount // ignore: cast_nullable_to_non_nullable
 as int,followingCount: null == followingCount ? _self.followingCount : followingCount // ignore: cast_nullable_to_non_nullable
-as int,
+as int,currentStreak: null == currentStreak ? _self.currentStreak : currentStreak // ignore: cast_nullable_to_non_nullable
+as int,longestStreak: null == longestStreak ? _self.longestStreak : longestStreak // ignore: cast_nullable_to_non_nullable
+as int,lastReadingDate: freezed == lastReadingDate ? _self.lastReadingDate : lastReadingDate // ignore: cast_nullable_to_non_nullable
+as String?,unlockedBadgeIds: null == unlockedBadgeIds ? _self.unlockedBadgeIds : unlockedBadgeIds // ignore: cast_nullable_to_non_nullable
+as List<String>,
   ));
 }
 
@@ -161,10 +166,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String uid,  String displayName,  String username,  String bio,  String profilePicUrl,  List<String> favoriteGenres,  List<String> topFavoriteBookIds,  int followerCount,  int followingCount)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String uid,  String displayName,  String username,  String bio,  String profilePicUrl,  List<String> favoriteGenres,  List<String> topFavoriteBookIds,  int followerCount,  int followingCount,  int currentStreak,  int longestStreak,  String? lastReadingDate,  List<String> unlockedBadgeIds)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserModel() when $default != null:
-return $default(_that.uid,_that.displayName,_that.username,_that.bio,_that.profilePicUrl,_that.favoriteGenres,_that.topFavoriteBookIds,_that.followerCount,_that.followingCount);case _:
+return $default(_that.uid,_that.displayName,_that.username,_that.bio,_that.profilePicUrl,_that.favoriteGenres,_that.topFavoriteBookIds,_that.followerCount,_that.followingCount,_that.currentStreak,_that.longestStreak,_that.lastReadingDate,_that.unlockedBadgeIds);case _:
   return orElse();
 
 }
@@ -182,10 +187,10 @@ return $default(_that.uid,_that.displayName,_that.username,_that.bio,_that.profi
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String uid,  String displayName,  String username,  String bio,  String profilePicUrl,  List<String> favoriteGenres,  List<String> topFavoriteBookIds,  int followerCount,  int followingCount)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String uid,  String displayName,  String username,  String bio,  String profilePicUrl,  List<String> favoriteGenres,  List<String> topFavoriteBookIds,  int followerCount,  int followingCount,  int currentStreak,  int longestStreak,  String? lastReadingDate,  List<String> unlockedBadgeIds)  $default,) {final _that = this;
 switch (_that) {
 case _UserModel():
-return $default(_that.uid,_that.displayName,_that.username,_that.bio,_that.profilePicUrl,_that.favoriteGenres,_that.topFavoriteBookIds,_that.followerCount,_that.followingCount);case _:
+return $default(_that.uid,_that.displayName,_that.username,_that.bio,_that.profilePicUrl,_that.favoriteGenres,_that.topFavoriteBookIds,_that.followerCount,_that.followingCount,_that.currentStreak,_that.longestStreak,_that.lastReadingDate,_that.unlockedBadgeIds);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -202,10 +207,10 @@ return $default(_that.uid,_that.displayName,_that.username,_that.bio,_that.profi
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String uid,  String displayName,  String username,  String bio,  String profilePicUrl,  List<String> favoriteGenres,  List<String> topFavoriteBookIds,  int followerCount,  int followingCount)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String uid,  String displayName,  String username,  String bio,  String profilePicUrl,  List<String> favoriteGenres,  List<String> topFavoriteBookIds,  int followerCount,  int followingCount,  int currentStreak,  int longestStreak,  String? lastReadingDate,  List<String> unlockedBadgeIds)?  $default,) {final _that = this;
 switch (_that) {
 case _UserModel() when $default != null:
-return $default(_that.uid,_that.displayName,_that.username,_that.bio,_that.profilePicUrl,_that.favoriteGenres,_that.topFavoriteBookIds,_that.followerCount,_that.followingCount);case _:
+return $default(_that.uid,_that.displayName,_that.username,_that.bio,_that.profilePicUrl,_that.favoriteGenres,_that.topFavoriteBookIds,_that.followerCount,_that.followingCount,_that.currentStreak,_that.longestStreak,_that.lastReadingDate,_that.unlockedBadgeIds);case _:
   return null;
 
 }
@@ -217,7 +222,7 @@ return $default(_that.uid,_that.displayName,_that.username,_that.bio,_that.profi
 @JsonSerializable()
 
 class _UserModel implements UserModel {
-  const _UserModel({required this.uid, required this.displayName, this.username = '', required this.bio, required this.profilePicUrl, required final  List<String> favoriteGenres, final  List<String> topFavoriteBookIds = const [], this.followerCount = 0, this.followingCount = 0}): _favoriteGenres = favoriteGenres,_topFavoriteBookIds = topFavoriteBookIds;
+  const _UserModel({required this.uid, required this.displayName, this.username = '', required this.bio, required this.profilePicUrl, required final  List<String> favoriteGenres, final  List<String> topFavoriteBookIds = const [], this.followerCount = 0, this.followingCount = 0, this.currentStreak = 0, this.longestStreak = 0, this.lastReadingDate, final  List<String> unlockedBadgeIds = const []}): _favoriteGenres = favoriteGenres,_topFavoriteBookIds = topFavoriteBookIds,_unlockedBadgeIds = unlockedBadgeIds;
   factory _UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
 
 @override final  String uid;
@@ -241,6 +246,18 @@ class _UserModel implements UserModel {
 
 @override@JsonKey() final  int followerCount;
 @override@JsonKey() final  int followingCount;
+@override@JsonKey() final  int currentStreak;
+@override@JsonKey() final  int longestStreak;
+@override final  String? lastReadingDate;
+// ISO string for consistency
+ final  List<String> _unlockedBadgeIds;
+// ISO string for consistency
+@override@JsonKey() List<String> get unlockedBadgeIds {
+  if (_unlockedBadgeIds is EqualUnmodifiableListView) return _unlockedBadgeIds;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_unlockedBadgeIds);
+}
+
 
 /// Create a copy of UserModel
 /// with the given fields replaced by the non-null parameter values.
@@ -255,16 +272,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.username, username) || other.username == username)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.profilePicUrl, profilePicUrl) || other.profilePicUrl == profilePicUrl)&&const DeepCollectionEquality().equals(other._favoriteGenres, _favoriteGenres)&&const DeepCollectionEquality().equals(other._topFavoriteBookIds, _topFavoriteBookIds)&&(identical(other.followerCount, followerCount) || other.followerCount == followerCount)&&(identical(other.followingCount, followingCount) || other.followingCount == followingCount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.username, username) || other.username == username)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.profilePicUrl, profilePicUrl) || other.profilePicUrl == profilePicUrl)&&const DeepCollectionEquality().equals(other._favoriteGenres, _favoriteGenres)&&const DeepCollectionEquality().equals(other._topFavoriteBookIds, _topFavoriteBookIds)&&(identical(other.followerCount, followerCount) || other.followerCount == followerCount)&&(identical(other.followingCount, followingCount) || other.followingCount == followingCount)&&(identical(other.currentStreak, currentStreak) || other.currentStreak == currentStreak)&&(identical(other.longestStreak, longestStreak) || other.longestStreak == longestStreak)&&(identical(other.lastReadingDate, lastReadingDate) || other.lastReadingDate == lastReadingDate)&&const DeepCollectionEquality().equals(other._unlockedBadgeIds, _unlockedBadgeIds));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,uid,displayName,username,bio,profilePicUrl,const DeepCollectionEquality().hash(_favoriteGenres),const DeepCollectionEquality().hash(_topFavoriteBookIds),followerCount,followingCount);
+int get hashCode => Object.hash(runtimeType,uid,displayName,username,bio,profilePicUrl,const DeepCollectionEquality().hash(_favoriteGenres),const DeepCollectionEquality().hash(_topFavoriteBookIds),followerCount,followingCount,currentStreak,longestStreak,lastReadingDate,const DeepCollectionEquality().hash(_unlockedBadgeIds));
 
 @override
 String toString() {
-  return 'UserModel(uid: $uid, displayName: $displayName, username: $username, bio: $bio, profilePicUrl: $profilePicUrl, favoriteGenres: $favoriteGenres, topFavoriteBookIds: $topFavoriteBookIds, followerCount: $followerCount, followingCount: $followingCount)';
+  return 'UserModel(uid: $uid, displayName: $displayName, username: $username, bio: $bio, profilePicUrl: $profilePicUrl, favoriteGenres: $favoriteGenres, topFavoriteBookIds: $topFavoriteBookIds, followerCount: $followerCount, followingCount: $followingCount, currentStreak: $currentStreak, longestStreak: $longestStreak, lastReadingDate: $lastReadingDate, unlockedBadgeIds: $unlockedBadgeIds)';
 }
 
 
@@ -275,7 +292,7 @@ abstract mixin class _$UserModelCopyWith<$Res> implements $UserModelCopyWith<$Re
   factory _$UserModelCopyWith(_UserModel value, $Res Function(_UserModel) _then) = __$UserModelCopyWithImpl;
 @override @useResult
 $Res call({
- String uid, String displayName, String username, String bio, String profilePicUrl, List<String> favoriteGenres, List<String> topFavoriteBookIds, int followerCount, int followingCount
+ String uid, String displayName, String username, String bio, String profilePicUrl, List<String> favoriteGenres, List<String> topFavoriteBookIds, int followerCount, int followingCount, int currentStreak, int longestStreak, String? lastReadingDate, List<String> unlockedBadgeIds
 });
 
 
@@ -292,7 +309,7 @@ class __$UserModelCopyWithImpl<$Res>
 
 /// Create a copy of UserModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? uid = null,Object? displayName = null,Object? username = null,Object? bio = null,Object? profilePicUrl = null,Object? favoriteGenres = null,Object? topFavoriteBookIds = null,Object? followerCount = null,Object? followingCount = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? uid = null,Object? displayName = null,Object? username = null,Object? bio = null,Object? profilePicUrl = null,Object? favoriteGenres = null,Object? topFavoriteBookIds = null,Object? followerCount = null,Object? followingCount = null,Object? currentStreak = null,Object? longestStreak = null,Object? lastReadingDate = freezed,Object? unlockedBadgeIds = null,}) {
   return _then(_UserModel(
 uid: null == uid ? _self.uid : uid // ignore: cast_nullable_to_non_nullable
 as String,displayName: null == displayName ? _self.displayName : displayName // ignore: cast_nullable_to_non_nullable
@@ -303,7 +320,11 @@ as String,favoriteGenres: null == favoriteGenres ? _self._favoriteGenres : favor
 as List<String>,topFavoriteBookIds: null == topFavoriteBookIds ? _self._topFavoriteBookIds : topFavoriteBookIds // ignore: cast_nullable_to_non_nullable
 as List<String>,followerCount: null == followerCount ? _self.followerCount : followerCount // ignore: cast_nullable_to_non_nullable
 as int,followingCount: null == followingCount ? _self.followingCount : followingCount // ignore: cast_nullable_to_non_nullable
-as int,
+as int,currentStreak: null == currentStreak ? _self.currentStreak : currentStreak // ignore: cast_nullable_to_non_nullable
+as int,longestStreak: null == longestStreak ? _self.longestStreak : longestStreak // ignore: cast_nullable_to_non_nullable
+as int,lastReadingDate: freezed == lastReadingDate ? _self.lastReadingDate : lastReadingDate // ignore: cast_nullable_to_non_nullable
+as String?,unlockedBadgeIds: null == unlockedBadgeIds ? _self._unlockedBadgeIds : unlockedBadgeIds // ignore: cast_nullable_to_non_nullable
+as List<String>,
   ));
 }
 

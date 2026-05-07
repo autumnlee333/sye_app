@@ -89,5 +89,49 @@ class UserService {
 
     return displayNameSnapshot.docs.map((doc) => UserModel.fromJson(doc.data())).toList();
   }
+
+  /// Deletes all Firestore data associated with a user.
+  Future<void> deleteUserData(String uid) async {
+    final batch = _firestore.batch();
+
+    // 1. Delete user document
+    batch.delete(_usersCollection.doc(uid));
+
+    // 2. Delete user's activities (top-level)
+    final activities = await _firestore.collection('activities')
+        .where('userId', isEqualTo: uid)
+        .get();
+    for (var doc in activities.docs) {
+      batch.delete(doc.reference);
+    }
+
+    // 3. Delete user's reviews (top-level)
+    final reviews = await _firestore.collection('reviews')
+        .where('userId', isEqualTo: uid)
+        .get();
+    for (var doc in reviews.docs) {
+      batch.delete(doc.reference);
+    }
+
+    // 4. Delete user's custom lists (where they are the owner)
+    final lists = await _firestore.collection('customLists')
+        .where('ownerId', isEqualTo: uid)
+        .get();
+    for (var doc in lists.docs) {
+      batch.delete(doc.reference);
+    }
+
+    // 5. Remove user from collaboratorIds in other lists
+    final collabLists = await _firestore.collection('customLists')
+        .where('collaboratorIds', arrayContains: uid)
+        .get();
+    for (var doc in collabLists.docs) {
+      batch.update(doc.reference, {
+        'collaboratorIds': FieldValue.arrayRemove([uid]),
+      });
+    }
+
+    await batch.commit();
   }
+}
 

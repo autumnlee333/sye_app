@@ -66,7 +66,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           children: [
             const SizedBox(height: 32),
             const Text(
-              'Welcome to SYE',
+              'Book Club',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 32),

@@ -31,6 +31,14 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       return;
     }
 
+    final validationError = _validatePassword(_passwordController.text);
+    if (validationError != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(validationError)),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
     try {
       await ref.read(authServiceProvider).signUp(
@@ -54,6 +62,16 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     }
   }
 
+  String? _validatePassword(String password) {
+    if (password.length < 8) return 'Password must be at least 8 characters.';
+    if (!password.contains(RegExp(r'[A-Z]'))) return 'Password must contain at least one capital letter.';
+    if (!password.contains(RegExp(r'[0-9]'))) return 'Password must contain at least one number.';
+    if (!password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
+      return 'Password must contain at least one special character.';
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,7 +83,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
           children: [
             const SizedBox(height: 32),
             const Text(
-              'Join SYE',
+              'Book Club',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 32),

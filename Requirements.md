@@ -157,21 +157,21 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
    - **Concept:** Foster collaborative discovery by allowing users to curate lists together.
    - **Goal:** Implement "Collaborative Lists" where multiple users can contribute books to a single shared collection.
 
- [ ] 5.2 **Reading Goals & Gamification**
+ [x] 5.2 **Reading Goals & Gamification**
    - **Concept:** Motivate users through yearly challenges, reading streaks, and unlockable badges that attach to their profile.
    - **Goal:** Implement a yearly challenge progress bar and logic for "Streak" and "Goal reached" badges.
 
 **Feature 6: Privacy and Settings**
 
- [ ] 6.1 **Private Shelves**
+ [x] 6.1 **Private Shelves**
    - **Concept:** Respect user privacy by giving them control over which parts of their library are public or "eyes-only."
    - **Goal:** Option to make specific bookshelves or lists private from other users.
 
- [ ] 6.2 **Account Settings**
+ [x] 6.2 **Account Settings**
    - **Concept:** Provide essential tools for users to manage their identity and account security.
    - **Goal:** Implement change password, delete account, and change username features.
 
- [ ] 6.3 **Theme Toggle**
+ [x] 6.3 **Theme Toggle**
    - **Concept:** Enhance accessibility and visual comfort by offering a choice between light and dark aesthetics.
    - **Goal:** Use `shared_preferences` to persist light/dark mode selection.
 
@@ -182,8 +182,3 @@ Gemini: When reading this file to implement a step, you MUST adhere to the follo
    - **Concept:** Establish a modern, "Instagram-like" hierarchy with a high-performance UI.
    - **Goal:** Implement a `BottomNavigationBar` with five main tabs: Home (Social Feed), Explore (Discovery & Search), Community (User Search), My Library, and Profile.
 
-**Feature 9: Real-Time Communication**
-
- [ ] 9.1 **User-to-User Chat**
-   - **Concept:** Foster community discussion through a direct messaging feature where readers can discuss books.
-   - **Goal:** Implement a real-time chat service using Firestore for private 1-on-1 messaging.

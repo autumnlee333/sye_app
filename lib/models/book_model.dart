@@ -15,6 +15,7 @@ abstract class BookModel with _$BookModel {
     String? thumbnailUrl,
     int? pageCount,
     double? averageRating,
+    @Default(0) int ratingsCount,
     @Default([]) List<String> categories,
   }) = _BookModel;
 

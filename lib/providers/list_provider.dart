@@ -17,6 +17,16 @@ final accessibleListsProvider = StreamProvider<List<CustomListModel>>((ref) {
   return ref.watch(listServiceProvider).watchUserAccessibleLists(userId);
 });
 
+/// Streams all public custom lists globally.
+final globalPublicListsProvider = StreamProvider<List<CustomListModel>>((ref) {
+  return ref.watch(listServiceProvider).watchPublicLists();
+});
+
+/// Streams all public custom lists for a specific user.
+final userPublicListsProvider = StreamProvider.family<List<CustomListModel>, String>((ref, userId) {
+  return ref.watch(listServiceProvider).watchUserPublicLists(userId);
+});
+
 /// Notifier to manage custom list actions.
 class ListNotifier extends AsyncNotifier<void> {
   @override

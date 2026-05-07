@@ -3,6 +3,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/navigation_provider.dart';
 import '../providers/library_provider.dart';
+import '../providers/gamification_provider.dart';
 import '../models/library_book_model.dart';
 import '../widgets/review_dialog.dart';
 import 'profile_screen.dart';
@@ -17,6 +18,9 @@ class MainNavigation extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentIndex = ref.watch(navigationIndexProvider);
+
+    // Initialize gamification (streak checks, etc.)
+    ref.watch(gamificationProvider);
 
     // Global listener for finished books to show the review prompt
     ref.listen<LibraryBookModel?>(finishedBookProvider, (previous, next) {

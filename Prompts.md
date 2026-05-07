@@ -509,3 +509,63 @@ This document tracks the iterative development process of the SYE (Share Your Ex
 - **Robustness:** Fixed missing bulk book addition/removal methods in the service and provider layers.
 - **Security Rules:** Provided updated Firestore rules for the new top-level collection to ensure proper access control for owners and collaborators.
 
+### 5.2 Reading Goals & Gamification
+**User:** Implement feature 5.2.
+**Gemini:**
+- **Streak System:**
+    - Updated `UserModel` to track `currentStreak`, `longestStreak`, and `lastReadingDate`.
+    - Created `gamificationProvider` with logic to increment streaks for daily reading activities (adding books, progress updates, reviews).
+    - Implemented auto-reset logic that checks for expired streaks whenever the user opens the app.
+- **Badge System:**
+    - Defined a `BadgeModel` and a library of unlockable achievements: "Goal Getter", "Week Warrior", "Reading Machine", and "Literary Critic".
+    - Automated achievement tracking: The app now reactively monitors goals and reviews to unlock badges instantly.
+- **Interactive Badges:**
+    - Added a tap interaction to badges on the profile. Users can now click any badge to see a dialog explaining exactly what achievement it represents and how it was earned.
+- **Profile Enhancements:**
+    - Integrated a "fire" streak counter into the profile header.
+    - Added a scrollable "Badges" showcase section that highlights the user's earned rewards with custom icons.
+
+### 6.3 Theme Toggle
+**User:** Implement feature 6.3.
+**Gemini:**
+- **Dynamic Themes:** Defined a custom `darkTheme` in `theme.dart` with olive and tan accents optimized for dark mode.
+- **State Management:** Created `themeModeProvider` using `StateNotifier` to manage and toggle between light and dark modes.
+- **Persistence:** Integrated theme selection with `StorageService` via `SharedPreferences`, ensuring the app remembers the user's preference across sessions.
+- **UI Integration:** Added a "Dark Mode" switch in the Profile settings section for easy access.
+- **Reactive Updates:** Refactored `main.dart` to use `ConsumerWidget`, enabling instant, app-wide theme transitions when toggled.
+
+### 6.1 Private Shelves & Community Discovery
+**User:** In visiting a users profile, you can't see their lists or shelves so theirs no reason to make them private, they already are. However can we add a explore lists section in explore in case users do want to make lists public.
+**Gemini:**
+- **Privacy Enforcement:** Validated the `isPrivate` flag in `CustomListModel`. Updated `ListService` queries to strictly enforce this flag: private lists are excluded from global discovery and visiting profiles.
+- **Explore Lists:** Created a new "Community Curated Lists" section in the Explore tab, allowing users to discover public collections from the community.
+- **Profile Visibility:** Enhanced user profiles to display a "Public Lists" section, making it easy to share curated content while keeping private shelves hidden.
+- **Composite Indexes:** Provided instructions for creating the necessary Firestore indexes to support high-performance "public-only" queries.
+- **User Control:** Integrated a "Private List" toggle in the list creation dialog, giving users full control over their data's visibility.
+
+### 6.2 Account Settings
+**User:** Implement feature 6.2.
+**Gemini:**
+- **Security Services:** Expanded `AuthService` with methods for re-authentication, password updates, and account deletion.
+- **Data Cleanup:** Implemented a robust `deleteUserData` method in `UserService` that uses Firestore batches to erase a user's profile, activities, reviews, and owned lists when they delete their account.
+- **Account Settings UI:** Built a dedicated `AccountSettingsScreen` featuring:
+    - **Password Management:** A secure flow for email/password users to update their credentials (including re-authentication checks).
+    - **Google Auth Awareness:** Adaptive UI that detects Google users and correctly notes that their security is managed by Google.
+    - **Danger Zone:** A permanent account deletion workflow with confirmation dialogs to prevent accidental data loss.
+- **Profile Integration:** Added a "settings" shortcut on the Profile screen for easy access.
+- **Security Standard:** Implemented robust password validation across Signup and Account Settings (min 8 characters, 1 uppercase, 1 number, 1 special character).
+
+### Search Engine Optimization & Design Overhaul
+**User:** Optimize the search feature for popular titles and authors. Improve the UI design.
+**Gemini:**
+- **"Series-First" Search Engine:**
+    - Completely overhauled the `BookService` ranking algorithm to solve the "IT" and "Harry Potter" discovery issues.
+    - **Exponential Popularity:** Implemented squared popularity scores, ensuring global blockbusters with millions of ratings overwhelmingly outrank niche titles.
+    - **Match Quality Safeguards:** Added heavy weighting for **Exact Title Matches** and **Prefix Matches** (e.g., "Harry Potter and...").
+    - **Logic Tuning:** Prioritized relevance (Match Quality 70%) while using popularity (30%) as the definitive series-lifter.
+- **"Literary Modern" UI Overhaul:**
+    - **Typography:** Integrated `google_fonts` to use **Playfair Display** (classic Serif) for headers and **Inter** (clean Sans-Serif) for body text.
+    - **Palette:** Shifted to a sophisticated **Deep Forest Green** and **Antique Parchment** theme for a cozy, premium library feel.
+    - **Component Polish:** Redesigned buttons with softer radii (12px), implemented subtle filled inputs, and added soft-border card styling across the app.
+- **Branding:** Renamed the app entry experience to **"Book Club"** for a warmer, community-centric first impression.
+

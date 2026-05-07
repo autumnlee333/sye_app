@@ -67,6 +67,34 @@ class ListService {
     });
   }
 
+  /// Streams all public custom lists globally.
+  Stream<List<CustomListModel>> watchPublicLists() {
+    return _listsCollection
+        .where('isPrivate', isEqualTo: false)
+        .orderBy('createdAt', descending: true)
+        .limit(20)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs
+          .map((doc) => CustomListModel.fromJson(doc.data()))
+          .toList();
+    });
+  }
+
+  /// Streams all public custom lists for a specific user.
+  Stream<List<CustomListModel>> watchUserPublicLists(String userId) {
+    return _listsCollection
+        .where('ownerId', isEqualTo: userId)
+        .where('isPrivate', isEqualTo: false)
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs
+          .map((doc) => CustomListModel.fromJson(doc.data()))
+          .toList();
+    });
+  }
+
   /// Streams all custom lists that a user either owns or is a collaborator on.
   Stream<List<CustomListModel>> watchUserAccessibleLists(String userId) {
     // We need two queries because Firestore doesn't support 'OR' across different fields easily 

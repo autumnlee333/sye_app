@@ -52,10 +52,7 @@ final singleBookProvider = FutureProvider.family<BookModel?, String>((ref, id) a
 
 /// Provider for recommended books based on user's favorite genres.
 final recommendationsProvider = FutureProvider<List<BookModel>>((ref) async {
-  // Explicitly watch the provider to ensure we rebuild when data changes
-  ref.watch(currentUserDataProvider);
-
-  // Use the value if available, otherwise wait
+  // Use the future property of the provider to await data correctly
   final userProfile = await ref.watch(currentUserDataProvider.future);
   if (userProfile == null || userProfile.favoriteGenres.isEmpty) return [];
 
@@ -65,20 +62,14 @@ final recommendationsProvider = FutureProvider<List<BookModel>>((ref) async {
 
 /// Provider for "Smart" recommendations based on the user's actual favorite books.
 final smartRecommendationsProvider = FutureProvider<List<BookModel>>((ref) async {
-  // Explicitly watch the provider to ensure we rebuild when data changes
-  ref.watch(currentUserDataProvider);
-
-  // Use the future to ensure we wait for data without hanging
+  // Use the future property of the provider to await data correctly
   final userProfile = await ref.watch(currentUserDataProvider.future);
   if (userProfile == null || userProfile.topFavoriteBookIds.isEmpty) return [];
 
   final bookService = ref.read(bookServiceProvider);
 
-  // Optimization: Only fetch details for up to 3 favorites to speed up similarity search
-  final favoriteIds = List<String>.from(userProfile.topFavoriteBookIds)..shuffle();
-  final subsetIds = favoriteIds.take(3).toList();
-
-  final favoriteBooks = await ref.watch(bookDetailsProvider(subsetIds).future);
+  // Fetch details for ALL favorite books to give the similarity engine more to work with
+  final favoriteBooks = await ref.watch(bookDetailsProvider(userProfile.topFavoriteBookIds).future);
 
   // Then get similar books based on those favorites
   return await bookService.getSimilarBooks(favoriteBooks);

@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import '../services/storage_service.dart';
 import '../services/firebase_storage_service.dart';
 
@@ -26,4 +28,27 @@ class OnboardingNotifier extends Notifier<bool> {
   /// Sets the onboarding status and updates the state.
   @override
   set state(bool value) => super.state = value;
+}
+
+/// Provider for the [ThemeMode].
+final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>((ref) {
+  final storage = ref.watch(storageServiceProvider);
+  return ThemeModeNotifier(storage);
+});
+
+class ThemeModeNotifier extends StateNotifier<ThemeMode> {
+  final StorageService _storage;
+
+  ThemeModeNotifier(this._storage) 
+      : super(_storage.isDarkMode() ? ThemeMode.dark : ThemeMode.light);
+
+  void toggleTheme() {
+    if (state == ThemeMode.dark) {
+      state = ThemeMode.light;
+      _storage.setDarkMode(false);
+    } else {
+      state = ThemeMode.dark;
+      _storage.setDarkMode(true);
+    }
+  }
 }

@@ -3,6 +3,7 @@ import '../models/review_model.dart';
 import '../services/review_service.dart';
 import 'auth_provider.dart';
 import 'user_provider.dart';
+import 'gamification_provider.dart';
 
 /// Provider for the [ReviewService].
 final reviewServiceProvider = Provider<ReviewService>((ref) {
@@ -12,6 +13,11 @@ final reviewServiceProvider = Provider<ReviewService>((ref) {
 /// Streams reviews for a specific book.
 final bookReviewsProvider = StreamProvider.family<List<ReviewModel>, String>((ref, bookId) {
   return ref.watch(reviewServiceProvider).watchReviewsForBook(bookId);
+});
+
+/// Streams all reviews posted by a specific user.
+final userReviewsProvider = StreamProvider.family<List<ReviewModel>, String>((ref, userId) {
+  return ref.watch(reviewServiceProvider).watchReviewsByUser(userId);
 });
 
 /// Streams the current user's review for a specific book, if it exists.
@@ -68,6 +74,7 @@ class ReviewNotifier extends AsyncNotifier<void> {
         timestamp: DateTime.now(),
       );
       await reviewService.saveReviewWithActivity(review);
+      await ref.read(gamificationProvider.notifier).updateStreak();
     });
   }
 

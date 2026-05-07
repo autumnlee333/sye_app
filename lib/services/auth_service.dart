@@ -78,6 +78,29 @@ class AuthService {
     }
   }
 
+  // Reauthenticate user (required for sensitive actions)
+  Future<void> reauthenticate(String email, String password) async {
+    final user = _auth.currentUser;
+    if (user == null) throw Exception('No user signed in.');
+
+    final credential = EmailAuthProvider.credential(email: email, password: password);
+    await user.reauthenticateWithCredential(credential);
+  }
+
+  // Change password
+  Future<void> updatePassword(String newPassword) async {
+    final user = _auth.currentUser;
+    if (user == null) throw Exception('No user signed in.');
+    await user.updatePassword(newPassword);
+  }
+
+  // Delete account from Firebase Auth
+  Future<void> deleteAuthAccount() async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+    await user.delete();
+  }
+
   // Current user
   User? get currentUser => _auth.currentUser;
 }

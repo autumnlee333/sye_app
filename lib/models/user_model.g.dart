@@ -22,6 +22,14 @@ _UserModel _$UserModelFromJson(Map<String, dynamic> json) => _UserModel(
       const [],
   followerCount: (json['followerCount'] as num?)?.toInt() ?? 0,
   followingCount: (json['followingCount'] as num?)?.toInt() ?? 0,
+  currentStreak: (json['currentStreak'] as num?)?.toInt() ?? 0,
+  longestStreak: (json['longestStreak'] as num?)?.toInt() ?? 0,
+  lastReadingDate: json['lastReadingDate'] as String?,
+  unlockedBadgeIds:
+      (json['unlockedBadgeIds'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
 );
 
 Map<String, dynamic> _$UserModelToJson(_UserModel instance) =>
@@ -35,4 +43,8 @@ Map<String, dynamic> _$UserModelToJson(_UserModel instance) =>
       'topFavoriteBookIds': instance.topFavoriteBookIds,
       'followerCount': instance.followerCount,
       'followingCount': instance.followingCount,
+      'currentStreak': instance.currentStreak,
+      'longestStreak': instance.longestStreak,
+      'lastReadingDate': instance.lastReadingDate,
+      'unlockedBadgeIds': instance.unlockedBadgeIds,
     };

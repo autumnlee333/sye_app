@@ -16,6 +16,7 @@ _BookModel _$BookModelFromJson(Map<String, dynamic> json) => _BookModel(
   thumbnailUrl: json['thumbnailUrl'] as String?,
   pageCount: (json['pageCount'] as num?)?.toInt(),
   averageRating: (json['averageRating'] as num?)?.toDouble(),
+  ratingsCount: (json['ratingsCount'] as num?)?.toInt() ?? 0,
   categories:
       (json['categories'] as List<dynamic>?)
           ?.map((e) => e as String)
@@ -32,5 +33,6 @@ Map<String, dynamic> _$BookModelToJson(_BookModel instance) =>
       'thumbnailUrl': instance.thumbnailUrl,
       'pageCount': instance.pageCount,
       'averageRating': instance.averageRating,
+      'ratingsCount': instance.ratingsCount,
       'categories': instance.categories,
     };

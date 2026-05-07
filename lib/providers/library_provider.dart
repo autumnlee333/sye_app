@@ -7,6 +7,7 @@ import '../services/library_service.dart';
 import 'auth_provider.dart';
 import 'activity_provider.dart';
 import 'list_provider.dart';
+import 'gamification_provider.dart';
 
 /// Provider for the [LibraryService].
 final libraryServiceProvider = Provider<LibraryService>((ref) {
@@ -89,6 +90,11 @@ class LibraryNotifier extends AsyncNotifier<void> {
       if (status == ReadingStatus.finished) {
         finishedBookNotifier.state = libraryBook;
       }
+
+      // Update streak for reading activity
+      if (status == ReadingStatus.reading || status == ReadingStatus.finished) {
+        await ref.read(gamificationProvider.notifier).updateStreak();
+      }
     });
   }
 
@@ -105,6 +111,7 @@ class LibraryNotifier extends AsyncNotifier<void> {
       
       if (status == ReadingStatus.finished) {
         finishedBookNotifier.state = book;
+        await ref.read(gamificationProvider.notifier).updateStreak();
       }
     });
   }
@@ -178,6 +185,8 @@ class LibraryNotifier extends AsyncNotifier<void> {
           timestamp: DateTime.now(),
         ));
       }
+      
+      await ref.read(gamificationProvider.notifier).updateStreak();
     });
   }
 

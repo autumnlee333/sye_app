@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$BookModel {
 
- String get id; String get title; List<String> get authors; String? get description; String? get thumbnailUrl; int? get pageCount; double? get averageRating; List<String> get categories;
+ String get id; String get title; List<String> get authors; String? get description; String? get thumbnailUrl; int? get pageCount; double? get averageRating; int get ratingsCount; List<String> get categories;
 /// Create a copy of BookModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $BookModelCopyWith<BookModel> get copyWith => _$BookModelCopyWithImpl<BookModel>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is BookModel&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other.authors, authors)&&(identical(other.description, description) || other.description == description)&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.pageCount, pageCount) || other.pageCount == pageCount)&&(identical(other.averageRating, averageRating) || other.averageRating == averageRating)&&const DeepCollectionEquality().equals(other.categories, categories));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is BookModel&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other.authors, authors)&&(identical(other.description, description) || other.description == description)&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.pageCount, pageCount) || other.pageCount == pageCount)&&(identical(other.averageRating, averageRating) || other.averageRating == averageRating)&&(identical(other.ratingsCount, ratingsCount) || other.ratingsCount == ratingsCount)&&const DeepCollectionEquality().equals(other.categories, categories));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title,const DeepCollectionEquality().hash(authors),description,thumbnailUrl,pageCount,averageRating,const DeepCollectionEquality().hash(categories));
+int get hashCode => Object.hash(runtimeType,id,title,const DeepCollectionEquality().hash(authors),description,thumbnailUrl,pageCount,averageRating,ratingsCount,const DeepCollectionEquality().hash(categories));
 
 @override
 String toString() {
-  return 'BookModel(id: $id, title: $title, authors: $authors, description: $description, thumbnailUrl: $thumbnailUrl, pageCount: $pageCount, averageRating: $averageRating, categories: $categories)';
+  return 'BookModel(id: $id, title: $title, authors: $authors, description: $description, thumbnailUrl: $thumbnailUrl, pageCount: $pageCount, averageRating: $averageRating, ratingsCount: $ratingsCount, categories: $categories)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $BookModelCopyWith<$Res>  {
   factory $BookModelCopyWith(BookModel value, $Res Function(BookModel) _then) = _$BookModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String title, List<String> authors, String? description, String? thumbnailUrl, int? pageCount, double? averageRating, List<String> categories
+ String id, String title, List<String> authors, String? description, String? thumbnailUrl, int? pageCount, double? averageRating, int ratingsCount, List<String> categories
 });
 
 
@@ -65,7 +65,7 @@ class _$BookModelCopyWithImpl<$Res>
 
 /// Create a copy of BookModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? authors = null,Object? description = freezed,Object? thumbnailUrl = freezed,Object? pageCount = freezed,Object? averageRating = freezed,Object? categories = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? authors = null,Object? description = freezed,Object? thumbnailUrl = freezed,Object? pageCount = freezed,Object? averageRating = freezed,Object? ratingsCount = null,Object? categories = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
@@ -74,7 +74,8 @@ as List<String>,description: freezed == description ? _self.description : descri
 as String?,thumbnailUrl: freezed == thumbnailUrl ? _self.thumbnailUrl : thumbnailUrl // ignore: cast_nullable_to_non_nullable
 as String?,pageCount: freezed == pageCount ? _self.pageCount : pageCount // ignore: cast_nullable_to_non_nullable
 as int?,averageRating: freezed == averageRating ? _self.averageRating : averageRating // ignore: cast_nullable_to_non_nullable
-as double?,categories: null == categories ? _self.categories : categories // ignore: cast_nullable_to_non_nullable
+as double?,ratingsCount: null == ratingsCount ? _self.ratingsCount : ratingsCount // ignore: cast_nullable_to_non_nullable
+as int,categories: null == categories ? _self.categories : categories // ignore: cast_nullable_to_non_nullable
 as List<String>,
   ));
 }
@@ -160,10 +161,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String title,  List<String> authors,  String? description,  String? thumbnailUrl,  int? pageCount,  double? averageRating,  List<String> categories)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String title,  List<String> authors,  String? description,  String? thumbnailUrl,  int? pageCount,  double? averageRating,  int ratingsCount,  List<String> categories)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _BookModel() when $default != null:
-return $default(_that.id,_that.title,_that.authors,_that.description,_that.thumbnailUrl,_that.pageCount,_that.averageRating,_that.categories);case _:
+return $default(_that.id,_that.title,_that.authors,_that.description,_that.thumbnailUrl,_that.pageCount,_that.averageRating,_that.ratingsCount,_that.categories);case _:
   return orElse();
 
 }
@@ -181,10 +182,10 @@ return $default(_that.id,_that.title,_that.authors,_that.description,_that.thumb
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String title,  List<String> authors,  String? description,  String? thumbnailUrl,  int? pageCount,  double? averageRating,  List<String> categories)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String title,  List<String> authors,  String? description,  String? thumbnailUrl,  int? pageCount,  double? averageRating,  int ratingsCount,  List<String> categories)  $default,) {final _that = this;
 switch (_that) {
 case _BookModel():
-return $default(_that.id,_that.title,_that.authors,_that.description,_that.thumbnailUrl,_that.pageCount,_that.averageRating,_that.categories);case _:
+return $default(_that.id,_that.title,_that.authors,_that.description,_that.thumbnailUrl,_that.pageCount,_that.averageRating,_that.ratingsCount,_that.categories);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -201,10 +202,10 @@ return $default(_that.id,_that.title,_that.authors,_that.description,_that.thumb
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String title,  List<String> authors,  String? description,  String? thumbnailUrl,  int? pageCount,  double? averageRating,  List<String> categories)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String title,  List<String> authors,  String? description,  String? thumbnailUrl,  int? pageCount,  double? averageRating,  int ratingsCount,  List<String> categories)?  $default,) {final _that = this;
 switch (_that) {
 case _BookModel() when $default != null:
-return $default(_that.id,_that.title,_that.authors,_that.description,_that.thumbnailUrl,_that.pageCount,_that.averageRating,_that.categories);case _:
+return $default(_that.id,_that.title,_that.authors,_that.description,_that.thumbnailUrl,_that.pageCount,_that.averageRating,_that.ratingsCount,_that.categories);case _:
   return null;
 
 }
@@ -216,7 +217,7 @@ return $default(_that.id,_that.title,_that.authors,_that.description,_that.thumb
 @JsonSerializable()
 
 class _BookModel implements BookModel {
-  const _BookModel({required this.id, required this.title, final  List<String> authors = const [], this.description, this.thumbnailUrl, this.pageCount, this.averageRating, final  List<String> categories = const []}): _authors = authors,_categories = categories;
+  const _BookModel({required this.id, required this.title, final  List<String> authors = const [], this.description, this.thumbnailUrl, this.pageCount, this.averageRating, this.ratingsCount = 0, final  List<String> categories = const []}): _authors = authors,_categories = categories;
   factory _BookModel.fromJson(Map<String, dynamic> json) => _$BookModelFromJson(json);
 
 @override final  String id;
@@ -232,6 +233,7 @@ class _BookModel implements BookModel {
 @override final  String? thumbnailUrl;
 @override final  int? pageCount;
 @override final  double? averageRating;
+@override@JsonKey() final  int ratingsCount;
  final  List<String> _categories;
 @override@JsonKey() List<String> get categories {
   if (_categories is EqualUnmodifiableListView) return _categories;
@@ -253,16 +255,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BookModel&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other._authors, _authors)&&(identical(other.description, description) || other.description == description)&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.pageCount, pageCount) || other.pageCount == pageCount)&&(identical(other.averageRating, averageRating) || other.averageRating == averageRating)&&const DeepCollectionEquality().equals(other._categories, _categories));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BookModel&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other._authors, _authors)&&(identical(other.description, description) || other.description == description)&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.pageCount, pageCount) || other.pageCount == pageCount)&&(identical(other.averageRating, averageRating) || other.averageRating == averageRating)&&(identical(other.ratingsCount, ratingsCount) || other.ratingsCount == ratingsCount)&&const DeepCollectionEquality().equals(other._categories, _categories));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title,const DeepCollectionEquality().hash(_authors),description,thumbnailUrl,pageCount,averageRating,const DeepCollectionEquality().hash(_categories));
+int get hashCode => Object.hash(runtimeType,id,title,const DeepCollectionEquality().hash(_authors),description,thumbnailUrl,pageCount,averageRating,ratingsCount,const DeepCollectionEquality().hash(_categories));
 
 @override
 String toString() {
-  return 'BookModel(id: $id, title: $title, authors: $authors, description: $description, thumbnailUrl: $thumbnailUrl, pageCount: $pageCount, averageRating: $averageRating, categories: $categories)';
+  return 'BookModel(id: $id, title: $title, authors: $authors, description: $description, thumbnailUrl: $thumbnailUrl, pageCount: $pageCount, averageRating: $averageRating, ratingsCount: $ratingsCount, categories: $categories)';
 }
 
 
@@ -273,7 +275,7 @@ abstract mixin class _$BookModelCopyWith<$Res> implements $BookModelCopyWith<$Re
   factory _$BookModelCopyWith(_BookModel value, $Res Function(_BookModel) _then) = __$BookModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String title, List<String> authors, String? description, String? thumbnailUrl, int? pageCount, double? averageRating, List<String> categories
+ String id, String title, List<String> authors, String? description, String? thumbnailUrl, int? pageCount, double? averageRating, int ratingsCount, List<String> categories
 });
 
 
@@ -290,7 +292,7 @@ class __$BookModelCopyWithImpl<$Res>
 
 /// Create a copy of BookModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? authors = null,Object? description = freezed,Object? thumbnailUrl = freezed,Object? pageCount = freezed,Object? averageRating = freezed,Object? categories = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? authors = null,Object? description = freezed,Object? thumbnailUrl = freezed,Object? pageCount = freezed,Object? averageRating = freezed,Object? ratingsCount = null,Object? categories = null,}) {
   return _then(_BookModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
@@ -299,7 +301,8 @@ as List<String>,description: freezed == description ? _self.description : descri
 as String?,thumbnailUrl: freezed == thumbnailUrl ? _self.thumbnailUrl : thumbnailUrl // ignore: cast_nullable_to_non_nullable
 as String?,pageCount: freezed == pageCount ? _self.pageCount : pageCount // ignore: cast_nullable_to_non_nullable
 as int?,averageRating: freezed == averageRating ? _self.averageRating : averageRating // ignore: cast_nullable_to_non_nullable
-as double?,categories: null == categories ? _self._categories : categories // ignore: cast_nullable_to_non_nullable
+as double?,ratingsCount: null == ratingsCount ? _self.ratingsCount : ratingsCount // ignore: cast_nullable_to_non_nullable
+as int,categories: null == categories ? _self._categories : categories // ignore: cast_nullable_to_non_nullable
 as List<String>,
   ));
 }

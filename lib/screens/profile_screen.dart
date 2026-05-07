@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:sye_app/providers/list_provider.dart';
+import 'package:sye_app/providers/storage_provider.dart';
+import 'package:sye_app/screens/list_details_screen.dart';
 import '../providers/auth_provider.dart';
 import '../providers/user_provider.dart';
 import '../providers/book_provider.dart';
@@ -9,11 +12,13 @@ import '../providers/follow_provider.dart';
 import '../providers/goal_provider.dart';
 import '../models/goal_model.dart';
 import '../models/library_book_model.dart';
+import '../models/badge_model.dart';
 import '../widgets/book_card.dart';
 import '../widgets/activity_card.dart';
 import '../widgets/stats_dashboard.dart';
 import 'select_favorites_screen.dart';
 import 'edit_profile_screen.dart';
+import 'account_settings_screen.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   final String? userId;
@@ -132,11 +137,41 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     _StatColumn(label: 'Followers', count: user.followerCount),
-                    const SizedBox(width: 32),
+                    const SizedBox(width: 24),
                     _StatColumn(label: 'Following', count: user.followingCount),
+                    const SizedBox(width: 24),
+                    _StatColumn(
+                      label: 'Streak', 
+                      count: user.currentStreak, 
+                      icon: Icons.local_fire_department,
+                      color: Colors.orange,
+                    ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
+                if (user.unlockedBadgeIds.isNotEmpty) ...[
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Badges',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 100,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: user.unlockedBadgeIds.length,
+                      itemBuilder: (context, index) {
+                        final badgeId = user.unlockedBadgeIds[index];
+                        final badge = allBadges.firstWhere((b) => b.id == badgeId);
+                        return _BadgeIcon(badge: badge);
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
                 if (!isCurrentUser)
                   Consumer(
                     builder: (context, ref, child) {
@@ -266,7 +301,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       ),
                 const SizedBox(height: 24),
                 const Divider(),
-                const SizedBox(height: 8),
+                const SizedBox(height: 16),
+                _PublicListsSection(userId: targetUserId),
+                const Divider(),
+                const SizedBox(height: 16),
                 InkWell(
                   onTap: () => setState(() => _isActivitiesExpanded = !_isActivitiesExpanded),
                   child: Padding(
@@ -316,6 +354,28 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ],
                 if (isCurrentUser) ...[
                   const SizedBox(height: 32),
+                  const Divider(),
+                  ListTile(
+                    leading: const Icon(Icons.settings),
+                    title: const Text('Account Settings'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const AccountSettingsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.brightness_6),
+                    title: const Text('Dark Mode'),
+                    trailing: Switch(
+                      value: ref.watch(themeModeProvider) == ThemeMode.dark,
+                      onChanged: (value) => ref.read(themeModeProvider.notifier).toggleTheme(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   ElevatedButton.icon(
                     onPressed: () => ref.read(authServiceProvider).signOut(),
                     icon: const Icon(Icons.logout),
@@ -341,16 +401,32 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 class _StatColumn extends StatelessWidget {
   final String label;
   final int count;
+  final IconData? icon;
+  final Color? color;
 
-  const _StatColumn({required this.label, required this.count});
+  const _StatColumn({
+    required this.label, 
+    required this.count,
+    this.icon,
+    this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(
-          count.toString(),
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(icon, size: 20, color: color),
+              const SizedBox(width: 4),
+            ],
+            Text(
+              count.toString(),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
         Text(
           label,
@@ -567,6 +643,156 @@ class _GoalCard extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _BadgeIcon extends StatelessWidget {
+  final BadgeModel badge;
+
+  const _BadgeIcon({required this.badge});
+
+  @override
+  Widget build(BuildContext context) {
+    IconData iconData = Icons.help_outline;
+    switch (badge.iconAsset) {
+      case 'emoji_events': iconData = Icons.emoji_events; break;
+      case 'local_fire_department': iconData = Icons.local_fire_department; break;
+      case 'psychology': iconData = Icons.psychology; break;
+      case 'rate_review': iconData = Icons.rate_review; break;
+    }
+
+    return InkWell(
+      onTap: () => _showBadgeInfo(context, iconData),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: 80,
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Column(
+          children: [
+            CircleAvatar(
+              radius: 30,
+              backgroundColor: Colors.amber.withValues(alpha: 0.1),
+              child: Icon(iconData, color: Colors.amber[800], size: 30),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              badge.name,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showBadgeInfo(BuildContext context, IconData icon) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: Icon(icon, color: Colors.amber[800], size: 48),
+        title: Text(badge.name),
+        content: Text(
+          badge.description,
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cool!'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PublicListsSection extends ConsumerWidget {
+  final String userId;
+  const _PublicListsSection({required this.userId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final publicListsAsync = ref.watch(userPublicListsProvider(userId));
+
+    return publicListsAsync.when(
+      data: (lists) {
+        if (lists.isEmpty) return const SizedBox.shrink();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Public Lists',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 140,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: lists.length,
+                itemBuilder: (context, index) {
+                  final list = lists[index];
+                  return Container(
+                    width: 160,
+                    margin: const EdgeInsets.only(right: 12),
+                    child: Card(
+                      elevation: 0,
+                      color: Colors.blue.withValues(alpha: 0.05),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(color: Colors.blue.withValues(alpha: 0.2)),
+                      ),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => ListDetailsScreen(list: list),
+                            ),
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(12),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.auto_stories, color: Colors.blue),
+                              const SizedBox(height: 8),
+                              Text(
+                                list.name,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '${list.bookIds.length} books',
+                                style: TextStyle(fontSize: 12, color: Colors.blue[800]),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        );
+      },
+      loading: () => const SizedBox(
+        height: 100,
+        child: Center(child: CircularProgressIndicator()),
+      ),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 }

@@ -4,9 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../providers/book_provider.dart';
 import '../providers/library_provider.dart';
+import '../providers/list_provider.dart';
 import '../models/library_book_model.dart';
+import '../models/custom_list_model.dart';
 import '../widgets/book_card.dart';
 import 'book_details_screen.dart';
+import 'list_details_screen.dart';
 
 class ExploreTab extends ConsumerStatefulWidget {
   const ExploreTab({super.key});
@@ -130,6 +133,33 @@ class _ExploreTabState extends ConsumerState<ExploreTab> {
               ),
               error: (_, __) => const SliverToBoxAdapter(child: SizedBox.shrink()),
             ),
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(16, 24, 16, 8),
+                child: Text(
+                  'Community Curated Lists',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: 140,
+                child: ref.watch(globalPublicListsProvider).when(
+                  data: (lists) => lists.isEmpty
+                      ? const Center(child: Text('No public lists found.'))
+                      : ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          itemCount: lists.length,
+                          itemBuilder: (context, index) => _CompactListCard(list: lists[index]),
+                        ),
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (e, _) => Center(child: Text('Error: $e')),
+                ),
+              ),
+            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 32)),
           ] else
             searchResults.when(
               data: (books) => books.isEmpty
@@ -231,6 +261,59 @@ class _CompactBookCard extends StatelessWidget {
               style: const TextStyle(fontSize: 10, color: Colors.grey),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CompactListCard extends StatelessWidget {
+  final CustomListModel list;
+  const _CompactListCard({required this.list});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 160,
+      margin: const EdgeInsets.all(4),
+      child: Card(
+        elevation: 0,
+        color: Colors.blue.withValues(alpha: 0.05),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(color: Colors.blue.withValues(alpha: 0.2)),
+        ),
+        child: InkWell(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => ListDetailsScreen(list: list),
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.auto_stories, color: Colors.blue),
+                const SizedBox(height: 8),
+                Text(
+                  list.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${list.bookIds.length} books',
+                  style: TextStyle(fontSize: 12, color: Colors.blue[800]),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
