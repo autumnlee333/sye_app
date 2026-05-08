@@ -1,7 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/user_model.dart';
-import '../models/goal_model.dart';
-import '../models/badge_model.dart';
 import 'user_provider.dart';
 import 'goal_provider.dart';
 import 'review_provider.dart';

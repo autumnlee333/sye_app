@@ -5,7 +5,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../models/user_model.dart';
 import '../providers/user_provider.dart';
-import '../providers/storage_provider.dart';
 import '../constants/genres.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {

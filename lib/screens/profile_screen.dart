@@ -11,7 +11,6 @@ import '../providers/activity_provider.dart';
 import '../providers/follow_provider.dart';
 import '../providers/goal_provider.dart';
 import '../models/goal_model.dart';
-import '../models/library_book_model.dart';
 import '../models/badge_model.dart';
 import '../widgets/book_card.dart';
 import '../widgets/activity_card.dart';
